@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://src/items/weapon_data.gd" id="1_weapondata"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/icons/fists.png" id="2_fistspng"]
+[ext_resource type="PackedScene" path="res://src/weapons/fists/fists.tscn" id="3_fiststscn"]
+
+[resource]
+script = ExtResource("1_weapondata")
+family = 0
+weapon_scene = ExtResource("3_fiststscn")
+base_damage = 6.0
+crit_multiplier = 1.75
+combo_window = 0.5
+hold_mode = 1
+hold_threshold = 0.18
+alt_cooldown = 0.6
+id = &"fists"
+display_name = "Puños"
+description = "Pim pam. Mantén para una ráfaga de golpes."
+icon = ExtResource("2_fistspng")

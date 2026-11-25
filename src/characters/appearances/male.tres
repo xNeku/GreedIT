@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CharacterAppearance" format=3]
+
+[ext_resource type="Script" path="res://src/characters/character_appearance.gd" id="1_charactera"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/head.png" id="2_headpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/eyes.png" id="3_eyespng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/torso.png" id="4_torsopng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/leg_l.png" id="5_leglpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/leg_r.png" id="6_legrpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/hand_l.png" id="7_handlpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/hand_r.png" id="8_handrpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/hair.png" id="9_hairpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/cloth_bottom.png" id="10_clothbotto"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/boot_l.png" id="11_bootlpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/boot_r.png" id="12_bootrpng"]
+
+[resource]
+script = ExtResource("1_charactera")
+head = ExtResource("2_headpng")
+eyes = ExtResource("3_eyespng")
+torso = ExtResource("4_torsopng")
+leg_l = ExtResource("5_leglpng")
+leg_r = ExtResource("6_legrpng")
+hand_l = ExtResource("7_handlpng")
+hand_r = ExtResource("8_handrpng")
+hair = ExtResource("9_hairpng")
+cloth_bottom = ExtResource("10_clothbotto")
+boot_l = ExtResource("11_bootlpng")
+boot_r = ExtResource("12_bootrpng")

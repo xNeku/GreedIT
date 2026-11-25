@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://src/items/weapon_data.gd" id="1_weapondata"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/icons/sword.png" id="2_swordpng"]
+[ext_resource type="PackedScene" path="res://src/weapons/sword/sword.tscn" id="3_swordtscn"]
+
+[resource]
+script = ExtResource("1_weapondata")
+weapon_scene = ExtResource("3_swordtscn")
+base_damage = 12.0
+hold_threshold = 0.25
+max_charge_time = 0.8
+id = &"sword"
+display_name = "Espada de hierro"
+description = "Combo de 3. Mantén para cargar un giro. Clic der: estocada con embestida."
+icon = ExtResource("2_swordpng")

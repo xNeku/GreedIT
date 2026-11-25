@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://src/items/weapon_data.gd" id="1_weapondata"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/icons/bow.png" id="2_bowpng"]
+[ext_resource type="PackedScene" path="res://src/weapons/bow/bow.tscn" id="3_bowtscn"]
+[ext_resource type="PackedScene" path="res://src/weapons/bow/arrow.tscn" id="4_arrowtscn"]
+
+[resource]
+script = ExtResource("1_weapondata")
+family = 4
+weapon_scene = ExtResource("3_bowtscn")
+crit_chance = 0.15
+air_attack_plunges = false
+combo_length = 1
+combo_window = 0.3
+hold_threshold = 0.15
+max_charge_multiplier = 3.0
+alt_cooldown = 0.9
+projectile_scene = ExtResource("4_arrowtscn")
+projectile_speed = 520.0
+id = &"bow"
+display_name = "Arco corto"
+description = "Pulsa: disparo rápido. Mantén: tiro cargado que perfora. Clic der: triple. En el aire: lluvia de flechas."
+icon = ExtResource("2_bowpng")

@@ -1,0 +1,103 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://src/player/player.tscn" id="1_playertscn"]
+[ext_resource type="PackedScene" path="res://src/enemies/training_dummy/training_dummy.tscn" id="2_trainingdu"]
+[ext_resource type="PackedScene" path="res://src/world/props/pillar.tscn" id="3_pillartscn"]
+[ext_resource type="PackedScene" path="res://src/world/props/brazier.tscn" id="4_braziertsc"]
+[ext_resource type="PackedScene" path="res://src/ui/hud.tscn" id="5_hudtscn"]
+[ext_resource type="Texture2D" path="res://assets/sprites/world/floor_stone.png" id="6_floorstone"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_Top"]
+size = Vector2(1960, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_Bottom"]
+size = Vector2(1960, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_Left"]
+size = Vector2(40, 1360)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_Right"]
+size = Vector2(40, 1360)
+
+[node name="Sandbox" type="Node2D"]
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color(0.3, 0.3, 0.4, 1)
+
+[node name="Floor" type="Sprite2D" parent="."]
+z_index = -10
+texture_repeat = 2
+texture = ExtResource("6_floorstone")
+region_enabled = true
+region_rect = Rect2(0, 0, 1920, 1280)
+
+[node name="World" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Player" parent="World" instance=ExtResource("1_playertscn")]
+position = Vector2(0, 90)
+
+[node name="TrainingDummy1" parent="World" instance=ExtResource("2_trainingdu")]
+position = Vector2(0, -20)
+
+[node name="TrainingDummy2" parent="World" instance=ExtResource("2_trainingdu")]
+position = Vector2(-210, 50)
+
+[node name="TrainingDummy3" parent="World" instance=ExtResource("2_trainingdu")]
+position = Vector2(210, 50)
+
+[node name="Pillar1" parent="World" instance=ExtResource("3_pillartscn")]
+position = Vector2(-330, -170)
+
+[node name="Pillar2" parent="World" instance=ExtResource("3_pillartscn")]
+position = Vector2(330, -170)
+
+[node name="Pillar3" parent="World" instance=ExtResource("3_pillartscn")]
+position = Vector2(-330, 250)
+
+[node name="Pillar4" parent="World" instance=ExtResource("3_pillartscn")]
+position = Vector2(330, 250)
+
+[node name="Pillar5" parent="World" instance=ExtResource("3_pillartscn")]
+position = Vector2(-120, -260)
+
+[node name="Pillar6" parent="World" instance=ExtResource("3_pillartscn")]
+position = Vector2(120, -260)
+
+[node name="Brazier1" parent="World" instance=ExtResource("4_braziertsc")]
+position = Vector2(-170, -150)
+
+[node name="Brazier2" parent="World" instance=ExtResource("4_braziertsc")]
+position = Vector2(170, -150)
+
+[node name="Brazier3" parent="World" instance=ExtResource("4_braziertsc")]
+position = Vector2(-240, 250)
+
+[node name="Brazier4" parent="World" instance=ExtResource("4_braziertsc")]
+position = Vector2(240, 250)
+
+[node name="Bounds" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Top" type="CollisionShape2D" parent="Bounds"]
+position = Vector2(0, -660)
+shape = SubResource("RectangleShape2D_Top")
+
+[node name="Bottom" type="CollisionShape2D" parent="Bounds"]
+position = Vector2(0, 660)
+shape = SubResource("RectangleShape2D_Bottom")
+
+[node name="Left" type="CollisionShape2D" parent="Bounds"]
+position = Vector2(-980, 0)
+shape = SubResource("RectangleShape2D_Left")
+
+[node name="Right" type="CollisionShape2D" parent="Bounds"]
+position = Vector2(980, 0)
+shape = SubResource("RectangleShape2D_Right")
+
+[node name="WorldOverlay" type="CanvasLayer" parent="." groups=["world_overlay"]]
+follow_viewport_enabled = true
+
+[node name="HUD" parent="." node_paths=PackedStringArray("player") instance=ExtResource("5_hudtscn")]
+player = NodePath("../World/Player")

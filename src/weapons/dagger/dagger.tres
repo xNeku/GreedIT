@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://src/items/weapon_data.gd" id="1_weapondata"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/icons/dagger.png" id="2_daggerpng"]
+[ext_resource type="PackedScene" path="res://src/weapons/dagger/dagger.tscn" id="3_daggertscn"]
+[ext_resource type="PackedScene" path="res://src/weapons/dagger/thrown_dagger.tscn" id="4_throwndagg"]
+
+[resource]
+script = ExtResource("1_weapondata")
+family = 2
+weapon_scene = ExtResource("3_daggertscn")
+base_damage = 7.0
+crit_chance = 0.25
+crit_multiplier = 2.2
+combo_length = 2
+combo_window = 0.45
+hold_mode = 1
+hold_threshold = 0.15
+repeat_speed_scale = 1.8
+alt_cooldown = 0.45
+projectile_scene = ExtResource("4_throwndagg")
+projectile_speed = 380.0
+id = &"dagger"
+display_name = "Daga"
+description = "Tacatacata: mantén para apuñalar sin parar. Clic der: lanzar daga."
+icon = ExtResource("2_daggerpng")

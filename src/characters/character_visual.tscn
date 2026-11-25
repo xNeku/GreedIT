@@ -1,0 +1,293 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/characters/character_visual.gd" id="1_characterv"]
+[ext_resource type="Resource" path="res://src/characters/appearances/male.tres" id="2_maletres"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/leg_l.png" id="3_leglpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/boot_l.png" id="4_bootlpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/leg_r.png" id="5_legrpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/boot_r.png" id="6_bootrpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/torso.png" id="7_torsopng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/cloth_bottom.png" id="8_clothbotto"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/head.png" id="9_headpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/eyes.png" id="10_eyespng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/hair.png" id="11_hairpng"]
+
+[sub_resource type="Animation" id="Animation_air"]
+resource_name = "air"
+length = 0.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Flip/Body/LegL:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [Vector2(0, -3)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Flip/Body/LegR:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [Vector2(0, -2)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Flip/Body/Upper:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [Vector2(0, -1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Flip/Body:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_idle"]
+resource_name = "idle"
+length = 1.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Flip/Body/LegL:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Flip/Body/LegR:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [Vector2(0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Flip/Body/Upper:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [Vector2(0, 0), Vector2(0, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Flip/Body:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_land"]
+resource_name = "land"
+length = 0.22
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Flip/Body/LegL:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Flip/Body/LegR:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [Vector2(0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Flip/Body/Upper:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.12),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [Vector2(0, 1), Vector2(0, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Flip/Body:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.08, 0.22),
+"transitions": PackedFloat32Array(1, 0.5, 1),
+"update": 0,
+"values": [Vector2(1.2, 0.8), Vector2(0.94, 1.06), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_walk"]
+resource_name = "walk"
+length = 0.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Flip/Body/LegL:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [Vector2(0, 0), Vector2(0, -2), Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Flip/Body/LegR:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [Vector2(0, 0), Vector2(0, 0), Vector2(0, -2)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Flip/Body/Upper:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [Vector2(0, 0), Vector2(0, 1), Vector2(0, 0), Vector2(0, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Flip/Body:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_lib"]
+_data = {
+&"air": SubResource("Animation_air"),
+&"idle": SubResource("Animation_idle"),
+&"land": SubResource("Animation_land"),
+&"walk": SubResource("Animation_walk")
+}
+
+[node name="CharacterVisual" type="Node2D"]
+script = ExtResource("1_characterv")
+appearance = ExtResource("2_maletres")
+
+[node name="Flip" type="Node2D" parent="."]
+
+[node name="Body" type="Node2D" parent="Flip"]
+
+[node name="LegL" type="Node2D" parent="Flip/Body"]
+
+[node name="Skin" type="Sprite2D" parent="Flip/Body/LegL"]
+texture = ExtResource("3_leglpng")
+offset = Vector2(0, -35)
+
+[node name="Boot" type="Sprite2D" parent="Flip/Body/LegL"]
+texture = ExtResource("4_bootlpng")
+offset = Vector2(0, -35)
+
+[node name="LegR" type="Node2D" parent="Flip/Body"]
+
+[node name="Skin" type="Sprite2D" parent="Flip/Body/LegR"]
+texture = ExtResource("5_legrpng")
+offset = Vector2(0, -35)
+
+[node name="Boot" type="Sprite2D" parent="Flip/Body/LegR"]
+texture = ExtResource("6_bootrpng")
+offset = Vector2(0, -35)
+
+[node name="Upper" type="Node2D" parent="Flip/Body"]
+
+[node name="Torso" type="Sprite2D" parent="Flip/Body/Upper"]
+texture = ExtResource("7_torsopng")
+offset = Vector2(0, -35)
+
+[node name="ClothTop" type="Sprite2D" parent="Flip/Body/Upper"]
+offset = Vector2(0, -35)
+
+[node name="ClothBottom" type="Sprite2D" parent="Flip/Body/Upper"]
+texture = ExtResource("8_clothbotto")
+offset = Vector2(0, -35)
+
+[node name="Head" type="Node2D" parent="Flip/Body/Upper"]
+
+[node name="Skin" type="Sprite2D" parent="Flip/Body/Upper/Head"]
+texture = ExtResource("9_headpng")
+offset = Vector2(0, -35)
+
+[node name="Eyes" type="Sprite2D" parent="Flip/Body/Upper/Head"]
+texture = ExtResource("10_eyespng")
+offset = Vector2(0, -35)
+
+[node name="Hair" type="Sprite2D" parent="Flip/Body/Upper/Head"]
+texture = ExtResource("11_hairpng")
+offset = Vector2(0, -35)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_lib")
+}
+autoplay = "idle"

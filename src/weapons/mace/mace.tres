@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://src/items/weapon_data.gd" id="1_weapondata"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/icons/mace.png" id="2_macepng"]
+[ext_resource type="PackedScene" path="res://src/weapons/mace/mace.tscn" id="3_macetscn"]
+
+[resource]
+script = ExtResource("1_weapondata")
+family = 3
+weapon_scene = ExtResource("3_macetscn")
+base_damage = 20.0
+crit_chance = 0.05
+combo_length = 2
+combo_window = 0.7
+hold_threshold = 0.3
+max_charge_time = 1.1
+max_charge_multiplier = 3.0
+alt_cooldown = 1.0
+id = &"mace"
+display_name = "Maza tosca"
+description = "Lenta y brutal. Mantén para un terremoto. Clic der: empujón."
+icon = ExtResource("2_macepng")
