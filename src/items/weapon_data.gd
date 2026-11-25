@@ -3,7 +3,7 @@ extends ItemData
 ## Datos de un arma. La escena (`weapon_scene`) define CÓMO se mueve y golpea;
 ## este recurso define CUÁNTO: daño, críticos, tiempos de carga, etc.
 
-enum Family { FISTS, SWORD, DAGGER, MACE, BOW, AXE, SPEAR, STAFF }
+enum Family { FISTS, SWORD, DAGGER, MACE, BOW, AXE, SPEAR, STAFF, BO }
 ## Qué pasa al MANTENER clic izquierdo.
 enum HoldMode {
 	CHARGE, ## Carga un ataque fuerte que sale al soltar (animación "charge" -> "heavy").
@@ -40,6 +40,8 @@ enum HoldMode {
 
 @export_group("Clic derecho")
 @export var alt_cooldown: float = 0.8
+## Si se puede MANTENER clic derecho: pulsar = "alt" (al soltar); mantener = "alt_charge" -> "alt_heavy".
+@export var alt_hold_enabled: bool = false
 
 @export_group("Proyectiles")
 @export var projectile_scene: PackedScene

@@ -15,15 +15,29 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [x] Sandbox con luces, sombras (columnas), braseros con fuego y hotbar 1-5
 - [x] Test de humo headless (`tests/smoke_test.tscn`)
 
+## Hito 0.2: Sensación y profesiones (hecho)
+
+- [x] Manos siempre derechas (antes rotaban con el arma) y reposo a los costados como en el dibujo
+- [x] El personaje mira hacia donde corre; al atacar se gira al ratón
+- [x] Andar más vivo: pisadas con polvo, inclinación, cabeza con retardo, giros más secos
+- [x] Salto hacia donde corres, con anticipación (se agacha), piernas encogidas en la cima y aterrizaje con squash
+- [x] Armas más curradas: estelas, partículas de carga, estocadas con destello, chispas al golpear, más desplazamiento
+- [x] Maza: mantener clic derecho = salto aplastante hacia el cursor
+- [x] Arco: clic derecho = salto atrás con triple disparo
+- [x] Nueva arma: vara bō (alcance largo, molinillo, remolino, salto con pértiga)
+- [x] Recolección infinita con tecla E: minería (pico), herboristería (hoz) y pesca (caña con minijuego)
+- [x] Inventario de materiales + panel en el HUD + texto "+1 ..." al recoger
+
 ## Hito 1: Sensación de combate (siguiente)
 
-- [ ] Ajustar a mano tiempos y poses de cada arma en el editor (prioridad: que se sienta bien)
+- [ ] Ajustar a mano tiempos y poses de cada arma en el editor según feedback de juego
 - [ ] Sonidos placeholder (golpe, swing, salto, aterrizaje)
 - [ ] Trails de arma (Line2D) y partículas de impacto por tipo de arma
 - [ ] Buffer de input más fino y ventana de cancelación configurable por animación
 - [ ] Saltar por encima de obstáculos bajos (capa "low_obstacles" que se ignora en el aire)
 - [ ] Hurtbox del jugador + vida + muerte (saco de materiales con temporizador)
 - [ ] Mando: apuntado con stick (ya existe `Player.aim_target_override`)
+- [ ] Vistas de espalda/perfil para que andar hacia arriba/abajo no se vea siempre de frente
 
 ## Hito 2: Primer enemigo de verdad
 
@@ -37,7 +51,8 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [ ] Generación por semilla con `FastNoiseLite` + `TileMapLayer` por chunks
 - [ ] Bioma bosque + cueva
 - [ ] Punto de spawn (cofre infinito, hamaca) y área de estaciones
-- [ ] Minería (picar bloques/vetas)
+- [ ] Vetas de distintos minerales por bioma (ahora solo cobre)
+- [ ] Profesiones con nivel (más rápido / mejor botín al subir)
 
 ## Hito 4: Coop
 

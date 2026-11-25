@@ -1,8 +1,14 @@
 @tool
 class_name CharacterVisual
 extends Node2D
-## Cuerpo del personaje por capas + sus animaciones (idle, walk, air, land).
+## Cuerpo del personaje por capas + sus animaciones.
 ## El AnimationPlayer de la escena es la fuente de verdad: edita ahí las animaciones.
+##   idle, walk (llama a footstep() en cada pisada)
+##   jump_windup (agacharse), rise / peak / fall (fases del salto), land, land_heavy
+
+signal footstep
+
+enum AirPhase { GROUND, RISING, PEAK, FALLING }
 
 @export var appearance: CharacterAppearance:
 	set(value):
@@ -11,11 +17,13 @@ extends Node2D
 			_apply_appearance()
 
 var _moving := false
-var _airborne := false
-var _landing := false
+var _air_phase := AirPhase.GROUND
+## Animación de una sola vez que tiene prioridad (agacharse, aterrizar).
+var _one_shot: StringName = &""
 
 @onready var flip: Node2D = $Flip
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
+@onready var foot_dust: CPUParticles2D = $FootDust
 @onready var _leg_l_skin: Sprite2D = $Flip/Body/LegL/Skin
 @onready var _leg_l_boot: Sprite2D = $Flip/Body/LegL/Boot
 @onready var _leg_r_skin: Sprite2D = $Flip/Body/LegR/Skin
@@ -47,31 +55,52 @@ func set_moving(moving: bool) -> void:
 		_refresh_animation()
 
 
-func set_airborne(airborne: bool) -> void:
-	if airborne != _airborne:
-		_airborne = airborne
+func set_air_phase(phase: AirPhase) -> void:
+	if phase != _air_phase:
+		_air_phase = phase
 		_refresh_animation()
 
 
-func play_land() -> void:
-	_landing = true
-	animation_player.play(&"land")
+func play_jump_windup() -> void:
+	_play_one_shot(&"jump_windup")
+
+
+func play_land(heavy: bool = false) -> void:
+	_play_one_shot(&"land_heavy" if heavy else &"land")
+
+
+## Llamado por la animación "walk" en cada pisada.
+func step() -> void:
+	foot_dust.restart()
+	footstep.emit()
+
+
+func _play_one_shot(anim: StringName) -> void:
+	_one_shot = anim
+	animation_player.stop()
+	animation_player.play(anim)
 
 
 func _on_animation_finished(anim_name: StringName) -> void:
-	if anim_name == &"land":
-		_landing = false
+	if anim_name == _one_shot:
+		_one_shot = &""
 		_refresh_animation()
 
 
 func _refresh_animation() -> void:
-	if _landing:
+	if _one_shot != &"":
 		return
 	var target := &"idle"
-	if _airborne:
-		target = &"air"
-	elif _moving:
-		target = &"walk"
+	match _air_phase:
+		AirPhase.RISING:
+			target = &"rise"
+		AirPhase.PEAK:
+			target = &"peak"
+		AirPhase.FALLING:
+			target = &"fall"
+		_:
+			if _moving:
+				target = &"walk"
 	if animation_player.current_animation != target:
 		animation_player.play(target)
 

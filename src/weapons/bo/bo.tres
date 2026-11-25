@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://src/items/weapon_data.gd" id="1_weapondata"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/icons/bo.png" id="2_bopng"]
+[ext_resource type="PackedScene" path="res://src/weapons/bo/bo.tscn" id="3_botscn"]
+
+[resource]
+script = ExtResource("1_weapondata")
+family = 8
+weapon_scene = ExtResource("3_botscn")
+base_damage = 11.0
+crit_chance = 0.12
+hold_threshold = 0.25
+max_charge_multiplier = 2.2
+alt_cooldown = 0.9
+id = &"bo"
+display_name = "Vara bō"
+description = "Alcance largo. Combo: estocada, barrido y giro. Mantén: molinillo y remolino. Clic der: salto con pértiga y patada."
+icon = ExtResource("2_bopng")

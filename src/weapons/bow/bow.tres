@@ -20,5 +20,5 @@ projectile_scene = ExtResource("4_arrowtscn")
 projectile_speed = 520.0
 id = &"bow"
 display_name = "Arco corto"
-description = "Pulsa: disparo rápido. Mantén: tiro cargado que perfora. Clic der: triple. En el aire: lluvia de flechas."
+description = "Pulsa: disparo rápido. Mantén: tiro cargado que perfora. Clic der: salto atrás con triple disparo. En el aire: lluvia de flechas."
 icon = ExtResource("2_bowpng")

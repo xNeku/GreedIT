@@ -7,6 +7,9 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/fx/shadow_blob.png" id="8_shadowblob"]
 [ext_resource type="Texture2D" path="res://assets/sprites/props/dummy_stand.png" id="9_dummystand"]
 [ext_resource type="Texture2D" path="res://assets/sprites/props/dummy_body.png" id="10_dummybodyp"]
+[ext_resource type="Material" path="res://assets/materials/unshaded_add.tres" id="13_unshadedad"]
+[ext_resource type="Texture2D" path="res://assets/sprites/fx/spark.png" id="14_sparkpng"]
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="15_unshadedtr"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_feet"]
 radius = 9.0
@@ -23,6 +26,10 @@ size = Vector2(32, 58)
 [sub_resource type="Gradient" id="Gradient_straw"]
 offsets = PackedFloat32Array(0, 0.7, 1)
 colors = PackedColorArray(0.95, 0.82, 0.48, 1, 0.8, 0.64, 0.32, 1, 0.8, 0.64, 0.32, 0)
+
+[sub_resource type="Gradient" id="Gradient_sparks"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 0.85, 0.4, 1, 1, 0.5, 0.2, 0)
 
 [node name="TrainingDummy" type="StaticBody2D"]
 collision_layer = 4
@@ -83,10 +90,31 @@ scale_amount_min = 1.0
 scale_amount_max = 2.0
 color_ramp = SubResource("Gradient_straw")
 
+[node name="Sparks" type="CPUParticles2D" parent="."]
+material = ExtResource("13_unshadedad")
+position = Vector2(0, -40)
+emitting = false
+amount = 10
+lifetime = 0.28
+one_shot = true
+explosiveness = 1.0
+texture = ExtResource("14_sparkpng")
+direction = Vector2(1, 0)
+spread = 40.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 90.0
+initial_velocity_max = 200.0
+damping_min = 300.0
+damping_max = 500.0
+scale_amount_min = 0.6
+scale_amount_max = 1.2
+color_ramp = SubResource("Gradient_sparks")
+
 [node name="NumberSpawn" type="Marker2D" parent="."]
 position = Vector2(0, -84)
 
 [node name="StatsLabel" type="Label" parent="."]
+material = ExtResource("15_unshadedtr")
 offset_left = -90.0
 offset_top = -118.0
 offset_right = 90.0

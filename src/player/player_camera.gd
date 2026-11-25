@@ -3,7 +3,7 @@ extends Camera2D
 ## Cámara del jugador: se adelanta un poco hacia el ratón y vibra con los golpes.
 
 ## Fracción de la distancia al ratón que la cámara se adelanta.
-@export var mouse_lead := 0.18
+@export var mouse_lead := 0.1
 @export var max_lead := 48.0
 @export var shake_decay := 18.0
 

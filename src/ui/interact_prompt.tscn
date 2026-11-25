@@ -1,0 +1,112 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/ui/interact_prompt.gd" id="1_interactpr"]
+[ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="2_unshadedtr"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/keycap.png" id="3_keycappng"]
+
+[sub_resource type="Animation" id="Animation_bob"]
+resource_name = "bob"
+length = 0.8
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Holder:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [Vector2(0, 0), Vector2(0, -1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Holder:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_urgent"]
+resource_name = "urgent"
+length = 0.24
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Holder:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.12),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [Vector2(0, -2), Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Holder:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.12),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1.2, 1.2), Vector2(1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_lib"]
+_data = {
+&"bob": SubResource("Animation_bob"),
+&"urgent": SubResource("Animation_urgent")
+}
+
+[node name="Prompt" type="Node2D"]
+z_index = 40
+material = ExtResource("2_unshadedtr")
+script = ExtResource("1_interactpr")
+
+[node name="Holder" type="Node2D" parent="."]
+use_parent_material = true
+
+[node name="Key" type="Sprite2D" parent="Holder"]
+use_parent_material = true
+position = Vector2(-8, 0)
+texture = ExtResource("3_keycappng")
+
+[node name="KeyLabel" type="Label" parent="Holder"]
+use_parent_material = true
+offset_left = -16.0
+offset_top = -9.0
+offset_right = 0.0
+offset_bottom = 6.0
+theme_override_colors/font_color = Color(0.12, 0.08, 0.1, 1)
+theme_override_font_sizes/font_size = 10
+text = "E"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Action" type="Label" parent="Holder"]
+use_parent_material = true
+offset_left = 2.0
+offset_top = -8.0
+offset_right = 92.0
+offset_bottom = 8.0
+theme_override_colors/font_color = Color(1, 0.95, 0.85, 1)
+theme_override_colors/font_outline_color = Color(0.09, 0.05, 0.07, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 10
+text = "Minar"
+vertical_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_lib")
+}

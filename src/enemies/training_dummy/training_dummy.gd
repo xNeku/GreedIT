@@ -33,6 +33,7 @@ var _last_crit := false
 @onready var body_sprite: Sprite2D = $Pivot/Body
 @onready var hurtbox: Hurtbox = $Hurtbox
 @onready var straw: CPUParticles2D = $Straw
+@onready var sparks: CPUParticles2D = $Sparks
 @onready var number_spawn: Marker2D = $NumberSpawn
 @onready var stats_label: Label = $StatsLabel
 
@@ -58,6 +59,10 @@ func _on_hit_received(hit: HitData) -> void:
 
 	straw.direction = hit.knockback.normalized() if hit.knockback != Vector2.ZERO else Vector2.UP
 	straw.restart()
+	var side := -signf(hit.knockback.x) if absf(hit.knockback.x) > 1.0 else 0.0
+	sparks.global_position = hurtbox.global_position + Vector2(side * 12.0, randf_range(-12.0, 6.0))
+	sparks.direction = hit.knockback.normalized() if hit.knockback != Vector2.ZERO else Vector2.UP
+	sparks.restart()
 	_spawn_number(hit)
 	_update_label()
 

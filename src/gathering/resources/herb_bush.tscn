@@ -1,0 +1,84 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/gathering/gatherable.gd" id="1_gatherable"]
+[ext_resource type="PackedScene" path="res://src/ui/floating_text.tscn" id="2_floatingte"]
+[ext_resource type="Shader" path="res://src/combat/flash.gdshader" id="3_flashgdsha"]
+[ext_resource type="PackedScene" path="res://src/gathering/tools/sickle.tscn" id="5_sickletscn"]
+[ext_resource type="Resource" path="res://src/items/materials/sage.tres" id="6_sagetres"]
+[ext_resource type="Texture2D" path="res://assets/sprites/fx/shadow_blob.png" id="8_shadowblob"]
+[ext_resource type="Texture2D" path="res://assets/sprites/gatherables/herb_bush.png" id="9_herbbushpn"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_col"]
+size = Vector2(24, 8)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_flash"]
+resource_local_to_scene = true
+shader = ExtResource("3_flashgdsha")
+shader_parameter/flash_color = Color(1, 1, 1, 1)
+shader_parameter/flash_amount = 0.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_interact"]
+radius = 26.0
+
+[sub_resource type="Gradient" id="Gradient_chips"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(0.5, 0.8, 0.4, 1, 0.8, 0.6, 0.9, 1, 0.3, 0.6, 0.3, 0)
+
+[node name="HerbBush" type="StaticBody2D"]
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_gatherable")
+floating_text_scene = ExtResource("2_floatingte")
+profession = 1
+action_text = "Recolectar"
+tool_scene = ExtResource("5_sickletscn")
+drop = ExtResource("6_sagetres")
+drop_min = 1
+drop_max = 2
+hits_to_gather = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -5)
+shape = SubResource("RectangleShape2D_col")
+
+[node name="Shadow" type="Sprite2D" parent="."]
+position = Vector2(0, -2)
+scale = Vector2(1.1, 1)
+texture = ExtResource("8_shadowblob")
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="Sprite" type="Sprite2D" parent="Visual"]
+material = SubResource("ShaderMaterial_flash")
+texture = ExtResource("9_herbbushpn")
+offset = Vector2(0, -12)
+
+[node name="InteractArea" type="Area2D" parent="."]
+position = Vector2(0, -8)
+collision_layer = 128
+collision_mask = 0
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
+shape = SubResource("CircleShape2D_interact")
+
+[node name="GatherPoint" type="Marker2D" parent="."]
+position = Vector2(0, -10)
+
+[node name="Chips" type="CPUParticles2D" parent="."]
+position = Vector2(0, -10)
+emitting = false
+amount = 10
+lifetime = 0.55
+one_shot = true
+explosiveness = 1.0
+emission_shape = 3
+emission_rect_extents = Vector2(8, 6)
+direction = Vector2(0, -1)
+spread = 70.0
+gravity = Vector2(0, 420)
+initial_velocity_min = 50.0
+initial_velocity_max = 120.0
+scale_amount_min = 1.0
+scale_amount_max = 2.0
+color_ramp = SubResource("Gradient_chips")

@@ -2,10 +2,12 @@
 
 [ext_resource type="Script" path="res://src/ui/hud.gd" id="1_hudgd"]
 [ext_resource type="PackedScene" path="res://src/ui/hotbar_slot.tscn" id="2_hotbarslot"]
+[ext_resource type="PackedScene" path="res://src/ui/inventory_row.tscn" id="3_inventoryr"]
 
 [node name="HUD" type="CanvasLayer"]
 layer = 10
 script = ExtResource("1_hudgd")
+inventory_row_scene = ExtResource("3_inventoryr")
 
 [node name="Hotbar" type="HBoxContainer" parent="."]
 offset_left = 8.0
@@ -28,6 +30,9 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="Slot5" parent="Hotbar" instance=ExtResource("2_hotbarslot")]
+layout_mode = 2
+
+[node name="Slot6" parent="Hotbar" instance=ExtResource("2_hotbarslot")]
 layout_mode = 2
 
 [node name="ItemName" type="Label" parent="."]
@@ -56,13 +61,38 @@ theme_override_font_sizes/font_size = 10
 text = "GreedIT · sandbox de combate 0.1"
 horizontal_alignment = 2
 
+[node name="Materials" type="VBoxContainer" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -170.0
+offset_top = 28.0
+offset_right = -10.0
+offset_bottom = 120.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="Header" type="Label" parent="Materials"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.5, 1)
+theme_override_colors/font_outline_color = Color(0.09, 0.05, 0.07, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 10
+text = "Materiales"
+horizontal_alignment = 2
+
+[node name="List" type="VBoxContainer" parent="Materials"]
+layout_mode = 2
+theme_override_constants/separation = 1
+
 [node name="Help" type="Label" parent="."]
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 10.0
 offset_top = -84.0
-offset_right = 470.0
+offset_right = 560.0
 offset_bottom = -8.0
 grow_vertical = 0
 modulate = Color(1, 1, 1, 0.85)
@@ -72,6 +102,6 @@ theme_override_font_sizes/font_size = 10
 text = "WASD mover · Ratón apuntar
 Clic izq: pulsa = combo · mantén = carga / ráfaga
 Clic der: ataque especial
-Espacio: salto hacia el cursor (ataca en el aire = caída en picado)
-Shift: dash · 1-5 / rueda: arma · C: cambiar personaje · F11: pantalla completa"
+Espacio: salto hacia donde corres (ataca en el aire = caída en picado)
+E: minar / recolectar / pescar · Shift: dash · 1-6 / rueda: arma · C: personaje · F11: pantalla completa"
 vertical_alignment = 2

@@ -28,12 +28,14 @@ src/
   autoload/             Events (bus de señales), GameFeel (hitstop, pantalla completa)
   combat/               HitData, Hitbox, Hurtbox, DamageNumber, shader de flash
   items/                ItemData, WeaponData (recursos de datos)
-  characters/           CharacterVisual (cuerpo por capas) + CharacterAppearance (.tres)
+  characters/           CharacterVisual (cuerpo por capas), CharacterAppearance (.tres), HandUtils
   player/               Player, PlayerCamera
-  weapons/              weapon.gd (base), projectile.gd, una carpeta por arma (.tscn + .tres)
+  weapons/              weapon.gd (base), projectile.gd, weapon_trail.gd, una carpeta por arma (.tscn + .tres)
+  gathering/            Gatherable (recurso infinito), GatherTool / FishingRod, tools/, resources/
+  items/materials/      materiales (.tres de ItemData)
   enemies/              enemigos (de momento TrainingDummy)
   world/                escenas de mundo/niveles y props
-  ui/                   HUD, hotbar
+  ui/                   HUD, hotbar, panel de materiales, cartel "E", textos flotantes
 tests/                  test de humo ejecutable en headless
 docs/                   GDD y backlog
 ```
@@ -59,17 +61,34 @@ Cada cosa vive en una carpeta por funcionalidad, con su escena, su script y sus 
 | 5 | enemy_hurtbox | Hurtbox de enemigos |
 | 6 | player_hurtbox | Hurtbox del jugador (futuro) |
 | 7 | enemy_attacks | ataques enemigos (futuro) |
+| 8 | interactables | InteractArea de recursos y objetos con los que se usa la E |
 
 Capa de render 2 (`no_shadow`): sprites altos (columnas, braseros) que reciben luz pero no se oscurecen con su propia sombra.
+
+Materiales compartidos en `assets/materials/`: `unshaded.tres` (ignora la oscuridad, para UI en el mundo) y
+`unshaded_add.tres` (aditivo y sin sombrear, para estelas, chispas y destellos).
 
 ## Cómo funciona el combate
 
 1. `Player` recibe el input y se lo pasa al arma equipada (`primary_pressed`, `secondary_pressed`...).
 2. `Weapon` (base) decide qué animación toca: pulsar = combo `light_N`; mantener = `charge`→`heavy` o ráfaga;
-   clic derecho = `alt`; en el aire = `air` (+ caída en picado) → `slam` al aterrizar.
-3. La animación enciende `Hitbox.active` en los frames de golpe y puede llamar a `lunge()`, `shake()` o `spawn_projectile()`.
+   clic derecho = `alt`; mantener clic derecho = `alt_charge`→`alt_heavy` (si `alt_hold_enabled`);
+   en el aire = `air` (+ caída en picado) → `slam` al aterrizar; tras `leap_attack()` → `leap_land`.
+3. La animación enciende `Hitbox.active` en los frames de golpe y puede llamar a `lunge()`, `shake()`,
+   `spawn_projectile()` o `leap_attack()` (salto de ataque: maza, pértiga del bō, salto atrás del arco).
 4. `Hitbox` detecta un `Hurtbox` → `Weapon.deal_hit()` crea un `HitData` (daño, crítico, empuje) → `Hurtbox.hit_received`.
 5. Cada golpe se emite también por `Events.hit_landed`. Ahí se engancharán talentos, afijos de forja y brebajes.
+
+### Poses y manos
+
+- Las poses se animan en el **espacio del arma**: +X = hacia donde apuntas. El `AimPivot` del jugador rota y se espeja solo.
+- En reposo (`idle`) el arma va **a un costado** y mira hacia donde mira el personaje (que mira hacia donde corre).
+  Al atacar, el personaje se gira hacia el ratón. Manos en reposo: `HandMain` (18, 2) y `HandOff` (-19, 2).
+- Las manos (`HandMain` / `HandOff`) **nunca rotan**: `HandUtils.keep_upright()` las endereza cada frame.
+  Anima solo su posición (y escala si quieres un puñetazo más gordo).
+- De momento todas las armas van a **una mano**; la otra flota libre (el arco la usa para tensar la cuerda).
+- Extras opcionales en la escena: `Trail` (estela, se enciende con `Trail:emitting`), `ChargeParticles`,
+  `SlashFX`, `ThrustFX`, `ImpactFX`. Todos se encienden desde las animaciones.
 
 ### Añadir un arma nueva
 
@@ -78,6 +97,15 @@ Capa de render 2 (`no_shadow`): sprites altos (columnas, braseros) que reciben l
 3. Edita las animaciones con los nombres estándar (ver cabecera de `weapon.gd`). Las que no existan simplemente no se usan.
 4. En el `.tres`: daño, críticos, modo de mantener (CHARGE o REPEAT), apunta `weapon_scene` a tu escena.
 5. Añade el `.tres` a la `hotbar` del jugador (inspector de `src/player/player.tscn`).
+
+### Recolección (minería, herboristería, pesca)
+
+- Un recurso es una escena con `gatherable.gd` (`src/gathering/resources/`): sprite, `InteractArea` (capa 8),
+  `GatherPoint`, partículas `Chips` y los datos (`drop`, `hits_to_gather`, `tool_scene`, `action_text`). Es **infinito**.
+- Al acercarte, el jugador muestra el cartel "E + acción". Al pulsar E saca la herramienta (`tool_scene`) y guarda el arma.
+- Herramientas (`src/gathering/tools/`): escena con `gather_tool.gd` y animación `use` en bucle que llama a `tool_hit()`.
+  La caña usa `fishing_rod.gd` (lanzar, esperar, ¡pica!, pulsar E a tiempo).
+- Moverse, atacar, saltar o cambiar de arma deja de recolectar. Lo recogido va a `Player.inventory` y al panel del HUD.
 
 ### Personaje por capas
 

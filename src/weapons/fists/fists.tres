@@ -16,5 +16,5 @@ hold_threshold = 0.18
 alt_cooldown = 0.6
 id = &"fists"
 display_name = "Puños"
-description = "Pim pam. Mantén para una ráfaga de golpes."
+description = "Pim pam. Mantén para una ráfaga de golpes. Clic der: gancho."
 icon = ExtResource("2_fistspng")

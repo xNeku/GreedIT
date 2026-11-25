@@ -3,20 +3,26 @@ extends Node2D
 ## Base de TODAS las armas.
 ##
 ## Una arma es una escena con:
-##   - Este script en la raíz (+ un WeaponData con los números).
+##   - Este script en la raíz (+ un WeaponData con los números, lo asigna el Player).
 ##   - Un AnimationPlayer llamado "AnimationPlayer" con animaciones de nombres estándar:
-##       idle            reposo (en bucle). También sirve de "reset" de poses.
+##       idle            reposo (en bucle): el arma a un costado, mirando hacia donde mira el personaje
+##       jump            pose mientras saltas sin atacar (opcional)
 ##       light_1..N      combo de clic izquierdo (N = data.combo_length)
-##       charge          bucle mientras cargas (solo HoldMode.CHARGE)
+##       charge          bucle mientras cargas clic izquierdo (HoldMode.CHARGE)
 ##       heavy           ataque al soltar la carga
 ##       alt             clic derecho
-##       air             ataque en el aire (te hace caer en picado)
+##       alt_charge      bucle manteniendo clic derecho (si data.alt_hold_enabled)
+##       alt_heavy       al soltar el clic derecho cargado
+##       air             ataque en el aire (te hace caer en picado si data.air_attack_plunges)
 ##       slam            impacto al aterrizar tras "air"
+##       leap_land       impacto al aterrizar tras un leap_attack()
 ##     Si una animación no existe, esa acción simplemente no hace nada.
 ##   - Nodos Hitbox (activados desde las animaciones con la propiedad `active`).
-##   - Opcional: Marker2D "Muzzle" para proyectiles, Sprite2D "HandMain"/"HandOff".
+##   - Opcional: Marker2D "Muzzle" (proyectiles), Sprite2D "HandMain"/"HandOff" (manos).
 ##
-## Desde las animaciones puedes llamar (pista de método): lunge(), spawn_projectile(), shake().
+## Las poses se animan en el espacio del arma: +X = hacia donde apuntas.
+## En reposo, el arma apunta hacia donde mira el personaje (no al ratón).
+## Métodos para pistas de animación: lunge(), shake(), spawn_projectile(), leap_attack().
 
 signal attack_started(attack: StringName)
 signal hit_landed(hit: HitData, target: Node)
@@ -35,11 +41,16 @@ var _primary_held_time := 0.0
 var _queued_primary := false
 var _charging := false
 var _charge_time := 0.0
+var _secondary_down := false
+var _secondary_held_time := 0.0
+var _alt_charging := false
 var _combo_timer := 0.0
 var _alt_cooldown_timer := 0.0
 var _air_attacking := false
+var _leaping := false
 var _damage_bonus := 1.0
 var _hitboxes: Array[Hitbox] = []
+var _hands: Array[Node2D] = []
 
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 
@@ -49,8 +60,9 @@ func _ready() -> void:
 		var hitbox := node as Hitbox
 		_hitboxes.append(hitbox)
 		hitbox.hurtbox_entered.connect(_on_hitbox_hurtbox_entered)
+	_hands = HandUtils.find_hands(self)
 	animation_player.animation_finished.connect(_on_animation_finished)
-	animation_player.play(&"idle")
+	_play_idle()
 
 
 func setup(owner_player: Player) -> void:
@@ -58,27 +70,22 @@ func setup(owner_player: Player) -> void:
 	apply_appearance(player.character_visual.appearance)
 
 
-## Pone las manos del personaje (piel) en el arma.
 func apply_appearance(appearance: CharacterAppearance) -> void:
-	if appearance == null:
-		return
-	var hand_main := find_child("HandMain", true, false) as Sprite2D
-	var hand_off := find_child("HandOff", true, false) as Sprite2D
-	if hand_main and appearance.hand_r:
-		hand_main.texture = appearance.hand_r
-		hand_main.self_modulate = appearance.skin_tint
-	if hand_off and appearance.hand_l:
-		hand_off.texture = appearance.hand_l
-		hand_off.self_modulate = appearance.skin_tint
+	HandUtils.apply_appearance(self, appearance)
 
 
 func is_busy() -> bool:
 	return current_attack != &""
 
 
-## Mientras atacas, el arma mantiene la dirección (te comprometes al golpe).
+## Si el jugador debe apuntar con el ratón (atacando o con un botón pulsado).
+func wants_aim() -> bool:
+	return is_busy() or _primary_down or _secondary_down
+
+
+## Mientras atacas, el arma mantiene la dirección (te comprometes al golpe). Cargando sí puedes reapuntar.
 func locks_aim() -> bool:
-	return is_busy() and current_attack != &"charge"
+	return is_busy() and current_attack != &"charge" and current_attack != &"alt_charge"
 
 
 # --- Input (lo llama Player) ---------------------------------------------
@@ -86,6 +93,8 @@ func locks_aim() -> bool:
 func primary_pressed() -> void:
 	_primary_down = true
 	_primary_held_time = 0.0
+	if _leaping:
+		return
 	if player.is_airborne:
 		_try_air_attack()
 	elif is_busy():
@@ -101,20 +110,24 @@ func primary_released() -> void:
 
 
 func secondary_pressed() -> void:
+	_secondary_down = true
+	_secondary_held_time = 0.0
+	if _leaping:
+		return
 	if player.is_airborne:
 		_try_air_attack()
-		return
-	if _alt_cooldown_timer > 0.0 or not animation_player.has_animation(&"alt"):
-		return
-	if is_busy() and not current_attack.begins_with("light") and current_attack != &"charge":
-		return
-	_charging = false
-	_alt_cooldown_timer = data.alt_cooldown
-	_play_attack(&"alt")
+	elif not data.alt_hold_enabled:
+		_do_alt()
+	# Con carga, se decide al soltar (pulsación corta) o al pasar el umbral (_process).
 
 
 func secondary_released() -> void:
-	pass
+	var was_down := _secondary_down
+	_secondary_down = false
+	if _alt_charging:
+		_release_alt_charge()
+	elif was_down and data.alt_hold_enabled and not player.is_airborne and not _leaping:
+		_do_alt()
 
 
 func on_jump_started() -> void:
@@ -123,24 +136,41 @@ func on_jump_started() -> void:
 
 
 func on_landed(was_plunging: bool) -> void:
-	if not _air_attacking:
+	if _leaping:
+		_leaping = false
+		if animation_player.has_animation(&"leap_land"):
+			_play_attack(&"leap_land", 1.0, false)
+		elif not animation_player.is_playing():
+			_finish_attack()
 		return
-	_air_attacking = false
-	if was_plunging and animation_player.has_animation(&"slam"):
-		_play_attack(&"slam")
-	elif animation_player.current_animation != &"air":
-		cancel()
-	# Si "air" aún suena (p. ej. el arco disparando), la dejamos terminar.
+	if _air_attacking:
+		_air_attacking = false
+		if was_plunging and animation_player.has_animation(&"slam"):
+			_play_attack(&"slam")
+		elif animation_player.current_animation != &"air":
+			cancel()
+		# Si "air" aún suena (p. ej. el arco disparando), la dejamos terminar.
+		return
+	if not is_busy():
+		_play_idle()
+
+
+## Vuelve a la pose de reposo adecuada (suelo o aire) si no está atacando.
+func refresh_pose() -> void:
+	if not is_busy():
+		_play_idle()
 
 
 ## Corta lo que esté haciendo el arma (dash, salto, cambio de arma...). Mantiene el combo.
 func cancel() -> void:
 	_charging = false
+	_alt_charging = false
 	_queued_primary = false
 	_air_attacking = false
+	_leaping = false
 	current_attack = &""
 	_set_hitboxes_active(false)
-	animation_player.play(&"idle")
+	_play_idle()
 
 
 # --- Lógica ---------------------------------------------------------------
@@ -158,6 +188,22 @@ func _process(delta: float) -> void:
 			charge_ratio = clampf(_charge_time / data.max_charge_time, 0.0, 1.0)
 		elif not is_busy() and not player.is_airborne and _primary_held_time >= data.hold_threshold:
 			_on_hold()
+	if _secondary_down and data.alt_hold_enabled:
+		_secondary_held_time += delta
+		if _alt_charging:
+			_charge_time += delta
+			charge_ratio = clampf(_charge_time / data.max_charge_time, 0.0, 1.0)
+		elif _secondary_held_time >= data.hold_threshold and not is_busy() and not player.is_airborne \
+				and _alt_cooldown_timer <= 0.0 and animation_player.has_animation(&"alt_charge"):
+			_start_alt_charge()
+	_update_hands()
+
+
+func _update_hands() -> void:
+	if player == null:
+		return
+	for hand in _hands:
+		HandUtils.keep_upright(hand, player.facing)
 
 
 func _on_hold() -> void:
@@ -177,6 +223,16 @@ func _do_light(speed: float = 1.0) -> void:
 	_play_attack(anim, speed)
 
 
+func _do_alt() -> void:
+	if _alt_cooldown_timer > 0.0 or not animation_player.has_animation(&"alt"):
+		return
+	if is_busy() and not current_attack.begins_with("light") and current_attack != &"charge":
+		return
+	_charging = false
+	_alt_cooldown_timer = data.alt_cooldown
+	_play_attack(&"alt")
+
+
 func _start_charge() -> void:
 	if not animation_player.has_animation(&"charge"):
 		return
@@ -190,6 +246,23 @@ func _release_charge() -> void:
 	_charging = false
 	_damage_bonus = lerpf(1.0, data.max_charge_multiplier, charge_ratio)
 	_play_attack(&"heavy", 1.0, false)
+
+
+func _start_alt_charge() -> void:
+	_alt_charging = true
+	_charge_time = 0.0
+	charge_ratio = 0.0
+	_play_attack(&"alt_charge")
+
+
+func _release_alt_charge() -> void:
+	_alt_charging = false
+	_alt_cooldown_timer = data.alt_cooldown
+	_damage_bonus = lerpf(1.0, data.max_charge_multiplier, charge_ratio)
+	if animation_player.has_animation(&"alt_heavy"):
+		_play_attack(&"alt_heavy", 1.0, false)
+	else:
+		cancel()
 
 
 func _try_air_attack() -> void:
@@ -212,20 +285,33 @@ func _play_attack(anim: StringName, speed: float = 1.0, reset_bonus: bool = true
 	attack_started.emit(anim)
 
 
+func _play_idle() -> void:
+	var anim := &"idle"
+	if player and player.is_airborne and animation_player.has_animation(&"jump"):
+		anim = &"jump"
+	animation_player.play(anim)
+
+
 func _on_animation_finished(anim: StringName) -> void:
-	if anim == &"charge" or anim == &"idle":
+	if anim == &"charge" or anim == &"alt_charge" or anim == &"idle" or anim == &"jump":
 		return # van en bucle
 	if anim == &"air" and _air_attacking:
 		return # seguimos en el aire: la pose aguanta hasta aterrizar (-> "slam")
+	if _leaping:
+		return # en pleno salto de ataque: la pose aguanta hasta aterrizar (-> "leap_land")
+	_finish_attack()
+
+
+func _finish_attack() -> void:
 	current_attack = &""
 	_set_hitboxes_active(false)
 	_combo_timer = data.combo_window
 	if _queued_primary:
 		_do_light()
-	elif _primary_down and anim.begins_with("light"):
+	elif _primary_down and combo_step > 0:
 		_on_hold()
 	if not is_busy():
-		animation_player.play(&"idle")
+		_play_idle()
 
 
 func _set_hitboxes_active(value: bool) -> void:
@@ -245,7 +331,7 @@ func deal_hit(hurtbox: Hurtbox, multiplier: float, knockback_force: float, attac
 		tags: PackedStringArray, hitstop: float, shake_strength: float, from_position: Vector2) -> void:
 	var hit := HitData.new()
 	var crit_chance := data.crit_chance
-	if current_attack == &"air" or current_attack == &"slam" or player.is_airborne:
+	if current_attack in [&"air", &"slam", &"leap_land"] or player.is_airborne:
 		crit_chance += data.air_crit_bonus
 	hit.is_crit = randf() < crit_chance
 	var damage := data.base_damage * multiplier * _damage_bonus * randf_range(0.9, 1.1)
@@ -266,6 +352,7 @@ func deal_hit(hurtbox: Hurtbox, multiplier: float, knockback_force: float, attac
 
 # --- Métodos para pistas de animación -------------------------------------
 
+## Empuje hacia donde apuntas.
 func lunge(speed: float) -> void:
 	if player:
 		player.lunge(speed)
@@ -273,6 +360,23 @@ func lunge(speed: float) -> void:
 
 func shake(strength: float) -> void:
 	Events.camera_shake_requested.emit(strength, 0.15)
+
+
+## Salto de ataque. Hacia el cursor (como mucho `max_distance`), o hacia atrás si `backwards`.
+## En "alt_heavy" la carga alarga el salto. Al aterrizar se toca "leap_land".
+func leap_attack(max_distance: float, height: float, duration: float, backwards: bool = false) -> void:
+	if player == null:
+		return
+	var direction := player.aim_direction()
+	var distance := max_distance
+	if backwards:
+		direction = -direction
+	else:
+		var to_target := player.get_aim_target() - player.global_position
+		distance = clampf(to_target.length(), max_distance * 0.3, max_distance)
+	if current_attack == &"alt_heavy":
+		distance *= lerpf(0.55, 1.0, charge_ratio)
+	_leaping = player.weapon_leap(direction, distance, height, duration)
 
 
 ## Dispara `count` proyectiles en abanico de `spread_degrees` desde el Marker2D "Muzzle".

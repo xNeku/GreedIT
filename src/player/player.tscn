@@ -10,11 +10,13 @@
 [ext_resource type="Resource" path="res://src/weapons/dagger/dagger.tres" id="8_daggertres"]
 [ext_resource type="Resource" path="res://src/weapons/mace/mace.tres" id="9_macetres"]
 [ext_resource type="Resource" path="res://src/weapons/bow/bow.tres" id="10_bowtres"]
-[ext_resource type="Resource" path="res://src/characters/appearances/male.tres" id="11_maletres"]
-[ext_resource type="Resource" path="res://src/characters/appearances/female.tres" id="12_femaletres"]
-[ext_resource type="Texture2D" path="res://assets/lights/light_radial.tres" id="13_lightradia"]
-[ext_resource type="Texture2D" path="res://assets/sprites/fx/shadow_blob.png" id="16_shadowblob"]
-[ext_resource type="Texture2D" path="res://assets/sprites/fx/shock_ring.png" id="17_shockringp"]
+[ext_resource type="Resource" path="res://src/weapons/bo/bo.tres" id="11_botres"]
+[ext_resource type="Resource" path="res://src/characters/appearances/male.tres" id="12_maletres"]
+[ext_resource type="Resource" path="res://src/characters/appearances/female.tres" id="13_femaletres"]
+[ext_resource type="Texture2D" path="res://assets/lights/light_radial.tres" id="14_lightradia"]
+[ext_resource type="Texture2D" path="res://assets/sprites/fx/shadow_blob.png" id="17_shadowblob"]
+[ext_resource type="Texture2D" path="res://assets/sprites/fx/shock_ring.png" id="18_shockringp"]
+[ext_resource type="PackedScene" path="res://src/ui/interact_prompt.tscn" id="23_interactpr"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_feet"]
 radius = 7.0
@@ -108,13 +110,16 @@ _data = {
 &"slam": SubResource("Animation_slam")
 }
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_interact"]
+radius = 14.0
+
 [node name="Player" type="CharacterBody2D"]
 collision_layer = 2
 collision_mask = 5
 motion_mode = 1
 script = ExtResource("1_playergd")
-hotbar = Array[ExtResource("4_itemdatagd")]([ExtResource("6_fiststres"), ExtResource("7_swordtres"), ExtResource("8_daggertres"), ExtResource("9_macetres"), ExtResource("10_bowtres")])
-appearances = Array[ExtResource("5_charactera")]([ExtResource("11_maletres"), ExtResource("12_femaletres")])
+hotbar = Array[ExtResource("4_itemdatagd")]([ExtResource("6_fiststres"), ExtResource("7_swordtres"), ExtResource("8_daggertres"), ExtResource("9_macetres"), ExtResource("10_bowtres"), ExtResource("11_botres")])
+appearances = Array[ExtResource("5_charactera")]([ExtResource("12_maletres"), ExtResource("13_femaletres")])
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -3)
@@ -122,7 +127,7 @@ shape = SubResource("CircleShape2D_feet")
 
 [node name="Shadow" type="Sprite2D" parent="."]
 position = Vector2(0, -1)
-texture = ExtResource("16_shadowblob")
+texture = ExtResource("17_shadowblob")
 
 [node name="VisualRoot" type="Node2D" parent="."]
 
@@ -137,7 +142,7 @@ position = Vector2(0, -26)
 
 [node name="SlamRing" type="Sprite2D" parent="GroundFX"]
 visible = false
-texture = ExtResource("17_shockringp")
+texture = ExtResource("18_shockringp")
 
 [node name="Dust" type="CPUParticles2D" parent="GroundFX"]
 emitting = false
@@ -166,15 +171,27 @@ libraries = {
 [node name="Light" type="PointLight2D" parent="."]
 position = Vector2(0, -24)
 color = Color(0.85, 0.88, 1, 1)
-energy = 0.45
+energy = 0.5
 range_item_cull_mask = 3
 shadow_enabled = true
 shadow_color = Color(0, 0, 0, 0.6)
 shadow_filter = 1
 shadow_filter_smooth = 1.5
 shadow_item_cull_mask = 1
-texture = ExtResource("13_lightradia")
+texture = ExtResource("14_lightradia")
 texture_scale = 1.3
+
+[node name="InteractArea" type="Area2D" parent="."]
+position = Vector2(0, -4)
+collision_layer = 0
+collision_mask = 128
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
+shape = SubResource("CircleShape2D_interact")
+
+[node name="Prompt" parent="." instance=ExtResource("23_interactpr")]
+position = Vector2(0, -86)
 
 [node name="Camera" type="Camera2D" parent="."]
 position = Vector2(0, -20)
