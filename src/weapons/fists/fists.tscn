@@ -4,8 +4,9 @@
 [ext_resource type="Material" path="res://assets/materials/unshaded_add.tres" id="2_unshadedad"]
 [ext_resource type="Texture2D" path="res://assets/sprites/characters/male/hand_l.png" id="3_handlpng"]
 [ext_resource type="Texture2D" path="res://assets/sprites/characters/male/hand_r.png" id="4_handrpng"]
-[ext_resource type="Texture2D" path="res://assets/sprites/fx/shock_ring.png" id="5_shockringp"]
-[ext_resource type="Script" path="res://src/combat/hitbox.gd" id="6_hitboxgd"]
+[ext_resource type="Texture2D" path="res://assets/sprites/spells/hand_flame.png" id="5_handflamep"]
+[ext_resource type="Texture2D" path="res://assets/sprites/fx/shock_ring.png" id="6_shockringp"]
+[ext_resource type="Script" path="res://src/combat/hitbox.gd" id="7_hitboxgd"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_JabHitbox"]
 radius = 12.0
@@ -25,7 +26,7 @@ length = 0.16
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("ImpactFX:visible")
+tracks/0/path = NodePath("HandOff/HandFlame:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -37,67 +38,67 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("ImpactFX:scale")
+tracks/1/path = NodePath("HandOff/HandFlame:scale")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(0.5, 0.5)]
+"values": [Vector2(1, 1)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("ImpactFX:modulate")
+tracks/2/path = NodePath("ImpactFX:visible")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 1)]
+"update": 1,
+"values": [false]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("ImpactFX:position")
+tracks/3/path = NodePath("ImpactFX:scale")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(30, 0)]
+"values": [Vector2(0.5, 0.5)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Hitboxes/JabHitbox:active")
+tracks/4/path = NodePath("ImpactFX:modulate")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Hitboxes/CrossHitbox:active")
+tracks/5/path = NodePath("ImpactFX:position")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
+"update": 0,
+"values": [Vector2(30, 0)]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("Hitboxes/UppercutHitbox:active")
+tracks/6/path = NodePath("Hitboxes/JabHitbox:active")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
@@ -109,7 +110,7 @@ tracks/6/keys = {
 tracks/7/type = "value"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("Hitboxes/SlamHitbox:active")
+tracks/7/path = NodePath("Hitboxes/CrossHitbox:active")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
@@ -121,46 +122,70 @@ tracks/7/keys = {
 tracks/8/type = "value"
 tracks/8/imported = false
 tracks/8/enabled = true
-tracks/8/path = NodePath("HandOff:position")
+tracks/8/path = NodePath("Hitboxes/UppercutHitbox:active")
 tracks/8/interp = 1
 tracks/8/loop_wrap = true
 tracks/8/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("Hitboxes/SlamHitbox:active")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("HandOff:position")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
 "times": PackedFloat32Array(0, 0.16),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Vector2(-17, -1), Vector2(-3, -17)]
 }
-tracks/9/type = "value"
-tracks/9/imported = false
-tracks/9/enabled = true
-tracks/9/path = NodePath("HandMain:position")
-tracks/9/interp = 1
-tracks/9/loop_wrap = true
-tracks/9/keys = {
+tracks/11/type = "value"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("HandMain:position")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
 "times": PackedFloat32Array(0, 0.16),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Vector2(18, -1), Vector2(3, -17)]
 }
-tracks/10/type = "value"
-tracks/10/imported = false
-tracks/10/enabled = true
-tracks/10/path = NodePath("HandMain:scale")
-tracks/10/interp = 1
-tracks/10/loop_wrap = true
-tracks/10/keys = {
+tracks/12/type = "value"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("HandMain:scale")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Vector2(1, 1)]
 }
-tracks/11/type = "value"
-tracks/11/imported = false
-tracks/11/enabled = true
-tracks/11/path = NodePath("HandOff:scale")
-tracks/11/interp = 1
-tracks/11/loop_wrap = true
-tracks/11/keys = {
+tracks/13/type = "value"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("HandOff:scale")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
@@ -173,91 +198,91 @@ length = 0.46
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("ImpactFX:visible")
+tracks/0/path = NodePath("HandOff/HandFlame:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.18, 0.3),
-"transitions": PackedFloat32Array(1, 1, 1),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [false, true, false]
+"values": [false]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("ImpactFX:scale")
+tracks/1/path = NodePath("HandOff/HandFlame:scale")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.18, 0.3),
-"transitions": PackedFloat32Array(1, 1, 0.5),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(0.35, 0.35), Vector2(0.35, 0.35), Vector2(0.9, 0.9)]
+"values": [Vector2(1, 1)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("ImpactFX:modulate")
+tracks/2/path = NodePath("ImpactFX:visible")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.18, 0.3),
 "transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+"update": 1,
+"values": [false, true, false]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("ImpactFX:position")
+tracks/3/path = NodePath("ImpactFX:scale")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.18, 0.3),
+"transitions": PackedFloat32Array(1, 1, 0.5),
 "update": 0,
-"values": [Vector2(28, -10)]
+"values": [Vector2(0.35, 0.35), Vector2(0.35, 0.35), Vector2(0.9, 0.9)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Hitboxes/JabHitbox:active")
+tracks/4/path = NodePath("ImpactFX:modulate")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
+"times": PackedFloat32Array(0, 0.18, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Hitboxes/CrossHitbox:active")
+tracks/5/path = NodePath("ImpactFX:position")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
+"update": 0,
+"values": [Vector2(28, -10)]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("Hitboxes/UppercutHitbox:active")
+tracks/6/path = NodePath("Hitboxes/JabHitbox:active")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
-"times": PackedFloat32Array(0, 0.15, 0.23),
-"transitions": PackedFloat32Array(1, 1, 1),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [false, true, false]
+"values": [false]
 }
 tracks/7/type = "value"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("Hitboxes/SlamHitbox:active")
+tracks/7/path = NodePath("Hitboxes/CrossHitbox:active")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
@@ -269,58 +294,82 @@ tracks/7/keys = {
 tracks/8/type = "value"
 tracks/8/imported = false
 tracks/8/enabled = true
-tracks/8/path = NodePath("HandOff:position")
+tracks/8/path = NodePath("Hitboxes/UppercutHitbox:active")
 tracks/8/interp = 1
 tracks/8/loop_wrap = true
 tracks/8/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.23),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [false, true, false]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("Hitboxes/SlamHitbox:active")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("HandOff:position")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.46),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
 "values": [Vector2(-17, -1), Vector2(-10, -6), Vector2(-17, -1)]
 }
-tracks/9/type = "value"
-tracks/9/imported = false
-tracks/9/enabled = true
-tracks/9/path = NodePath("HandMain:position")
-tracks/9/interp = 1
-tracks/9/loop_wrap = true
-tracks/9/keys = {
+tracks/11/type = "value"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("HandMain:position")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.18, 0.26, 0.46),
 "transitions": PackedFloat32Array(1, 1, 0.3, 1, 1),
 "update": 0,
 "values": [Vector2(18, -1), Vector2(10, 14), Vector2(28, -14), Vector2(27, -15), Vector2(18, -1)]
 }
-tracks/10/type = "value"
-tracks/10/imported = false
-tracks/10/enabled = true
-tracks/10/path = NodePath("HandMain:scale")
-tracks/10/interp = 1
-tracks/10/loop_wrap = true
-tracks/10/keys = {
+tracks/12/type = "value"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("HandMain:scale")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.18, 0.46),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(1, 1), Vector2(0.9, 0.9), Vector2(1.5, 1.5), Vector2(1, 1)]
 }
-tracks/11/type = "value"
-tracks/11/imported = false
-tracks/11/enabled = true
-tracks/11/path = NodePath("HandOff:scale")
-tracks/11/interp = 1
-tracks/11/loop_wrap = true
-tracks/11/keys = {
+tracks/13/type = "value"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("HandOff:scale")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Vector2(1, 1)]
 }
-tracks/12/type = "method"
-tracks/12/imported = false
-tracks/12/enabled = true
-tracks/12/path = NodePath(".")
-tracks/12/interp = 1
-tracks/12/loop_wrap = true
-tracks/12/keys = {
+tracks/14/type = "method"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath(".")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
 "times": PackedFloat32Array(0.12, 0.18),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
@@ -332,85 +381,85 @@ tracks/12/keys = {
 }]
 }
 
-[sub_resource type="Animation" id="Animation_idle"]
-resource_name = "idle"
-loop_mode = 1
+[sub_resource type="Animation" id="Animation_cast"]
+resource_name = "cast"
+length = 0.34
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("ImpactFX:visible")
+tracks/0/path = NodePath("HandOff/HandFlame:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.12),
+"transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [false]
+"values": [true, false]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("ImpactFX:scale")
+tracks/1/path = NodePath("HandOff/HandFlame:scale")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.1),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector2(0.5, 0.5)]
+"values": [Vector2(0.4, 0.4), Vector2(1.3, 1.3)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("ImpactFX:modulate")
+tracks/2/path = NodePath("ImpactFX:visible")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 1)]
+"update": 1,
+"values": [false]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("ImpactFX:position")
+tracks/3/path = NodePath("ImpactFX:scale")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(30, 0)]
+"values": [Vector2(0.5, 0.5)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Hitboxes/JabHitbox:active")
+tracks/4/path = NodePath("ImpactFX:modulate")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Hitboxes/CrossHitbox:active")
+tracks/5/path = NodePath("ImpactFX:position")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
+"update": 0,
+"values": [Vector2(30, 0)]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("Hitboxes/UppercutHitbox:active")
+tracks/6/path = NodePath("Hitboxes/JabHitbox:active")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
@@ -422,7 +471,7 @@ tracks/6/keys = {
 tracks/7/type = "value"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("Hitboxes/SlamHitbox:active")
+tracks/7/path = NodePath("Hitboxes/CrossHitbox:active")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
@@ -434,46 +483,256 @@ tracks/7/keys = {
 tracks/8/type = "value"
 tracks/8/imported = false
 tracks/8/enabled = true
-tracks/8/path = NodePath("HandOff:position")
+tracks/8/path = NodePath("Hitboxes/UppercutHitbox:active")
 tracks/8/interp = 1
 tracks/8/loop_wrap = true
 tracks/8/keys = {
-"times": PackedFloat32Array(0, 0.5),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Vector2(-17, -1), Vector2(-17, 0)]
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
 }
 tracks/9/type = "value"
 tracks/9/imported = false
 tracks/9/enabled = true
-tracks/9/path = NodePath("HandMain:position")
+tracks/9/path = NodePath("Hitboxes/SlamHitbox:active")
 tracks/9/interp = 1
 tracks/9/loop_wrap = true
 tracks/9/keys = {
-"times": PackedFloat32Array(0, 0.5),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Vector2(18, -1), Vector2(18, 0)]
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
 }
 tracks/10/type = "value"
 tracks/10/imported = false
 tracks/10/enabled = true
-tracks/10/path = NodePath("HandMain:scale")
+tracks/10/path = NodePath("HandOff:position")
 tracks/10/interp = 1
 tracks/10/loop_wrap = true
 tracks/10/keys = {
+"times": PackedFloat32Array(0, 0.07, 0.12, 0.2, 0.34),
+"transitions": PackedFloat32Array(1, 1, 0.35, 1, 1),
+"update": 0,
+"values": [Vector2(-17, -1), Vector2(2, -9), Vector2(26, -2), Vector2(24, -2), Vector2(-17, -1)]
+}
+tracks/11/type = "value"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("HandMain:position")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(18, -1)]
+}
+tracks/12/type = "value"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("HandMain:scale")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Vector2(1, 1)]
 }
+tracks/13/type = "value"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("HandOff:scale")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/14/type = "method"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath(".")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
+"times": PackedFloat32Array(0.12),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"release_spell"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_idle"]
+resource_name = "idle"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HandOff/HandFlame:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("HandOff/HandFlame:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("ImpactFX:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("ImpactFX:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0.5, 0.5)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("ImpactFX:modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("ImpactFX:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(30, 0)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Hitboxes/JabHitbox:active")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Hitboxes/CrossHitbox:active")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Hitboxes/UppercutHitbox:active")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("Hitboxes/SlamHitbox:active")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("HandOff:position")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(-17, -1), Vector2(-17, 0)]
+}
 tracks/11/type = "value"
 tracks/11/imported = false
 tracks/11/enabled = true
-tracks/11/path = NodePath("HandOff:scale")
+tracks/11/path = NodePath("HandMain:position")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(18, -1), Vector2(18, 0)]
+}
+tracks/12/type = "value"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("HandMain:scale")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/13/type = "value"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("HandOff:scale")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
@@ -487,7 +746,7 @@ loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("ImpactFX:visible")
+tracks/0/path = NodePath("HandOff/HandFlame:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -499,67 +758,67 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("ImpactFX:scale")
+tracks/1/path = NodePath("HandOff/HandFlame:scale")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(0.5, 0.5)]
+"values": [Vector2(1, 1)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("ImpactFX:modulate")
+tracks/2/path = NodePath("ImpactFX:visible")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 1)]
+"update": 1,
+"values": [false]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("ImpactFX:position")
+tracks/3/path = NodePath("ImpactFX:scale")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(30, 0)]
+"values": [Vector2(0.5, 0.5)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Hitboxes/JabHitbox:active")
+tracks/4/path = NodePath("ImpactFX:modulate")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Hitboxes/CrossHitbox:active")
+tracks/5/path = NodePath("ImpactFX:position")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
+"update": 0,
+"values": [Vector2(30, 0)]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("Hitboxes/UppercutHitbox:active")
+tracks/6/path = NodePath("Hitboxes/JabHitbox:active")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
@@ -571,7 +830,7 @@ tracks/6/keys = {
 tracks/7/type = "value"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("Hitboxes/SlamHitbox:active")
+tracks/7/path = NodePath("Hitboxes/CrossHitbox:active")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
@@ -583,46 +842,70 @@ tracks/7/keys = {
 tracks/8/type = "value"
 tracks/8/imported = false
 tracks/8/enabled = true
-tracks/8/path = NodePath("HandOff:position")
+tracks/8/path = NodePath("Hitboxes/UppercutHitbox:active")
 tracks/8/interp = 1
 tracks/8/loop_wrap = true
 tracks/8/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(-15, -9)]
+"update": 1,
+"values": [false]
 }
 tracks/9/type = "value"
 tracks/9/imported = false
 tracks/9/enabled = true
-tracks/9/path = NodePath("HandMain:position")
+tracks/9/path = NodePath("Hitboxes/SlamHitbox:active")
 tracks/9/interp = 1
 tracks/9/loop_wrap = true
 tracks/9/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(16, -9)]
+"update": 1,
+"values": [false]
 }
 tracks/10/type = "value"
 tracks/10/imported = false
 tracks/10/enabled = true
-tracks/10/path = NodePath("HandMain:scale")
+tracks/10/path = NodePath("HandOff:position")
 tracks/10/interp = 1
 tracks/10/loop_wrap = true
 tracks/10/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(1, 1)]
+"values": [Vector2(-15, -9)]
 }
 tracks/11/type = "value"
 tracks/11/imported = false
 tracks/11/enabled = true
-tracks/11/path = NodePath("HandOff:scale")
+tracks/11/path = NodePath("HandMain:position")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(16, -9)]
+}
+tracks/12/type = "value"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("HandMain:scale")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/13/type = "value"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("HandOff:scale")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
@@ -635,91 +918,91 @@ length = 0.2
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("ImpactFX:visible")
+tracks/0/path = NodePath("HandOff/HandFlame:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.08, 0.16),
-"transitions": PackedFloat32Array(1, 1, 1),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [false, true, false]
+"values": [false]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("ImpactFX:scale")
+tracks/1/path = NodePath("HandOff/HandFlame:scale")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.08, 0.16),
-"transitions": PackedFloat32Array(1, 1, 0.5),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(0.2, 0.2), Vector2(0.2, 0.2), Vector2(0.45, 0.45)]
+"values": [Vector2(1, 1)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("ImpactFX:modulate")
+tracks/2/path = NodePath("ImpactFX:visible")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.16),
 "transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+"update": 1,
+"values": [false, true, false]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("ImpactFX:position")
+tracks/3/path = NodePath("ImpactFX:scale")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.08, 0.16),
+"transitions": PackedFloat32Array(1, 1, 0.5),
 "update": 0,
-"values": [Vector2(30, -3)]
+"values": [Vector2(0.2, 0.2), Vector2(0.2, 0.2), Vector2(0.45, 0.45)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Hitboxes/JabHitbox:active")
+tracks/4/path = NodePath("ImpactFX:modulate")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0, 0.06, 0.11),
+"times": PackedFloat32Array(0, 0.08, 0.16),
 "transitions": PackedFloat32Array(1, 1, 1),
-"update": 1,
-"values": [false, true, false]
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Hitboxes/CrossHitbox:active")
+tracks/5/path = NodePath("ImpactFX:position")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
+"update": 0,
+"values": [Vector2(30, -3)]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("Hitboxes/UppercutHitbox:active")
+tracks/6/path = NodePath("Hitboxes/JabHitbox:active")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.06, 0.11),
+"transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
-"values": [false]
+"values": [false, true, false]
 }
 tracks/7/type = "value"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("Hitboxes/SlamHitbox:active")
+tracks/7/path = NodePath("Hitboxes/CrossHitbox:active")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
@@ -731,58 +1014,82 @@ tracks/7/keys = {
 tracks/8/type = "value"
 tracks/8/imported = false
 tracks/8/enabled = true
-tracks/8/path = NodePath("HandOff:position")
+tracks/8/path = NodePath("Hitboxes/UppercutHitbox:active")
 tracks/8/interp = 1
 tracks/8/loop_wrap = true
 tracks/8/keys = {
-"times": PackedFloat32Array(0, 0.04, 0.08, 0.2),
-"transitions": PackedFloat32Array(1, 1, 0.35, 1),
-"update": 0,
-"values": [Vector2(-12, -3), Vector2(-6, -3), Vector2(29, -3), Vector2(-17, -1)]
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
 }
 tracks/9/type = "value"
 tracks/9/imported = false
 tracks/9/enabled = true
-tracks/9/path = NodePath("HandMain:position")
+tracks/9/path = NodePath("Hitboxes/SlamHitbox:active")
 tracks/9/interp = 1
 tracks/9/loop_wrap = true
 tracks/9/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(18, -1)]
+"update": 1,
+"values": [false]
 }
 tracks/10/type = "value"
 tracks/10/imported = false
 tracks/10/enabled = true
-tracks/10/path = NodePath("HandMain:scale")
+tracks/10/path = NodePath("HandOff:position")
 tracks/10/interp = 1
 tracks/10/loop_wrap = true
 tracks/10/keys = {
+"times": PackedFloat32Array(0, 0.04, 0.08, 0.2),
+"transitions": PackedFloat32Array(1, 1, 0.35, 1),
+"update": 0,
+"values": [Vector2(-12, -3), Vector2(-6, -3), Vector2(29, -3), Vector2(-17, -1)]
+}
+tracks/11/type = "value"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("HandMain:position")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(18, -1)]
+}
+tracks/12/type = "value"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("HandMain:scale")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Vector2(1, 1)]
 }
-tracks/11/type = "value"
-tracks/11/imported = false
-tracks/11/enabled = true
-tracks/11/path = NodePath("HandOff:scale")
-tracks/11/interp = 1
-tracks/11/loop_wrap = true
-tracks/11/keys = {
+tracks/13/type = "value"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("HandOff:scale")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.2),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
 "values": [Vector2(1, 1), Vector2(1.2, 1.2), Vector2(1, 1)]
 }
-tracks/12/type = "method"
-tracks/12/imported = false
-tracks/12/enabled = true
-tracks/12/path = NodePath(".")
-tracks/12/interp = 1
-tracks/12/loop_wrap = true
-tracks/12/keys = {
+tracks/14/type = "method"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath(".")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
 "times": PackedFloat32Array(0.04),
 "transitions": PackedFloat32Array(1),
 "values": [{
@@ -797,91 +1104,91 @@ length = 0.2
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("ImpactFX:visible")
+tracks/0/path = NodePath("HandOff/HandFlame:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.08, 0.16),
-"transitions": PackedFloat32Array(1, 1, 1),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [false, true, false]
+"values": [false]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("ImpactFX:scale")
+tracks/1/path = NodePath("HandOff/HandFlame:scale")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.08, 0.16),
-"transitions": PackedFloat32Array(1, 1, 0.5),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(0.2, 0.2), Vector2(0.2, 0.2), Vector2(0.45, 0.45)]
+"values": [Vector2(1, 1)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("ImpactFX:modulate")
+tracks/2/path = NodePath("ImpactFX:visible")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.16),
 "transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+"update": 1,
+"values": [false, true, false]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("ImpactFX:position")
+tracks/3/path = NodePath("ImpactFX:scale")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.08, 0.16),
+"transitions": PackedFloat32Array(1, 1, 0.5),
 "update": 0,
-"values": [Vector2(31, 2)]
+"values": [Vector2(0.2, 0.2), Vector2(0.2, 0.2), Vector2(0.45, 0.45)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Hitboxes/JabHitbox:active")
+tracks/4/path = NodePath("ImpactFX:modulate")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0, 0.06, 0.11),
+"times": PackedFloat32Array(0, 0.08, 0.16),
 "transitions": PackedFloat32Array(1, 1, 1),
-"update": 1,
-"values": [false, true, false]
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Hitboxes/CrossHitbox:active")
+tracks/5/path = NodePath("ImpactFX:position")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
+"update": 0,
+"values": [Vector2(31, 2)]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("Hitboxes/UppercutHitbox:active")
+tracks/6/path = NodePath("Hitboxes/JabHitbox:active")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.06, 0.11),
+"transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
-"values": [false]
+"values": [false, true, false]
 }
 tracks/7/type = "value"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("Hitboxes/SlamHitbox:active")
+tracks/7/path = NodePath("Hitboxes/CrossHitbox:active")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
@@ -893,58 +1200,82 @@ tracks/7/keys = {
 tracks/8/type = "value"
 tracks/8/imported = false
 tracks/8/enabled = true
-tracks/8/path = NodePath("HandOff:position")
+tracks/8/path = NodePath("Hitboxes/UppercutHitbox:active")
 tracks/8/interp = 1
 tracks/8/loop_wrap = true
 tracks/8/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(-17, -1)]
+"update": 1,
+"values": [false]
 }
 tracks/9/type = "value"
 tracks/9/imported = false
 tracks/9/enabled = true
-tracks/9/path = NodePath("HandMain:position")
+tracks/9/path = NodePath("Hitboxes/SlamHitbox:active")
 tracks/9/interp = 1
 tracks/9/loop_wrap = true
 tracks/9/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("HandOff:position")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-17, -1)]
+}
+tracks/11/type = "value"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("HandMain:position")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
 "times": PackedFloat32Array(0, 0.04, 0.08, 0.2),
 "transitions": PackedFloat32Array(1, 1, 0.35, 1),
 "update": 0,
 "values": [Vector2(14, 1), Vector2(12, 2), Vector2(31, 2), Vector2(18, -1)]
 }
-tracks/10/type = "value"
-tracks/10/imported = false
-tracks/10/enabled = true
-tracks/10/path = NodePath("HandMain:scale")
-tracks/10/interp = 1
-tracks/10/loop_wrap = true
-tracks/10/keys = {
+tracks/12/type = "value"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("HandMain:scale")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.2),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
 "values": [Vector2(1, 1), Vector2(1.2, 1.2), Vector2(1, 1)]
 }
-tracks/11/type = "value"
-tracks/11/imported = false
-tracks/11/enabled = true
-tracks/11/path = NodePath("HandOff:scale")
-tracks/11/interp = 1
-tracks/11/loop_wrap = true
-tracks/11/keys = {
+tracks/13/type = "value"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("HandOff:scale")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Vector2(1, 1)]
 }
-tracks/12/type = "method"
-tracks/12/imported = false
-tracks/12/enabled = true
-tracks/12/path = NodePath(".")
-tracks/12/interp = 1
-tracks/12/loop_wrap = true
-tracks/12/keys = {
+tracks/14/type = "method"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath(".")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
 "times": PackedFloat32Array(0.04),
 "transitions": PackedFloat32Array(1),
 "values": [{
@@ -959,79 +1290,79 @@ length = 0.38
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("ImpactFX:visible")
+tracks/0/path = NodePath("HandOff/HandFlame:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.15, 0.27),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 1,
-"values": [false, true, false]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("ImpactFX:scale")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.15, 0.27),
-"transitions": PackedFloat32Array(1, 1, 0.5),
-"update": 0,
-"values": [Vector2(0.3, 0.3), Vector2(0.3, 0.3), Vector2(0.8, 0.8)]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("ImpactFX:modulate")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.15, 0.27),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("ImpactFX:position")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(36, 0)]
-}
-tracks/4/type = "value"
-tracks/4/imported = false
-tracks/4/enabled = true
-tracks/4/path = NodePath("Hitboxes/JabHitbox:active")
-tracks/4/interp = 1
-tracks/4/loop_wrap = true
-tracks/4/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [false]
 }
-tracks/5/type = "value"
-tracks/5/imported = false
-tracks/5/enabled = true
-tracks/5/path = NodePath("Hitboxes/CrossHitbox:active")
-tracks/5/interp = 1
-tracks/5/loop_wrap = true
-tracks/5/keys = {
-"times": PackedFloat32Array(0, 0.13, 0.2),
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("HandOff/HandFlame:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("ImpactFX:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.27),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
 "values": [false, true, false]
 }
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("ImpactFX:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.27),
+"transitions": PackedFloat32Array(1, 1, 0.5),
+"update": 0,
+"values": [Vector2(0.3, 0.3), Vector2(0.3, 0.3), Vector2(0.8, 0.8)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("ImpactFX:modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.27),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("ImpactFX:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(36, 0)]
+}
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("Hitboxes/UppercutHitbox:active")
+tracks/6/path = NodePath("Hitboxes/JabHitbox:active")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
@@ -1043,70 +1374,94 @@ tracks/6/keys = {
 tracks/7/type = "value"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("Hitboxes/SlamHitbox:active")
+tracks/7/path = NodePath("Hitboxes/CrossHitbox:active")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
+"times": PackedFloat32Array(0, 0.13, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [false, true, false]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Hitboxes/UppercutHitbox:active")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [false]
 }
-tracks/8/type = "value"
-tracks/8/imported = false
-tracks/8/enabled = true
-tracks/8/path = NodePath("HandOff:position")
-tracks/8/interp = 1
-tracks/8/loop_wrap = true
-tracks/8/keys = {
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("Hitboxes/SlamHitbox:active")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("HandOff:position")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.38),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
 "values": [Vector2(-17, -1), Vector2(-8, -6), Vector2(-17, -1)]
 }
-tracks/9/type = "value"
-tracks/9/imported = false
-tracks/9/enabled = true
-tracks/9/path = NodePath("HandMain:position")
-tracks/9/interp = 1
-tracks/9/loop_wrap = true
-tracks/9/keys = {
+tracks/11/type = "value"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("HandMain:position")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.15, 0.22, 0.38),
 "transitions": PackedFloat32Array(1, 1, 0.3, 1, 1),
 "update": 0,
 "values": [Vector2(18, -1), Vector2(6, 6), Vector2(36, 0), Vector2(34, 0), Vector2(18, -1)]
 }
-tracks/10/type = "value"
-tracks/10/imported = false
-tracks/10/enabled = true
-tracks/10/path = NodePath("HandMain:scale")
-tracks/10/interp = 1
-tracks/10/loop_wrap = true
-tracks/10/keys = {
+tracks/12/type = "value"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("HandMain:scale")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
 "times": PackedFloat32Array(0, 0.15, 0.38),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
 "values": [Vector2(1, 1), Vector2(1.4, 1.4), Vector2(1, 1)]
 }
-tracks/11/type = "value"
-tracks/11/imported = false
-tracks/11/enabled = true
-tracks/11/path = NodePath("HandOff:scale")
-tracks/11/interp = 1
-tracks/11/loop_wrap = true
-tracks/11/keys = {
+tracks/13/type = "value"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("HandOff:scale")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Vector2(1, 1)]
 }
-tracks/12/type = "method"
-tracks/12/imported = false
-tracks/12/enabled = true
-tracks/12/path = NodePath(".")
-tracks/12/interp = 1
-tracks/12/loop_wrap = true
-tracks/12/keys = {
+tracks/14/type = "method"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath(".")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
 "times": PackedFloat32Array(0.1, 0.15),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
@@ -1124,79 +1479,79 @@ length = 0.36
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("ImpactFX:visible")
+tracks/0/path = NodePath("HandOff/HandFlame:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.05, 0.3),
-"transitions": PackedFloat32Array(1, 1, 1),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [false, true, false]
+"values": [false]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("ImpactFX:scale")
+tracks/1/path = NodePath("HandOff/HandFlame:scale")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.05, 0.3),
-"transitions": PackedFloat32Array(1, 1, 0.5),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(0.6, 0.6), Vector2(0.6, 0.6), Vector2(1.6, 1.6)]
+"values": [Vector2(1, 1)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("ImpactFX:modulate")
+tracks/2/path = NodePath("ImpactFX:visible")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.05, 0.3),
 "transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+"update": 1,
+"values": [false, true, false]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("ImpactFX:position")
+tracks/3/path = NodePath("ImpactFX:scale")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.05, 0.3),
+"transitions": PackedFloat32Array(1, 1, 0.5),
 "update": 0,
-"values": [Vector2(14, 8)]
+"values": [Vector2(0.6, 0.6), Vector2(0.6, 0.6), Vector2(1.6, 1.6)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Hitboxes/JabHitbox:active")
+tracks/4/path = NodePath("ImpactFX:modulate")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
+"times": PackedFloat32Array(0, 0.05, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Hitboxes/CrossHitbox:active")
+tracks/5/path = NodePath("ImpactFX:position")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
+"update": 0,
+"values": [Vector2(14, 8)]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("Hitboxes/UppercutHitbox:active")
+tracks/6/path = NodePath("Hitboxes/JabHitbox:active")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
@@ -1208,58 +1563,82 @@ tracks/6/keys = {
 tracks/7/type = "value"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("Hitboxes/SlamHitbox:active")
+tracks/7/path = NodePath("Hitboxes/CrossHitbox:active")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Hitboxes/UppercutHitbox:active")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("Hitboxes/SlamHitbox:active")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
 "times": PackedFloat32Array(0, 0.08),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [true, false]
 }
-tracks/8/type = "value"
-tracks/8/imported = false
-tracks/8/enabled = true
-tracks/8/path = NodePath("HandOff:position")
-tracks/8/interp = 1
-tracks/8/loop_wrap = true
-tracks/8/keys = {
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("HandOff:position")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
 "times": PackedFloat32Array(0, 0.05, 0.36),
 "transitions": PackedFloat32Array(1, 0.3, 1),
 "update": 0,
 "values": [Vector2(-3, -17), Vector2(10, 6), Vector2(-17, -1)]
 }
-tracks/9/type = "value"
-tracks/9/imported = false
-tracks/9/enabled = true
-tracks/9/path = NodePath("HandMain:position")
-tracks/9/interp = 1
-tracks/9/loop_wrap = true
-tracks/9/keys = {
+tracks/11/type = "value"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("HandMain:position")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
 "times": PackedFloat32Array(0, 0.05, 0.36),
 "transitions": PackedFloat32Array(1, 0.3, 1),
 "update": 0,
 "values": [Vector2(3, -17), Vector2(18, 6), Vector2(18, -1)]
 }
-tracks/10/type = "value"
-tracks/10/imported = false
-tracks/10/enabled = true
-tracks/10/path = NodePath("HandMain:scale")
-tracks/10/interp = 1
-tracks/10/loop_wrap = true
-tracks/10/keys = {
+tracks/12/type = "value"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("HandMain:scale")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Vector2(1, 1)]
 }
-tracks/11/type = "value"
-tracks/11/imported = false
-tracks/11/enabled = true
-tracks/11/path = NodePath("HandOff:scale")
-tracks/11/interp = 1
-tracks/11/loop_wrap = true
-tracks/11/keys = {
+tracks/13/type = "value"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("HandOff:scale")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
@@ -1270,6 +1649,7 @@ tracks/11/keys = {
 _data = {
 &"air": SubResource("Animation_air"),
 &"alt": SubResource("Animation_alt"),
+&"cast": SubResource("Animation_cast"),
 &"idle": SubResource("Animation_idle"),
 &"jump": SubResource("Animation_jump"),
 &"light_1": SubResource("Animation_light_1"),
@@ -1289,11 +1669,18 @@ texture = ExtResource("3_handlpng")
 position = Vector2(18, -1)
 texture = ExtResource("4_handrpng")
 
+[node name="HandFlame" type="Sprite2D" parent="HandOff"]
+visible = false
+z_index = 1
+material = ExtResource("2_unshadedad")
+position = Vector2(3, -3)
+texture = ExtResource("5_handflamep")
+
 [node name="ImpactFX" type="Sprite2D" parent="."]
 visible = false
 material = ExtResource("2_unshadedad")
 position = Vector2(30, 0)
-texture = ExtResource("5_shockringp")
+texture = ExtResource("6_shockringp")
 
 [node name="Hitboxes" type="Node2D" parent="."]
 
@@ -1302,7 +1689,7 @@ position = Vector2(27, 0)
 collision_layer = 8
 collision_mask = 16
 monitorable = false
-script = ExtResource("6_hitboxgd")
+script = ExtResource("7_hitboxgd")
 damage_multiplier = 1.0
 knockback_force = 40.0
 hitstop = 0.035
@@ -1317,7 +1704,7 @@ position = Vector2(32, 0)
 collision_layer = 8
 collision_mask = 16
 monitorable = false
-script = ExtResource("6_hitboxgd")
+script = ExtResource("7_hitboxgd")
 damage_multiplier = 1.8
 knockback_force = 120.0
 hitstop = 0.06
@@ -1332,7 +1719,7 @@ position = Vector2(26, -6)
 collision_layer = 8
 collision_mask = 16
 monitorable = false
-script = ExtResource("6_hitboxgd")
+script = ExtResource("7_hitboxgd")
 damage_multiplier = 2.4
 knockback_force = 220.0
 hitstop = 0.08
@@ -1347,7 +1734,7 @@ position = Vector2(0, 0)
 collision_layer = 8
 collision_mask = 16
 monitorable = false
-script = ExtResource("6_hitboxgd")
+script = ExtResource("7_hitboxgd")
 damage_multiplier = 2.2
 knockback_force = 170.0
 hitstop = 0.08

@@ -18,6 +18,12 @@ extends Resource
 @export var hair: Texture2D
 @export var hair_tint := Color.WHITE
 
+@export_group("Vista de espalda")
+## Capas que cambian al verse de espalda. Las que estén vacías usan la de frente.
+@export var head_back: Texture2D
+@export var hair_back: Texture2D
+@export var torso_back: Texture2D
+
 @export_group("Ropa")
 @export var cloth_top: Texture2D
 @export var cloth_bottom: Texture2D

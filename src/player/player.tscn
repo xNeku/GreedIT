@@ -14,9 +14,10 @@
 [ext_resource type="Resource" path="res://src/characters/appearances/male.tres" id="12_maletres"]
 [ext_resource type="Resource" path="res://src/characters/appearances/female.tres" id="13_femaletres"]
 [ext_resource type="Texture2D" path="res://assets/lights/light_radial.tres" id="14_lightradia"]
-[ext_resource type="Texture2D" path="res://assets/sprites/fx/shadow_blob.png" id="17_shadowblob"]
-[ext_resource type="Texture2D" path="res://assets/sprites/fx/shock_ring.png" id="18_shockringp"]
-[ext_resource type="PackedScene" path="res://src/ui/interact_prompt.tscn" id="23_interactpr"]
+[ext_resource type="Resource" path="res://src/spells/fireball/fireball.tres" id="17_fireballtr"]
+[ext_resource type="Texture2D" path="res://assets/sprites/fx/shadow_blob.png" id="18_shadowblob"]
+[ext_resource type="Texture2D" path="res://assets/sprites/fx/shock_ring.png" id="19_shockringp"]
+[ext_resource type="PackedScene" path="res://src/ui/interact_prompt.tscn" id="24_interactpr"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_feet"]
 radius = 7.0
@@ -119,6 +120,7 @@ collision_mask = 5
 motion_mode = 1
 script = ExtResource("1_playergd")
 hotbar = Array[ExtResource("4_itemdatagd")]([ExtResource("6_fiststres"), ExtResource("7_swordtres"), ExtResource("8_daggertres"), ExtResource("9_macetres"), ExtResource("10_bowtres"), ExtResource("11_botres")])
+spell = ExtResource("17_fireballtr")
 appearances = Array[ExtResource("5_charactera")]([ExtResource("12_maletres"), ExtResource("13_femaletres")])
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -127,7 +129,7 @@ shape = SubResource("CircleShape2D_feet")
 
 [node name="Shadow" type="Sprite2D" parent="."]
 position = Vector2(0, -1)
-texture = ExtResource("17_shadowblob")
+texture = ExtResource("18_shadowblob")
 
 [node name="VisualRoot" type="Node2D" parent="."]
 
@@ -142,7 +144,7 @@ position = Vector2(0, -26)
 
 [node name="SlamRing" type="Sprite2D" parent="GroundFX"]
 visible = false
-texture = ExtResource("18_shockringp")
+texture = ExtResource("19_shockringp")
 
 [node name="Dust" type="CPUParticles2D" parent="GroundFX"]
 emitting = false
@@ -190,7 +192,7 @@ monitorable = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
 shape = SubResource("CircleShape2D_interact")
 
-[node name="Prompt" parent="." instance=ExtResource("23_interactpr")]
+[node name="Prompt" parent="." instance=ExtResource("24_interactpr")]
 position = Vector2(0, -86)
 
 [node name="Camera" type="Camera2D" parent="."]

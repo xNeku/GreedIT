@@ -1,6 +1,6 @@
 class_name HUD
 extends CanvasLayer
-## HUD del sandbox: hotbar (1-5) y nombre del arma seleccionada.
+## HUD del sandbox: hotbar, arma seleccionada, maná, hechizo de la rueda y panel de materiales.
 
 @export var player: Player
 ## Escena de cada fila del panel de materiales.
@@ -8,6 +8,12 @@ extends CanvasLayer
 
 @onready var hotbar: HBoxContainer = $Hotbar
 @onready var item_name: Label = $ItemName
+@onready var mana_bar: ProgressBar = $ManaBar
+@onready var mana_label: Label = $ManaLabel
+@onready var spell_icon: TextureRect = $SpellSlot/Icon
+@onready var spell_cooldown: ColorRect = $SpellSlot/Cooldown
+@onready var cast_message: Label = $CastMessage
+@onready var animation_player: AnimationPlayer = $AnimationPlayer
 @onready var materials: VBoxContainer = $Materials
 @onready var materials_list: VBoxContainer = $Materials/List
 
@@ -19,6 +25,10 @@ func _ready() -> void:
 		player.hotbar_changed.connect(_on_hotbar_changed)
 		_on_hotbar_changed(player.hotbar, player.selected_slot)
 		player.inventory.changed.connect(_on_inventory_changed)
+		player.mana_changed.connect(_on_mana_changed)
+		player.cast_failed.connect(_on_cast_failed)
+		_on_mana_changed(player.mana, player.max_mana)
+		spell_icon.texture = player.spell.icon if player.spell else null
 	materials.visible = false
 
 
@@ -40,3 +50,23 @@ func _on_inventory_changed(item: ItemData, count: int) -> void:
 		_rows[item] = row
 	row.set_item(item, count)
 	materials.visible = true
+
+
+func _process(_delta: float) -> void:
+	if player == null:
+		return
+	var ratio := player.spell_cooldown_ratio()
+	spell_cooldown.visible = ratio > 0.0 or (player.spell != null and player.mana < player.spell.mana_cost)
+	spell_cooldown.size.y = 20.0 * (ratio if ratio > 0.0 else 1.0)
+
+
+func _on_mana_changed(mana: float, max_mana: float) -> void:
+	mana_bar.max_value = max_mana
+	mana_bar.value = mana
+	mana_label.text = "Maná %d" % floori(mana)
+
+
+func _on_cast_failed(reason: String) -> void:
+	cast_message.text = reason
+	animation_player.stop()
+	animation_player.play(&"flash")

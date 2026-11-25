@@ -3,12 +3,14 @@ class_name CharacterVisual
 extends Node2D
 ## Cuerpo del personaje por capas + sus animaciones.
 ## El AnimationPlayer de la escena es la fuente de verdad: edita ahí las animaciones.
-##   idle, walk (llama a footstep() en cada pisada)
+## Vistas: FRONT (de frente), SIDE (3/4 de lado: ojos y pelo girados + zancada), BACK (de espalda).
+##   idle (respira y parpadea), walk (frente/espalda) y walk_side (zancada lateral), ambas llaman a step()
 ##   jump_windup (agacharse), rise / peak / fall (fases del salto), land, land_heavy
 
 signal footstep
 
 enum AirPhase { GROUND, RISING, PEAK, FALLING }
+enum View { FRONT, SIDE, BACK }
 
 @export var appearance: CharacterAppearance:
 	set(value):
@@ -16,6 +18,13 @@ enum AirPhase { GROUND, RISING, PEAK, FALLING }
 		if is_node_ready():
 			_apply_appearance()
 
+@export_group("Vista de lado")
+## Píxeles que se desplazan los ojos hacia donde mira (simula girar la cabeza).
+@export var side_eye_shift := 2
+## Píxeles que se desplaza el pelo hacia atrás.
+@export var side_hair_shift := -1
+
+var view := View.FRONT
 var _moving := false
 var _air_phase := AirPhase.GROUND
 ## Animación de una sola vez que tiene prioridad (agacharse, aterrizar).
@@ -47,6 +56,14 @@ func _ready() -> void:
 func set_facing(direction: float) -> void:
 	if direction != 0.0:
 		flip.scale.x = signf(direction)
+
+
+func set_view(new_view: View) -> void:
+	if new_view == view:
+		return
+	view = new_view
+	_apply_appearance()
+	_refresh_animation()
 
 
 func set_moving(moving: bool) -> void:
@@ -100,7 +117,7 @@ func _refresh_animation() -> void:
 			target = &"fall"
 		_:
 			if _moving:
-				target = &"walk"
+				target = &"walk_side" if view == View.SIDE else &"walk"
 	if animation_player.current_animation != target:
 		animation_player.play(target)
 
@@ -108,16 +125,21 @@ func _refresh_animation() -> void:
 func _apply_appearance() -> void:
 	if appearance == null:
 		return
+	var back := view == View.BACK
 	_leg_l_skin.texture = appearance.leg_l
 	_leg_r_skin.texture = appearance.leg_r
 	_leg_l_boot.texture = appearance.boot_l
 	_leg_r_boot.texture = appearance.boot_r
-	_torso.texture = appearance.torso
+	_torso.texture = appearance.torso_back if back and appearance.torso_back else appearance.torso
 	_cloth_top.texture = appearance.cloth_top
 	_cloth_bottom.texture = appearance.cloth_bottom
-	_head_skin.texture = appearance.head
+	_head_skin.texture = appearance.head_back if back and appearance.head_back else appearance.head
 	_eyes.texture = appearance.eyes
-	_hair.texture = appearance.hair
+	_eyes.visible = not back
+	_hair.texture = appearance.hair_back if back and appearance.hair_back else appearance.hair
+	var side := view == View.SIDE
+	_eyes.position.x = side_eye_shift if side else 0
+	_hair.position.x = side_hair_shift if side else 0
 	for sprite: Sprite2D in [_leg_l_skin, _leg_r_skin, _torso, _head_skin]:
 		sprite.self_modulate = appearance.skin_tint
 	_hair.self_modulate = appearance.hair_tint

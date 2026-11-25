@@ -16,13 +16,14 @@ extends Node2D
 ##       air             ataque en el aire (te hace caer en picado si data.air_attack_plunges)
 ##       slam            impacto al aterrizar tras "air"
 ##       leap_land       impacto al aterrizar tras un leap_attack()
+##       cast            gesto de lanzar un hechizo con la mano libre (llama a release_spell())
 ##     Si una animación no existe, esa acción simplemente no hace nada.
 ##   - Nodos Hitbox (activados desde las animaciones con la propiedad `active`).
 ##   - Opcional: Marker2D "Muzzle" (proyectiles), Sprite2D "HandMain"/"HandOff" (manos).
 ##
 ## Las poses se animan en el espacio del arma: +X = hacia donde apuntas.
 ## En reposo, el arma apunta hacia donde mira el personaje (no al ratón).
-## Métodos para pistas de animación: lunge(), shake(), spawn_projectile(), leap_attack().
+## Métodos para pistas de animación: lunge(), shake(), spawn_projectile(), leap_attack(), release_spell().
 
 signal attack_started(attack: StringName)
 signal hit_landed(hit: HitData, target: Node)
@@ -153,6 +154,18 @@ func on_landed(was_plunging: bool) -> void:
 		return
 	if not is_busy():
 		_play_idle()
+
+
+## Gesto de lanzar hechizo. Corta el ataque en curso (sin perder el combo).
+## En pleno salto de ataque o ataque aéreo, el hechizo sale directamente sin gesto.
+func cast() -> void:
+	if _leaping or _air_attacking or not animation_player.has_animation(&"cast"):
+		release_spell()
+		return
+	_charging = false
+	_alt_charging = false
+	_queued_primary = false
+	_play_attack(&"cast")
 
 
 ## Vuelve a la pose de reposo adecuada (suelo o aire) si no está atacando.
@@ -377,6 +390,12 @@ func leap_attack(max_distance: float, height: float, duration: float, backwards:
 	if current_attack == &"alt_heavy":
 		distance *= lerpf(0.55, 1.0, charge_ratio)
 	_leaping = player.weapon_leap(direction, distance, height, duration)
+
+
+## Suelta el hechizo del jugador (pista de método de "cast").
+func release_spell() -> void:
+	if player:
+		player.release_spell()
 
 
 ## Dispara `count` proyectiles en abanico de `spread_degrees` desde el Marker2D "Muzzle".

@@ -13,6 +13,9 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/characters/female/boot_l.png" id="11_bootlpng"]
 [ext_resource type="Texture2D" path="res://assets/sprites/characters/female/boot_r.png" id="12_bootrpng"]
 [ext_resource type="Texture2D" path="res://assets/sprites/characters/female/cloth_top.png" id="13_clothtoppn"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/female/head_back.png" id="14_headbackpn"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/female/hair_back.png" id="15_hairbackpn"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/female/torso_back.png" id="16_torsobackp"]
 
 [resource]
 script = ExtResource("1_charactera")
@@ -24,6 +27,9 @@ leg_r = ExtResource("6_legrpng")
 hand_l = ExtResource("7_handlpng")
 hand_r = ExtResource("8_handrpng")
 hair = ExtResource("9_hairpng")
+head_back = ExtResource("14_headbackpn")
+hair_back = ExtResource("15_hairbackpn")
+torso_back = ExtResource("16_torsobackp")
 cloth_top = ExtResource("13_clothtoppn")
 cloth_bottom = ExtResource("10_clothbotto")
 boot_l = ExtResource("11_bootlpng")

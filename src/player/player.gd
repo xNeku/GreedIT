@@ -8,12 +8,17 @@ extends CharacterBody2D
 ## - Dash (Shift). Más adelante lo darán objetos; ahora viene de serie para probar.
 ## - Hotbar estilo Terraria (1-6 / rueda).
 ## - Interactuar (E) con recursos cercanos: minería, herboristería y pesca.
+## - Magia: clic de la rueda lanza el hechizo equipado (bola de fuego) gastando maná.
 
 signal hotbar_changed(items: Array[ItemData], selected: int)
 signal jumped
 signal landed(was_plunging: bool)
 signal gathering_started(target: Gatherable)
 signal gathering_stopped
+signal mana_changed(mana: float, max_mana: float)
+## Intentaste lanzar sin maná o en enfriamiento.
+signal cast_failed(reason: String)
+signal spell_cast(spell: SpellData)
 
 const GROUND_MASK := 1 | 4 ## world + enemies
 const AIR_MASK := 1 ## en el aire solo chocas con el mundo
@@ -46,6 +51,13 @@ const AIR_MASK := 1 ## en el aire solo chocas con el mundo
 @export var hotbar: Array[ItemData] = []
 @export var selected_slot := 0
 
+@export_group("Magia")
+## Hechizo de la rueda del ratón.
+@export var spell: SpellData
+@export var max_mana := 100.0
+## Maná por segundo.
+@export var mana_regen := 12.0
+
 @export_group("Aspecto")
 ## Pulsa C para ir cambiando entre estos aspectos.
 @export var appearances: Array[CharacterAppearance] = []
@@ -60,6 +72,7 @@ var is_airborne := false
 var aim_angle := 0.0
 ## 1 = mira a la derecha, -1 = a la izquierda.
 var facing := 1.0
+var mana := 100.0
 var is_gathering: bool:
 	get:
 		return _gather_target != null
@@ -81,6 +94,8 @@ var _interactables: Array[Gatherable] = []
 var _focused: Gatherable
 var _gather_target: Gatherable
 var _tool: GatherTool
+var _spell_cooldown := 0.0
+var _last_mana_emitted := -1.0
 
 @onready var visual_root: Node2D = $VisualRoot
 @onready var character_visual: CharacterVisual = $VisualRoot/CharacterVisual
@@ -99,6 +114,7 @@ func _ready() -> void:
 	interact_area.area_exited.connect(_on_interact_area_exited)
 	if not appearances.is_empty():
 		character_visual.appearance = appearances[0]
+	mana = max_mana
 	select_slot(selected_slot)
 
 
@@ -125,6 +141,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		try_dash()
 	elif event.is_action_pressed("interact"):
 		interact()
+	elif event.is_action_pressed("cast_spell"):
+		try_cast()
 	elif event.is_action_pressed("hotbar_next"):
 		select_slot(wrapi(selected_slot + 1, 0, hotbar.size()))
 	elif event.is_action_pressed("hotbar_prev"):
@@ -141,6 +159,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _physics_process(delta: float) -> void:
 	_dash_cooldown_timer = maxf(0.0, _dash_cooldown_timer - delta)
+	_update_mana(delta)
 	var input_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	if is_gathering and input_dir != Vector2.ZERO:
 		_stop_gathering()
@@ -226,7 +245,26 @@ func _update_facing_and_aim() -> void:
 			facing = signf(velocity.x)
 		aim_angle = 0.0 if facing > 0.0 else PI
 	_apply_aim()
-	aim_pivot.z_index = -1 if (aiming and sin(aim_angle) < -0.35) else 1
+	_update_view(aiming)
+	var behind := sin(aim_angle) < -0.35 if aiming else character_visual.view == CharacterVisual.View.BACK
+	aim_pivot.z_index = -1 if behind else 1
+
+
+## Frente / lado / espalda: según hacia dónde apuntas (atacando) o hacia dónde te mueves.
+func _update_view(aiming: bool) -> void:
+	var dir := Vector2.ZERO
+	if aiming or is_gathering:
+		dir = Vector2.RIGHT.rotated(aim_angle)
+	elif velocity.length() > 12.0:
+		dir = velocity.normalized()
+	if dir == Vector2.ZERO:
+		return # quieto: conserva la última vista
+	var view := CharacterVisual.View.SIDE
+	if dir.y < -0.6:
+		view = CharacterVisual.View.BACK
+	elif dir.y > 0.6:
+		view = CharacterVisual.View.FRONT
+	character_visual.set_view(view)
 
 
 func _apply_aim() -> void:
@@ -431,6 +469,64 @@ func _stop_gathering() -> void:
 	if current_weapon:
 		current_weapon.visible = true
 	gathering_stopped.emit()
+
+
+# --- Magia ----------------------------------------------------------------
+
+## Clic de la rueda: lanza el hechizo hacia el ratón. El arma hace el gesto con la mano libre
+## y llama a release_spell() en el momento justo.
+func try_cast() -> void:
+	if spell == null:
+		return
+	if _spell_cooldown > 0.0:
+		cast_failed.emit("Recargando")
+		return
+	if mana < spell.mana_cost:
+		cast_failed.emit("Sin maná")
+		return
+	_stop_gathering()
+	_aim_at_target()
+	mana -= spell.mana_cost
+	_spell_cooldown = spell.cooldown
+	spell_cast.emit(spell)
+	if current_weapon and current_weapon.visible:
+		current_weapon.cast()
+	else:
+		release_spell()
+
+
+## Crea el proyectil del hechizo en la mano libre (o delante del pecho).
+func release_spell() -> void:
+	if spell == null or spell.projectile_scene == null:
+		return
+	var origin := aim_pivot.global_position + aim_direction() * 14.0
+	if current_weapon:
+		var hand := current_weapon.find_child("HandOff", true, false) as Node2D
+		if hand:
+			origin = hand.global_position
+	var projectile := spell.projectile_scene.instantiate() as Fireball
+	var to_target := get_aim_target() - origin
+	projectile.direction = to_target.normalized() if to_target.length() > 4.0 else aim_direction()
+	projectile.speed = spell.projectile_speed
+	projectile.spell = spell
+	projectile.caster = self
+	get_parent().add_child(projectile)
+	projectile.global_position = origin
+
+
+## 0 = listo, 1 = recién lanzado.
+func spell_cooldown_ratio() -> float:
+	if spell == null or spell.cooldown <= 0.0:
+		return 0.0
+	return clampf(_spell_cooldown / spell.cooldown, 0.0, 1.0)
+
+
+func _update_mana(delta: float) -> void:
+	_spell_cooldown = maxf(0.0, _spell_cooldown - delta)
+	mana = minf(max_mana, mana + mana_regen * delta)
+	if absf(mana - _last_mana_emitted) >= 0.5 or (mana >= max_mana and _last_mana_emitted < max_mana):
+		_last_mana_emitted = mana
+		mana_changed.emit(mana, max_mana)
 
 
 # --- Hotbar / aspecto -----------------------------------------------------

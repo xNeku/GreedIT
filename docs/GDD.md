@@ -35,7 +35,9 @@ Pilares:
 - **Salto** (marca de la casa, inspirado en Conquer Online): saltas hacia el cursor en un arco. En el aire pasas por
   encima de enemigos. Atacar en el aire = ataque aéreo + caída en picado con impacto al aterrizar.
 - **Dash**: lo darán objetos (de momento viene de serie para probar).
-- No hay más habilidades activas. Todo sale de las armas y lo que las modifica.
+- **Magia**: clic de la rueda lanza el hechizo equipado (de momento, bola de fuego) gastando maná.
+  Los hechizos se ampliarán con la rama de Magia de los talentos.
+- Aparte de eso no hay habilidades activas: todo sale de las armas y lo que las modifica.
 
 ### Armas
 - Puedes llevar todas las armas (hotbar estilo Terraria) y cambiar al vuelo.

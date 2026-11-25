@@ -4,6 +4,8 @@ extends Node
 ##   y salto + ataque aéreo. Todo debe hacer daño.
 ## - El salto va hacia donde te mueves.
 ## - Minería, herboristería y pesca dan materiales.
+## - La bola de fuego (clic de la rueda) gasta maná y hace daño en área.
+## - La vista del personaje cambia según hacia dónde se mueve (frente / lado / espalda).
 ##
 ## Uso:   godot --headless --path . res://tests/smoke_test.tscn
 ## Con capturas (necesita render, no --headless):
@@ -34,6 +36,8 @@ func _run() -> void:
 	for i in _player.hotbar.size():
 		await _test_weapon(i)
 
+	await _test_fireball()
+	await _test_views()
 	await _test_jump_direction()
 	await _test_gathering("World/OreRock1", Vector2(-32, 0), &"copper_ore", "minería")
 	await _test_gathering("World/HerbBush1", Vector2(-30, 2), &"sage", "herboristería")
@@ -117,6 +121,60 @@ func _test_weapon(index: int) -> void:
 	for phase in phases:
 		if phases[phase] <= 0:
 			_failures.append("%s: '%s' no hizo daño" % [weapon_name, phase])
+
+
+func _test_fireball() -> void:
+	_player.select_slot(1)
+	_reset_player()
+	_player.global_position = _dummy.global_position + Vector2(-110, 0)
+	_player.mana = _player.max_mana
+	await _wait(0.3)
+	var before := _dummy._total
+	var mana_before := _player.mana
+	_player.try_cast()
+	await _wait(0.08)
+	await _shot("69_fireball_cast")
+	await _wait(0.16)
+	await _shot("70_fireball_flight")
+	await _wait(0.2)
+	await _shot("71_fireball_hit")
+	await _wait(0.6)
+	var damage := _dummy._total - before
+	print("Bola de fuego: daño %d, maná %d -> %d" % [damage, mana_before, _player.mana])
+	if damage <= 0:
+		_failures.append("bola de fuego: no hizo daño")
+	if _player.mana >= mana_before:
+		_failures.append("bola de fuego: no gastó maná")
+	# Sin maná no se lanza
+	_player.mana = 0.0
+	var failed := [false]
+	_player.cast_failed.connect(func(_r: String) -> void: failed[0] = true, CONNECT_ONE_SHOT)
+	_player.try_cast()
+	if not failed[0]:
+		_failures.append("bola de fuego: se lanzó sin maná")
+	_player.mana = _player.max_mana
+
+
+func _test_views() -> void:
+	_player.aim_target_override = null
+	_player.global_position = Vector2(0, 230)
+	var cases := {Vector2.UP: CharacterVisual.View.BACK, Vector2.RIGHT: CharacterVisual.View.SIDE, Vector2.DOWN: CharacterVisual.View.FRONT}
+	for dir: Vector2 in cases:
+		_player.velocity = dir * _player.move_speed
+		_player._update_facing_and_aim()
+		await _wait(0.05)
+		if _player.character_visual.view != cases[dir]:
+			_failures.append("vista: moviéndose %s debería ser %s" % [dir, cases[dir]])
+	_player.velocity = Vector2.UP * _player.move_speed
+	_player._update_facing_and_aim()
+	await _wait(0.05)
+	await _shot("75_view_back")
+	_player.velocity = Vector2.RIGHT * _player.move_speed
+	_player._update_facing_and_aim()
+	await _wait(0.05)
+	await _shot("76_view_side")
+	_player.velocity = Vector2.ZERO
+	_player._update_facing_and_aim()
 
 
 func _test_jump_direction() -> void:

@@ -28,6 +28,13 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [x] Recolección infinita con tecla E: minería (pico), herboristería (hoz) y pesca (caña con minijuego)
 - [x] Inventario de materiales + panel en el HUD + texto "+1 ..." al recoger
 
+## Hito 0.3: Sprite más vivo y magia (hecho)
+
+- [x] Vistas del personaje: frente, lado (3/4 con ojos y pelo girados) y espalda (pelo, nuca y espalda nuevos)
+- [x] Zancada al andar de lado, parpadeo y respiración en reposo
+- [x] Maná con regeneración + barra en el HUD
+- [x] Bola de fuego con clic de la rueda: gesto de la mano libre, proyectil con luz y estela, explosión en área
+
 ## Hito 1: Sensación de combate (siguiente)
 
 - [ ] Ajustar a mano tiempos y poses de cada arma en el editor según feedback de juego
@@ -37,7 +44,7 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [ ] Saltar por encima de obstáculos bajos (capa "low_obstacles" que se ignora en el aire)
 - [ ] Hurtbox del jugador + vida + muerte (saco de materiales con temporizador)
 - [ ] Mando: apuntado con stick (ya existe `Player.aim_target_override`)
-- [ ] Vistas de espalda/perfil para que andar hacia arriba/abajo no se vea siempre de frente
+- [ ] Perfil real dibujado a mano (ahora el lado es el frente con ojos y pelo desplazados)
 
 ## Hito 2: Primer enemigo de verdad
 
@@ -59,6 +66,12 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [ ] Arquitectura host-cliente (MultiplayerSpawner / MultiplayerSynchronizer)
 - [ ] Sincronizar jugador, armas, golpes
 - [ ] Chunks cargados por jugador
+
+## Magia (siguiente)
+
+- [ ] Más hechizos (rayo, escarcha, curación...) y un hueco de hechizo seleccionable
+- [ ] Estados elementales (quemado, congelado...) a través de `HitData.tags`
+- [ ] Rama de Magia del árbol de talentos que modifique los hechizos
 
 ## Sistemas de build (diseño pendiente)
 

@@ -32,6 +32,7 @@ src/
   player/               Player, PlayerCamera
   weapons/              weapon.gd (base), projectile.gd, weapon_trail.gd, una carpeta por arma (.tscn + .tres)
   gathering/            Gatherable (recurso infinito), GatherTool / FishingRod, tools/, resources/
+  spells/               SpellData, SpellExplosion, una carpeta por hechizo (fireball/: proyectil, explosión, .tres)
   items/materials/      materiales (.tres de ItemData)
   enemies/              enemigos (de momento TrainingDummy)
   world/                escenas de mundo/niveles y props
@@ -98,6 +99,14 @@ Materiales compartidos en `assets/materials/`: `unshaded.tres` (ignora la oscuri
 4. En el `.tres`: daño, críticos, modo de mantener (CHARGE o REPEAT), apunta `weapon_scene` a tu escena.
 5. Añade el `.tres` a la `hotbar` del jugador (inspector de `src/player/player.tscn`).
 
+### Magia
+
+- Clic de la rueda (`cast_spell`) lanza `Player.spell` (un `SpellData`) gastando maná (`max_mana`, `mana_regen`).
+- El arma hace el gesto con la mano libre (animación `cast`, con la llama `HandOff/HandFlame`) y llama a `release_spell()`.
+  Si el arma no tiene `cast` (o estás en pleno salto de ataque), el hechizo sale directamente.
+- Un hechizo = escena de proyectil (p. ej. `fireball.gd`) + escena de explosión (`SpellExplosion`, daño en área
+  con una consulta de física) + `.tres` con los números. Los golpes también se emiten por `Events.hit_landed`.
+
 ### Recolección (minería, herboristería, pesca)
 
 - Un recurso es una escena con `gatherable.gd` (`src/gathering/resources/`): sprite, `InteractArea` (capa 8),
@@ -113,6 +122,11 @@ Las capas del personaje comparten un lienzo de **52x70 px** con los pies abajo e
 `leg_l/r`, `boot_l/r`, `torso`, `cloth_bottom`, `cloth_top`, `head`, `eyes`, `hair`. Las manos (`hand_l/r`) van recortadas
 porque flotan y las mueve el arma. Un `CharacterAppearance` (.tres) dice qué textura usa cada capa.
 Para un pelo, ropa o armadura nueva: pinta sobre el lienzo de 52x70 y asígnala en un `CharacterAppearance`.
+
+Vistas (`CharacterVisual.View`): **FRONT**, **SIDE** y **BACK**. El jugador elige la vista según hacia dónde se mueve
+(o apunta al atacar). De espalda se usan `head_back`, `hair_back` y `torso_back`; de lado se reutiliza el frente
+desplazando ojos (+2 px) y pelo (-1 px) y se usa la animación `walk_side` (zancada). Si añades ropa o pelo nuevo,
+pinta también su versión de espalda (si no, se usa la de frente).
 
 ## Pixel art
 
