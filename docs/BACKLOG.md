@@ -51,6 +51,7 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [ ] Árbol de talentos (Vida / Destreza / Daño / Magia) + talentos clave
 - [ ] Peso de armas vs fuerza (penalización suave)
 - [ ] Dual wield
+- [ ] Agarre a dos manos para armas pesadas (ahora todas van a una mano; la mano libre flota)
 - [ ] Forja: materiales → afijos
 - [ ] Brebajes: ingredientes con propiedades por bioma
 
