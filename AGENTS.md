@@ -34,7 +34,8 @@ src/
   gathering/            Gatherable (recurso infinito), GatherTool / FishingRod, tools/, resources/
   spells/               SpellData, SpellExplosion, una carpeta por hechizo (fireball/: proyectil, explosión, .tres)
   items/materials/      materiales (.tres de ItemData)
-  enemies/              enemigos (de momento TrainingDummy)
+  enemies/              Enemy (IA base), EnemyProjectile, MobSpawner, una carpeta por mob (goblin/, skeleton/, zombie/)
+                        y training_dummy/
   world/                escenas de mundo/niveles y props
   ui/                   HUD, hotbar, panel de materiales, cartel "E", textos flotantes
 tests/                  test de humo ejecutable en headless
@@ -60,8 +61,8 @@ Cada cosa vive en una carpeta por funcionalidad, con su escena, su script y sus 
 | 3 | enemies | cuerpo de enemigos / muñecos |
 | 4 | player_attacks | Hitbox y proyectiles del jugador |
 | 5 | enemy_hurtbox | Hurtbox de enemigos |
-| 6 | player_hurtbox | Hurtbox del jugador (futuro) |
-| 7 | enemy_attacks | ataques enemigos (futuro) |
+| 6 | player_hurtbox | Hurtbox del jugador |
+| 7 | enemy_attacks | Hitbox y proyectiles de los enemigos |
 | 8 | interactables | InteractArea de recursos y objetos con los que se usa la E |
 
 Capa de render 2 (`no_shadow`): sprites altos (columnas, braseros) que reciben luz pero no se oscurecen con su propia sombra.
@@ -98,6 +99,21 @@ Materiales compartidos en `assets/materials/`: `unshaded.tres` (ignora la oscuri
 3. Edita las animaciones con los nombres estándar (ver cabecera de `weapon.gd`). Las que no existan simplemente no se usan.
 4. En el `.tres`: daño, críticos, modo de mantener (CHARGE o REPEAT), apunta `weapon_scene` a tu escena.
 5. Añade el `.tres` a la `hotbar` del jugador (inspector de `src/player/player.tscn`).
+
+### Enemigos
+
+- `enemy.gd` es una IA por estados: IDLE/WANDER (deambula cerca de su sitio) → CHASE (te ve a `detection_radius`)
+  → ATTACK (animación `attack`) → HURT (aturdido) → DEAD. Todo se ajusta con `@export` en el inspector.
+- Escena de un mob: `Visual/Body` (con `LegL`, `LegR`, `Upper` del sprite troceado y el shader de flash en `Body`),
+  `Hurtbox` (capa 5), `AttackPivot/AttackHitbox` (capa 7, apunta al jugador al empezar el ataque),
+  `AttackPivot/Muzzle` (opcional, proyectiles), `HealthBar/Fill`, `DeathParticles` y `AnimationPlayer`
+  con `idle`, `walk`, `attack`, `hurt` y `die`.
+- La animación `attack` tiene un **aviso** (el cuerpo se tiñe y se echa atrás) antes del golpe, para poder esquivar.
+  Pistas de método: `attack_lunge()`, `fire_projectile()`, `attack_shake()`.
+- `MobSpawner` (Marker2D) mantiene N mobs vivos y los reaparece al morir. Al morir sueltan `drop` directo al inventario.
+- El jugador esquiva los golpes saltando alto (`dodge_height`) o en dash, y tras un golpe es invulnerable un momento.
+- Para un mob nuevo: trocea su sprite en `upper` / `leg_l` / `leg_r` (mismo lienzo, pies abajo en el centro),
+  duplica la escena de uno parecido y cambia texturas, números y la animación `attack`.
 
 ### Magia
 

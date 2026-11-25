@@ -8,6 +8,9 @@ extends CanvasLayer
 
 @onready var hotbar: HBoxContainer = $Hotbar
 @onready var item_name: Label = $ItemName
+@onready var health_bar: ProgressBar = $HealthBar
+@onready var health_label: Label = $HealthLabel
+@onready var death_message: Label = $DeathMessage
 @onready var mana_bar: ProgressBar = $ManaBar
 @onready var mana_label: Label = $ManaLabel
 @onready var spell_icon: TextureRect = $SpellSlot/Icon
@@ -26,6 +29,11 @@ func _ready() -> void:
 		_on_hotbar_changed(player.hotbar, player.selected_slot)
 		player.inventory.changed.connect(_on_inventory_changed)
 		player.mana_changed.connect(_on_mana_changed)
+		player.health_changed.connect(_on_health_changed)
+		player.died.connect(func() -> void: death_message.visible = true)
+		player.respawned.connect(func() -> void: death_message.visible = false)
+		_on_health_changed(player.health, player.max_health)
+		death_message.visible = false
 		player.cast_failed.connect(_on_cast_failed)
 		_on_mana_changed(player.mana, player.max_mana)
 		spell_icon.texture = player.spell.icon if player.spell else null
@@ -58,6 +66,12 @@ func _process(_delta: float) -> void:
 	var ratio := player.spell_cooldown_ratio()
 	spell_cooldown.visible = ratio > 0.0 or (player.spell != null and player.mana < player.spell.mana_cost)
 	spell_cooldown.size.y = 20.0 * (ratio if ratio > 0.0 else 1.0)
+
+
+func _on_health_changed(health: float, max_health: float) -> void:
+	health_bar.max_value = max_health
+	health_bar.value = health
+	health_label.text = "Vida %d" % ceili(health)
 
 
 func _on_mana_changed(mana: float, max_mana: float) -> void:

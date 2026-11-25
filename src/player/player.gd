@@ -9,6 +9,8 @@ extends CharacterBody2D
 ## - Hotbar estilo Terraria (1-6 / rueda).
 ## - Interactuar (E) con recursos cercanos: minería, herboristería y pesca.
 ## - Magia: clic de la rueda lanza el hechizo equipado (bola de fuego) gastando maná.
+## - Vida: recibe golpes en su Hurtbox; tras un golpe parpadea invulnerable. Saltando alto o en dash
+##   esquivas los golpes. Fuera de combate regenera. Al morir reaparece en el punto de inicio.
 
 signal hotbar_changed(items: Array[ItemData], selected: int)
 signal jumped
@@ -19,6 +21,9 @@ signal mana_changed(mana: float, max_mana: float)
 ## Intentaste lanzar sin maná o en enfriamiento.
 signal cast_failed(reason: String)
 signal spell_cast(spell: SpellData)
+signal health_changed(health: float, max_health: float)
+signal died
+signal respawned
 
 const GROUND_MASK := 1 | 4 ## world + enemies
 const AIR_MASK := 1 ## en el aire solo chocas con el mundo
@@ -58,6 +63,19 @@ const AIR_MASK := 1 ## en el aire solo chocas con el mundo
 ## Maná por segundo.
 @export var mana_regen := 12.0
 
+@export_group("Vida")
+@export var max_health := 100.0
+## Segundos invulnerable (parpadeando) tras recibir un golpe.
+@export var invulnerability_time := 0.7
+## Vida por segundo fuera de combate.
+@export var health_regen := 4.0
+## Segundos sin recibir daño para empezar a regenerar.
+@export var regen_delay := 4.0
+## Por encima de esta altura de salto, los golpes no te alcanzan.
+@export var dodge_height := 12.0
+@export var respawn_delay := 1.6
+@export var damage_number_scene: PackedScene
+
 @export_group("Aspecto")
 ## Pulsa C para ir cambiando entre estos aspectos.
 @export var appearances: Array[CharacterAppearance] = []
@@ -73,6 +91,8 @@ var aim_angle := 0.0
 ## 1 = mira a la derecha, -1 = a la izquierda.
 var facing := 1.0
 var mana := 100.0
+var health := 100.0
+var is_dead := false
 var is_gathering: bool:
 	get:
 		return _gather_target != null
@@ -96,6 +116,10 @@ var _gather_target: Gatherable
 var _tool: GatherTool
 var _spell_cooldown := 0.0
 var _last_mana_emitted := -1.0
+var _invulnerable_timer := 0.0
+var _hurt_flash := 0.0
+var _since_damage := 100.0
+var _spawn_point := Vector2.ZERO
 
 @onready var visual_root: Node2D = $VisualRoot
 @onready var character_visual: CharacterVisual = $VisualRoot/CharacterVisual
@@ -106,6 +130,7 @@ var _last_mana_emitted := -1.0
 @onready var dust: CPUParticles2D = $GroundFX/Dust
 @onready var interact_area: Area2D = $InteractArea
 @onready var prompt: InteractPrompt = $Prompt
+@onready var hurtbox: Hurtbox = $Hurtbox
 
 
 func _ready() -> void:
@@ -115,10 +140,15 @@ func _ready() -> void:
 	if not appearances.is_empty():
 		character_visual.appearance = appearances[0]
 	mana = max_mana
+	health = max_health
+	_spawn_point = global_position
+	hurtbox.hit_received.connect(_on_hit_received)
 	select_slot(selected_slot)
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if is_dead:
+		return
 	if event.is_action_pressed("attack_primary"):
 		_stop_gathering()
 		_aim_at_target()
@@ -160,6 +190,11 @@ func _unhandled_input(event: InputEvent) -> void:
 func _physics_process(delta: float) -> void:
 	_dash_cooldown_timer = maxf(0.0, _dash_cooldown_timer - delta)
 	_update_mana(delta)
+	_update_health(delta)
+	if is_dead:
+		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
+		move_and_slide()
+		return
 	var input_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	if is_gathering and input_dir != Vector2.ZERO:
 		_stop_gathering()
@@ -469,6 +504,76 @@ func _stop_gathering() -> void:
 	if current_weapon:
 		current_weapon.visible = true
 	gathering_stopped.emit()
+
+
+# --- Vida -----------------------------------------------------------------
+
+func _on_hit_received(hit: HitData) -> void:
+	if is_dead or _invulnerable_timer > 0.0 or _dash_timer > 0.0 or z > dodge_height:
+		return
+	health = maxf(0.0, health - hit.amount)
+	_since_damage = 0.0
+	_invulnerable_timer = invulnerability_time
+	_hurt_flash = 1.0
+	health_changed.emit(health, max_health)
+	_spawn_damage_number(hit)
+	_stop_gathering()
+	if not is_airborne:
+		velocity = hit.knockback * 1.3
+	Events.camera_shake_requested.emit(4.0, 0.2)
+	Events.hitstop_requested.emit(0.05)
+	if health <= 0.0:
+		_die()
+
+
+func _spawn_damage_number(hit: HitData) -> void:
+	if damage_number_scene == null:
+		return
+	var number := damage_number_scene.instantiate() as DamageNumber
+	number.amount = hit.amount
+	number.is_crit = hit.is_crit
+	number.color_override = Color(1.0, 0.35, 0.3)
+	var container := get_tree().get_first_node_in_group(&"world_overlay")
+	(container if container else get_parent()).add_child(number)
+	number.global_position = global_position + Vector2(0, -78)
+
+
+func _update_health(delta: float) -> void:
+	_invulnerable_timer = maxf(0.0, _invulnerable_timer - delta)
+	_hurt_flash = move_toward(_hurt_flash, 0.0, delta * 5.0)
+	_since_damage += delta
+	if not is_dead and _since_damage > regen_delay and health < max_health:
+		health = minf(max_health, health + health_regen * delta)
+		health_changed.emit(health, max_health)
+	# Rojo al recibir el golpe y parpadeo mientras eres invulnerable.
+	var color := Color(1.0, 1.0 - _hurt_flash * 0.65, 1.0 - _hurt_flash * 0.65)
+	if _invulnerable_timer > 0.0 and not is_dead:
+		color.a = 0.35 if fmod(_invulnerable_timer, 0.12) < 0.06 else 1.0
+	visual_root.modulate = color
+
+
+func _die() -> void:
+	is_dead = true
+	_stop_gathering()
+	if current_weapon:
+		current_weapon.cancel()
+	set_prompt("")
+	character_visual.play_land(true)
+	visual_root.rotation = -PI / 2.0 * facing # cae de lado
+	died.emit()
+	get_tree().create_timer(respawn_delay).timeout.connect(_respawn)
+
+
+func _respawn() -> void:
+	is_dead = false
+	visual_root.rotation = 0.0
+	global_position = _spawn_point
+	velocity = Vector2.ZERO
+	health = max_health
+	mana = max_mana
+	_invulnerable_timer = 2.0
+	health_changed.emit(health, max_health)
+	respawned.emit()
 
 
 # --- Magia ----------------------------------------------------------------

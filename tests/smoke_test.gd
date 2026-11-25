@@ -6,6 +6,8 @@ extends Node
 ## - Minería, herboristería y pesca dan materiales.
 ## - La bola de fuego (clic de la rueda) gasta maná y hace daño en área.
 ## - La vista del personaje cambia según hacia dónde se mueve (frente / lado / espalda).
+## - Mobs: te atacan (cuerpo a cuerpo y a distancia), mueren, sueltan botín y reaparecen.
+## - El jugador muere y reaparece.
 ##
 ## Uso:   godot --headless --path . res://tests/smoke_test.tscn
 ## Con capturas (necesita render, no --headless):
@@ -39,6 +41,11 @@ func _run() -> void:
 	await _test_fireball()
 	await _test_views()
 	await _test_jump_direction()
+	await _test_mob_attacks("GoblinSpawner", 36.0, "goblin")
+	await _test_mob_attacks("SkeletonSpawner", 120.0, "esqueleto")
+	await _test_kill_with_sword("GoblinSpawner")
+	await _test_kill_with_fireballs("ZombieSpawner")
+	await _test_player_death()
 	await _test_gathering("World/OreRock1", Vector2(-32, 0), &"copper_ore", "minería")
 	await _test_gathering("World/HerbBush1", Vector2(-30, 2), &"sage", "herboristería")
 	await _test_fishing()
@@ -240,11 +247,117 @@ func _test_fishing() -> void:
 	_player._stop_gathering()
 
 
+func _first_mob(spawner_name: String) -> Enemy:
+	var spawner := _scene.get_node("World/" + spawner_name) as MobSpawner
+	for enemy in spawner.alive():
+		if is_instance_valid(enemy) and enemy.state != Enemy.State.DEAD:
+			return enemy
+	return null
+
+
+func _test_mob_attacks(spawner_name: String, distance: float, label: String) -> void:
+	var mob := _first_mob(spawner_name)
+	if mob == null:
+		_failures.append("%s: no hay mobs" % label)
+		return
+	_player.health = _player.max_health
+	_player.aim_target_override = null
+	_player.global_position = mob.global_position + Vector2(-distance, 0)
+	_player.velocity = Vector2.ZERO
+	var waited := 0.0
+	var shot_done := false
+	while _player.health >= _player.max_health and waited < 5.0:
+		await _wait(0.05)
+		waited += 0.05
+		if not shot_done and mob.state == Enemy.State.ATTACK:
+			await _wait(0.2)
+			await _shot("60_%s_attack" % label)
+			shot_done = true
+	print("%-10s -> te quitó %d de vida en %.1fs" % [label, _player.max_health - _player.health, waited])
+	if _player.health >= _player.max_health:
+		_failures.append("%s: no ataca al jugador" % label)
+	_player.health = _player.max_health
+	_player.global_position = Vector2(0, 230)
+	await _wait(1.0)
+
+
+func _test_kill_with_sword(spawner_name: String) -> void:
+	_player.select_slot(1)
+	var mob := _first_mob(spawner_name)
+	var spawner := _scene.get_node("World/" + spawner_name) as MobSpawner
+	var count_before := spawner.alive().size()
+	var ears_before := _player.inventory.count_by_id(&"goblin_ear")
+	var waited := 0.0
+	var hit_shot := false
+	while is_instance_valid(mob) and mob.state != Enemy.State.DEAD and waited < 8.0:
+		_player.health = _player.max_health
+		_player.global_position = mob.global_position + Vector2(-30, 0)
+		_player.aim_target_override = mob.hurtbox.global_position
+		_player._aim_at_target() # lo que hace el input real antes de atacar
+		_player.current_weapon.primary_pressed()
+		await _wait(0.05)
+		_player.current_weapon.primary_released()
+		await _wait(0.3)
+		waited += 0.35
+		if not hit_shot and mob.health < mob.max_health:
+			await _shot("61_goblin_hit")
+			hit_shot = true
+	if is_instance_valid(mob) and mob.state != Enemy.State.DEAD:
+		_failures.append("espada: no consigue matar al goblin")
+		return
+	await _wait(0.2)
+	await _shot("62_goblin_dead")
+	print("Goblin muerto en %.1fs (orejas: %d -> %d)" % [waited, ears_before, _player.inventory.count_by_id(&"goblin_ear")])
+	_player.global_position = Vector2(0, 230)
+	_player.aim_target_override = null
+	await _wait(5.6)
+	if spawner.alive().size() < count_before:
+		_failures.append("los goblins no reaparecen")
+
+
+func _test_kill_with_fireballs(spawner_name: String) -> void:
+	var mob := _first_mob(spawner_name)
+	var waited := 0.0
+	while is_instance_valid(mob) and mob.state != Enemy.State.DEAD and waited < 10.0:
+		_player.health = _player.max_health
+		_player.mana = _player.max_mana
+		_player.global_position = mob.global_position + Vector2(-90, 0)
+		_player.aim_target_override = mob.hurtbox.global_position
+		_player.try_cast()
+		await _wait(0.5)
+		waited += 0.5
+	if is_instance_valid(mob) and mob.state != Enemy.State.DEAD:
+		_failures.append("bola de fuego: no consigue matar al zombi")
+	else:
+		print("Zombi muerto a bolas de fuego en %.1fs" % waited)
+	_player.global_position = Vector2(0, 230)
+	_player.aim_target_override = null
+	await _wait(0.5)
+
+
+func _test_player_death() -> void:
+	var hit := HitData.new()
+	hit.amount = 9999
+	_player._invulnerable_timer = 0.0
+	_player.hurtbox.receive_hit(hit)
+	await _wait(0.3)
+	await _shot("95_dead")
+	if not _player.is_dead:
+		_failures.append("el jugador no muere con 0 de vida")
+		return
+	await _wait(_player.respawn_delay + 0.3)
+	if _player.is_dead or _player.health < _player.max_health:
+		_failures.append("el jugador no reaparece")
+	else:
+		print("Muerte y reaparición OK")
+
+
 ## Coloca al jugador a la izquierda del muñeco, apuntándole.
 func _reset_player() -> void:
 	_player.global_position = _dummy.global_position + Vector2(-38, 0)
 	_player.velocity = Vector2.ZERO
 	_player.aim_target_override = _dummy.hurtbox.global_position
+	_player._aim_at_target()
 
 
 func _wait(seconds: float) -> void:

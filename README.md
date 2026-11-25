@@ -3,7 +3,7 @@
 ARPG cooperativo top-down en pixel art: **Terraria + Path of Exile**.
 Farmear, forjar, hacerte una build bestia y tumbar bosses con tus colegas.
 
-> Estado: **sandbox 0.3**. Personaje con vistas de frente/lado/espalda, 6 armas, bola de fuego, muñecos de entrenamiento y recolección (minería, herboristería y pesca).
+> Estado: **sandbox 0.4**. Personaje con vistas de frente/lado/espalda, 6 armas, bola de fuego, primeros mobs (goblin, esqueleto y zombi, al norte del mapa), muñecos de entrenamiento y recolección (minería, herboristería y pesca).
 
 ## Cómo abrirlo
 

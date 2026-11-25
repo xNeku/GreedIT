@@ -35,6 +35,13 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [x] Maná con regeneración + barra en el HUD
 - [x] Bola de fuego con clic de la rueda: gesto de la mano libre, proyectil con luz y estela, explosión en área
 
+## Hito 0.4: Primeros mobs (hecho)
+
+- [x] Goblin (rápido, embiste), esqueleto (guarda distancia y lanza huesos) y zombi (lento, aguanta, aplasta en área)
+- [x] IA por estados con aviso antes de atacar, aturdimiento, knockback, barra de vida y muerte
+- [x] Botín directo al inventario (oreja de goblin, hueso, carne podrida) y reaparición con `MobSpawner`
+- [x] Vida del jugador: hurtbox, invulnerabilidad tras golpe, esquivar saltando o con dash, regeneración, muerte y reaparición
+
 ## Hito 1: Sensación de combate (siguiente)
 
 - [ ] Ajustar a mano tiempos y poses de cada arma en el editor según feedback de juego
@@ -42,16 +49,16 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [ ] Trails de arma (Line2D) y partículas de impacto por tipo de arma
 - [ ] Buffer de input más fino y ventana de cancelación configurable por animación
 - [ ] Saltar por encima de obstáculos bajos (capa "low_obstacles" que se ignora en el aire)
-- [ ] Hurtbox del jugador + vida + muerte (saco de materiales con temporizador)
+- [ ] Al morir, soltar el saco de materiales con temporizador (ahora solo reapareces)
 - [ ] Mando: apuntado con stick (ya existe `Player.aim_target_override`)
 - [ ] Perfil real dibujado a mano (ahora el lado es el frente con ojos y pelo desplazados)
 
-## Hito 2: Primer enemigo de verdad
+## Hito 2: Enemigos y progresión
 
-- [ ] Enemigo básico con IA (perseguir, atacar, retroceder) y vida
-- [ ] Knockback real en enemigos (CharacterBody2D)
-- [ ] Drop de loot simple
+- [ ] Vistas de espalda/lado de los mobs (ahora siempre de frente, volteados)
+- [ ] Pathfinding (NavigationAgent2D) cuando haya paredes de verdad
 - [ ] XP y subida de nivel
+- [ ] Primer boss
 
 ## Hito 3: Mundo
 

@@ -11,6 +11,8 @@ extends Node2D
 
 var amount: int = 0
 var is_crit: bool = false
+## Si tiene alfa > 0, se usa este color (p. ej. rojo para el daño que recibe el jugador).
+var color_override := Color(0, 0, 0, 0)
 
 @onready var label: Label = $Holder/Label
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
@@ -18,7 +20,10 @@ var is_crit: bool = false
 
 func _ready() -> void:
 	label.text = str(amount) + ("!" if is_crit else "")
-	label.add_theme_color_override("font_color", crit_color if is_crit else normal_color)
+	var color := crit_color if is_crit else normal_color
+	if color_override.a > 0.0:
+		color = color_override
+	label.add_theme_color_override("font_color", color)
 	label.add_theme_font_size_override("font_size", crit_font_size if is_crit else normal_font_size)
 	position.x += randf_range(-horizontal_jitter, horizontal_jitter)
 	animation_player.animation_finished.connect(func(_n: StringName) -> void: queue_free())
