@@ -3,14 +3,18 @@ class_name CharacterVisual
 extends Node2D
 ## Cuerpo del personaje por capas + sus animaciones.
 ## El AnimationPlayer de la escena es la fuente de verdad: edita ahí las animaciones.
-## Vistas: FRONT (de frente), SIDE (3/4 de lado: ojos y pelo girados + zancada), BACK (de espalda).
-##   idle (respira y parpadea), walk (frente/espalda) y walk_side (zancada lateral), ambas llaman a step()
-##   jump_windup (agacharse), rise / peak / fall (fases del salto), land, land_heavy
+##
+## Vistas (`View`), que con el volteo izquierda/derecha dan 8 direcciones:
+##   FRONT (abajo), FRONT_SIDE (diagonal abajo), SIDE (lado), BACK_SIDE (diagonal arriba), BACK (arriba).
+##   De espaldas se usan las capas *_back; en diagonal y de lado se desplazan ojos y pelo para "girar" la cabeza.
+## Animaciones: idle (respira y parpadea), walk (frente/espalda), walk_diag, walk_side (todas llaman a step()),
+##   jump_windup, rise / peak / fall, land, land_heavy. Las manos libres (HandL/HandR) se balancean al andar.
+## BackWeapon: el arma guardada a la espalda (detrás del cuerpo de frente, encima de la espalda de espaldas).
 
 signal footstep
 
 enum AirPhase { GROUND, RISING, PEAK, FALLING }
-enum View { FRONT, SIDE, BACK }
+enum View { FRONT, FRONT_SIDE, SIDE, BACK_SIDE, BACK }
 
 @export var appearance: CharacterAppearance:
 	set(value):
@@ -18,11 +22,13 @@ enum View { FRONT, SIDE, BACK }
 		if is_node_ready():
 			_apply_appearance()
 
-@export_group("Vista de lado")
-## Píxeles que se desplazan los ojos hacia donde mira (simula girar la cabeza).
-@export var side_eye_shift := 2
-## Píxeles que se desplaza el pelo hacia atrás.
-@export var side_hair_shift := -1
+@export_group("Giro de cabeza")
+## Píxeles que se desplazan los ojos hacia donde mira, por vista (simula girar la cabeza).
+@export var eye_shift_diagonal := 1
+@export var eye_shift_side := 2
+## Píxeles que se desplaza el pelo hacia atrás (de espaldas en diagonal deja ver un poco de cara/oreja).
+@export var hair_shift_side := -1
+@export var hair_shift_back_diagonal := -1
 
 var view := View.FRONT
 var _moving := false
@@ -33,6 +39,9 @@ var _one_shot: StringName = &""
 @onready var flip: Node2D = $Flip
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 @onready var foot_dust: CPUParticles2D = $FootDust
+@onready var back_weapon: Sprite2D = $Flip/Body/Upper/BackWeapon
+@onready var _hand_l: Sprite2D = $Flip/Body/HandL
+@onready var _hand_r: Sprite2D = $Flip/Body/HandR
 @onready var _leg_l_skin: Sprite2D = $Flip/Body/LegL/Skin
 @onready var _leg_l_boot: Sprite2D = $Flip/Body/LegL/Boot
 @onready var _leg_r_skin: Sprite2D = $Flip/Body/LegR/Skin
@@ -66,6 +75,10 @@ func set_view(new_view: View) -> void:
 	_refresh_animation()
 
 
+func is_back_view() -> bool:
+	return view == View.BACK or view == View.BACK_SIDE
+
+
 func set_moving(moving: bool) -> void:
 	if moving != _moving:
 		_moving = moving
@@ -78,6 +91,24 @@ func set_air_phase(phase: AirPhase) -> void:
 		_refresh_animation()
 
 
+## Manos libres (cuando no hay arma ni herramienta en las manos).
+func set_free_hands_visible(value: bool) -> void:
+	_hand_l.visible = value
+	_hand_r.visible = value
+
+
+## Arma guardada a la espalda. null o sin `back_texture` = nada.
+func set_back_item(data: WeaponData) -> void:
+	if data == null or data.back_texture == null:
+		back_weapon.visible = false
+		return
+	back_weapon.visible = true
+	back_weapon.texture = data.back_texture
+	back_weapon.offset = data.back_texture_offset
+	back_weapon.position = data.back_position
+	back_weapon.rotation_degrees = data.back_rotation_degrees
+
+
 func play_jump_windup() -> void:
 	_play_one_shot(&"jump_windup")
 
@@ -86,7 +117,7 @@ func play_land(heavy: bool = false) -> void:
 	_play_one_shot(&"land_heavy" if heavy else &"land")
 
 
-## Llamado por la animación "walk" en cada pisada.
+## Llamado por las animaciones de andar en cada pisada.
 func step() -> void:
 	foot_dust.restart()
 	footstep.emit()
@@ -117,7 +148,13 @@ func _refresh_animation() -> void:
 			target = &"fall"
 		_:
 			if _moving:
-				target = &"walk_side" if view == View.SIDE else &"walk"
+				match view:
+					View.SIDE:
+						target = &"walk_side"
+					View.FRONT_SIDE, View.BACK_SIDE:
+						target = &"walk_diag"
+					_:
+						target = &"walk"
 	if animation_player.current_animation != target:
 		animation_player.play(target)
 
@@ -125,7 +162,7 @@ func _refresh_animation() -> void:
 func _apply_appearance() -> void:
 	if appearance == null:
 		return
-	var back := view == View.BACK
+	var back := is_back_view()
 	_leg_l_skin.texture = appearance.leg_l
 	_leg_r_skin.texture = appearance.leg_r
 	_leg_l_boot.texture = appearance.boot_l
@@ -137,9 +174,22 @@ func _apply_appearance() -> void:
 	_eyes.texture = appearance.eyes
 	_eyes.visible = not back
 	_hair.texture = appearance.hair_back if back and appearance.hair_back else appearance.hair
-	var side := view == View.SIDE
-	_eyes.position.x = side_eye_shift if side else 0
-	_hair.position.x = side_hair_shift if side else 0
-	for sprite: Sprite2D in [_leg_l_skin, _leg_r_skin, _torso, _head_skin]:
+	_hand_l.texture = appearance.hand_l
+	_hand_r.texture = appearance.hand_r
+	for sprite: Sprite2D in [_leg_l_skin, _leg_r_skin, _torso, _head_skin, _hand_l, _hand_r]:
 		sprite.self_modulate = appearance.skin_tint
 	_hair.self_modulate = appearance.hair_tint
+	var eye_shift := 0
+	var hair_shift := 0
+	match view:
+		View.FRONT_SIDE:
+			eye_shift = eye_shift_diagonal
+		View.SIDE:
+			eye_shift = eye_shift_side
+			hair_shift = hair_shift_side
+		View.BACK_SIDE:
+			hair_shift = hair_shift_back_diagonal
+	_eyes.position.x = eye_shift
+	_hair.position.x = hair_shift
+	# El arma de la espalda: detrás del cuerpo si te vemos de frente, encima si te vemos de espaldas.
+	back_weapon.z_index = 0 if back else -1

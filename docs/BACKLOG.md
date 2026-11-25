@@ -42,6 +42,13 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [x] Botín directo al inventario (oreja de goblin, hueso, carne podrida) y reaparición con `MobSpawner`
 - [x] Vida del jugador: hurtbox, invulnerabilidad tras golpe, esquivar saltando o con dash, regeneración, muerte y reaparición
 
+## Hito 0.5: Armas a la espalda y 8 direcciones (hecho)
+
+- [x] Arma guardada a la espalda cuando no se usa; se desenfunda al atacar/lanzar y se guarda sola
+- [x] Manos libres con balanceo al andar y brazos arriba al saltar
+- [x] 5 vistas (8 direcciones con el volteo): frente, diagonal abajo, lado, diagonal arriba, espalda
+- [x] Empuñadura real: mano debajo del mango y dedos encima (de espaldas, al revés)
+
 ## Hito 1: Sensación de combate (siguiente)
 
 - [ ] Ajustar a mano tiempos y poses de cada arma en el editor según feedback de juego
@@ -51,7 +58,8 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [ ] Saltar por encima de obstáculos bajos (capa "low_obstacles" que se ignora en el aire)
 - [ ] Al morir, soltar el saco de materiales con temporizador (ahora solo reapareces)
 - [ ] Mando: apuntado con stick (ya existe `Player.aim_target_override`)
-- [ ] Perfil real dibujado a mano (ahora el lado es el frente con ojos y pelo desplazados)
+- [ ] Perfil y diagonales dibujados a mano (ahora son el frente/espalda con ojos y pelo desplazados)
+- [ ] Animación de desenfundar/enfundar (ahora es instantáneo)
 
 ## Hito 2: Enemigos y progresión
 

@@ -84,8 +84,15 @@ Materiales compartidos en `assets/materials/`: `unshaded.tres` (ignora la oscuri
 ### Poses y manos
 
 - Las poses se animan en el **espacio del arma**: +X = hacia donde apuntas. El `AimPivot` del jugador rota y se espeja solo.
-- En reposo (`idle`) el arma va **a un costado** y mira hacia donde mira el personaje (que mira hacia donde corre).
-  Al atacar, el personaje se gira hacia el ratón. Manos en reposo: `HandMain` (18, 2) y `HandOff` (-19, 2).
+- **Enfundada / desenfundada**: si no la usas, el arma va **a la espalda** (`CharacterVisual/.../BackWeapon`,
+  con los datos `back_*` del `WeaponData`) y se ven las **manos libres** del cuerpo (`HandL`/`HandR`, que se
+  balancean al andar). Al atacar o lanzar se desenfunda; tras `Player.sheathe_delay` segundos sin usarla se guarda.
+  De frente el arma de la espalda va detrás del cuerpo (solo asoma); de espaldas va encima.
+- Desenfundada, en reposo (`idle`) el arma va **a un costado** y mira hacia donde mira el personaje (que mira hacia
+  donde corre). Al atacar, el personaje se gira hacia el ratón. Manos en reposo: `HandMain` (18, 2) y `HandOff` (-19, 2).
+- **Empuñadura**: dentro de `Rig`, el orden es `HandMain` → sprite del arma → `GripFingers` (dedos que rodean el mango).
+  Así el mango tapa el puño y los dedos tapan el mango. De espaldas (`HandUtils.set_grip_back_view`) la mano pasa
+  por encima del arma y los dedos se ocultan. Las herramientas siguen el mismo esquema.
 - Las manos (`HandMain` / `HandOff`) **nunca rotan**: `HandUtils.keep_upright()` las endereza cada frame.
   Anima solo su posición (y escala si quieres un puñetazo más gordo).
 - De momento todas las armas van a **una mano**; la otra flota libre (el arco la usa para tensar la cuerda).
@@ -139,9 +146,10 @@ Las capas del personaje comparten un lienzo de **52x70 px** con los pies abajo e
 porque flotan y las mueve el arma. Un `CharacterAppearance` (.tres) dice qué textura usa cada capa.
 Para un pelo, ropa o armadura nueva: pinta sobre el lienzo de 52x70 y asígnala en un `CharacterAppearance`.
 
-Vistas (`CharacterVisual.View`): **FRONT**, **SIDE** y **BACK**. El jugador elige la vista según hacia dónde se mueve
-(o apunta al atacar). De espalda se usan `head_back`, `hair_back` y `torso_back`; de lado se reutiliza el frente
-desplazando ojos (+2 px) y pelo (-1 px) y se usa la animación `walk_side` (zancada). Si añades ropa o pelo nuevo,
+Vistas (`CharacterVisual.View`): **FRONT**, **FRONT_SIDE**, **SIDE**, **BACK_SIDE** y **BACK** (con el volteo,
+8 direcciones). El jugador elige la vista según hacia dónde se mueve (o apunta al atacar). De espaldas se usan
+`head_back`, `hair_back` y `torso_back`; en diagonal y de lado se desplazan ojos y pelo para girar la cabeza.
+Andar: `walk` (frente/espalda), `walk_diag` y `walk_side` (zancada), con balanceo de las manos libres. Si añades ropa o pelo nuevo,
 pinta también su versión de espalda (si no, se usa la de frente).
 
 ## Pixel art

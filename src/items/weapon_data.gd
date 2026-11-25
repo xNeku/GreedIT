@@ -14,6 +14,15 @@ enum HoldMode {
 ## Escena del arma (raíz con weapon.gd).
 @export var weapon_scene: PackedScene
 
+@export_group("A la espalda")
+## Textura del arma guardada a la espalda (vacía = no se ve, p. ej. puños).
+@export var back_texture: Texture2D
+## Desplazamiento de la textura para que el agarre quede en el origen.
+@export var back_texture_offset := Vector2.ZERO
+## Posición en el lienzo del personaje (pies en 0,0; +X = hacia donde mira).
+@export var back_position := Vector2.ZERO
+@export var back_rotation_degrees := 0.0
+
 @export_group("Daño")
 @export var base_damage: float = 10.0
 @export_range(0.0, 1.0) var crit_chance: float = 0.1

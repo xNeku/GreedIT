@@ -22,6 +22,9 @@ static func apply_appearance(root: Node, appearance: CharacterAppearance) -> voi
 	if hand_off and appearance.hand_l:
 		hand_off.texture = appearance.hand_l
 		hand_off.self_modulate = appearance.skin_tint
+	var grip := root.find_child("GripFingers", true, false) as CanvasItem
+	if grip:
+		grip.self_modulate = appearance.skin_tint
 
 
 static func find_hands(root: Node) -> Array[Node2D]:
@@ -31,3 +34,14 @@ static func find_hands(root: Node) -> Array[Node2D]:
 		if hand:
 			hands.append(hand)
 	return hands
+
+
+## Empuñadura según la vista.
+## De frente / de lado: el mango pasa POR ENCIMA del puño y los dedos (GripFingers) lo rodean por delante.
+## De espaldas: la mano queda más cerca de la cámara, así que tapa el mango y los dedos no se ven.
+static func set_grip_back_view(root: Node, back: bool) -> void:
+	var hand_main := root.find_child("HandMain", true, false) as CanvasItem
+	var grip := root.find_child("GripFingers", true, false) as CanvasItem
+	if hand_main and grip:
+		hand_main.z_index = 3 if back else 0
+		grip.visible = not back

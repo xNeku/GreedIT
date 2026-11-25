@@ -2,11 +2,12 @@
 
 [ext_resource type="Script" path="res://src/weapons/weapon.gd" id="1_weapongd"]
 [ext_resource type="Material" path="res://assets/materials/unshaded_add.tres" id="2_unshadedad"]
-[ext_resource type="Texture2D" path="res://assets/sprites/weapons/bow.png" id="3_bowpng"]
-[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/hand_r.png" id="4_handrpng"]
-[ext_resource type="Texture2D" path="res://assets/sprites/weapons/arrow.png" id="5_arrowpng"]
-[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/hand_l.png" id="6_handlpng"]
-[ext_resource type="Texture2D" path="res://assets/sprites/spells/hand_flame.png" id="7_handflamep"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/hand_r.png" id="3_handrpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/weapons/bow.png" id="4_bowpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/grip_fingers.png" id="5_gripfinger"]
+[ext_resource type="Texture2D" path="res://assets/sprites/weapons/arrow.png" id="6_arrowpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/hand_l.png" id="7_handlpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/spells/hand_flame.png" id="8_handflamep"]
 
 [sub_resource type="Gradient" id="Gradient_charge"]
 colors = PackedColorArray(1, 0.9, 0.5, 0, 1, 0.85, 0.4, 1)
@@ -1005,32 +1006,37 @@ script = ExtResource("1_weapongd")
 position = Vector2(18, 2)
 rotation = 0.35
 
+[node name="HandMain" type="Sprite2D" parent="Rig"]
+position = Vector2(0, 0)
+texture = ExtResource("3_handrpng")
+
 [node name="BowSprite" type="Sprite2D" parent="Rig"]
-texture = ExtResource("3_bowpng")
+texture = ExtResource("4_bowpng")
 centered = false
 offset = Vector2(-9, -19)
 
-[node name="HandMain" type="Sprite2D" parent="Rig"]
+[node name="GripFingers" type="Sprite2D" parent="Rig"]
 position = Vector2(0, 0)
-texture = ExtResource("4_handrpng")
+rotation = 1.5708
+texture = ExtResource("5_gripfinger")
 
 [node name="NockedArrow" type="Sprite2D" parent="."]
 visible = false
 position = Vector2(8, 0)
-texture = ExtResource("5_arrowpng")
+texture = ExtResource("6_arrowpng")
 centered = false
 offset = Vector2(0, -3)
 
 [node name="HandOff" type="Sprite2D" parent="."]
 position = Vector2(-19, 2)
-texture = ExtResource("6_handlpng")
+texture = ExtResource("7_handlpng")
 
 [node name="HandFlame" type="Sprite2D" parent="HandOff"]
 visible = false
 z_index = 1
 material = ExtResource("2_unshadedad")
 position = Vector2(3, -3)
-texture = ExtResource("7_handflamep")
+texture = ExtResource("8_handflamep")
 
 [node name="ChargeParticles" type="CPUParticles2D" parent="."]
 material = ExtResource("2_unshadedad")

@@ -5,7 +5,8 @@ extends Node
 ## - El salto va hacia donde te mueves.
 ## - Minería, herboristería y pesca dan materiales.
 ## - La bola de fuego (clic de la rueda) gasta maná y hace daño en área.
-## - La vista del personaje cambia según hacia dónde se mueve (frente / lado / espalda).
+## - La vista del personaje cambia según hacia dónde se mueve (8 direcciones, 5 vistas).
+## - El arma se guarda a la espalda si no la usas y se desenfunda al atacar.
 ## - Mobs: te atacan (cuerpo a cuerpo y a distancia), mueren, sueltan botín y reaparecen.
 ## - El jugador muere y reaparece.
 ##
@@ -40,6 +41,7 @@ func _run() -> void:
 
 	await _test_fireball()
 	await _test_views()
+	await _test_sheathe()
 	await _test_jump_direction()
 	await _test_mob_attacks("GoblinSpawner", 36.0, "goblin")
 	await _test_mob_attacks("SkeletonSpawner", 120.0, "esqueleto")
@@ -165,23 +167,59 @@ func _test_fireball() -> void:
 func _test_views() -> void:
 	_player.aim_target_override = null
 	_player.global_position = Vector2(0, 230)
-	var cases := {Vector2.UP: CharacterVisual.View.BACK, Vector2.RIGHT: CharacterVisual.View.SIDE, Vector2.DOWN: CharacterVisual.View.FRONT}
+	var V := CharacterVisual.View
+	var cases := {Vector2.UP: V.BACK, Vector2(1, -1): V.BACK_SIDE, Vector2.RIGHT: V.SIDE, Vector2(1, 1): V.FRONT_SIDE, Vector2.DOWN: V.FRONT}
+	var names := {V.BACK: "back", V.BACK_SIDE: "back_side", V.SIDE: "side", V.FRONT_SIDE: "front_side", V.FRONT: "front"}
 	for dir: Vector2 in cases:
-		_player.velocity = dir * _player.move_speed
+		_player.velocity = dir.normalized() * _player.move_speed
 		_player._update_facing_and_aim()
-		await _wait(0.05)
+		await _wait(0.12)
 		if _player.character_visual.view != cases[dir]:
-			_failures.append("vista: moviéndose %s debería ser %s" % [dir, cases[dir]])
-	_player.velocity = Vector2.UP * _player.move_speed
-	_player._update_facing_and_aim()
-	await _wait(0.05)
-	await _shot("75_view_back")
-	_player.velocity = Vector2.RIGHT * _player.move_speed
-	_player._update_facing_and_aim()
-	await _wait(0.05)
-	await _shot("76_view_side")
+			_failures.append("vista: moviéndose %s debería ser %s" % [dir, names[cases[dir]]])
+		await _shot("75_view_%s" % names[cases[dir]])
 	_player.velocity = Vector2.ZERO
 	_player._update_facing_and_aim()
+
+
+func _test_sheathe() -> void:
+	_player.select_slot(1) # espada
+	_player.global_position = Vector2(0, 230)
+	_player.aim_target_override = Vector2(60, 200)
+	await _wait(0.1)
+	if _player.weapon_drawn or not _player.character_visual.back_weapon.visible:
+		_failures.append("al cambiar de arma debería ir a la espalda")
+	await _shot("77_sheathed")
+	_player.draw_weapon()
+	_player._aim_at_target()
+	_player.current_weapon.primary_pressed()
+	_player.current_weapon.primary_released()
+	await _wait(0.08)
+	if not _player.current_weapon.visible or _player.character_visual.back_weapon.visible:
+		_failures.append("al atacar debería desenfundar")
+	await _shot("78_drawn_attack")
+	await _wait(_player.sheathe_delay + 0.6)
+	if _player.weapon_drawn or _player.current_weapon.visible:
+		_failures.append("no guarda el arma a la espalda al dejar de atacar")
+	else:
+		print("Arma: se desenfunda al atacar y vuelve a la espalda sola")
+	# de espaldas el arma de la espalda se ve encima
+	_player.velocity = Vector2.UP * _player.move_speed
+	_player._update_facing_and_aim()
+	await _wait(0.1)
+	await _shot("79_sheathed_back")
+	# todas las armas guardadas, de frente y de espaldas
+	for i in _player.hotbar.size():
+		_player.select_slot(i)
+		for dir: Vector2 in [Vector2.DOWN, Vector2.UP]:
+			_player.global_position = Vector2(0, 230)
+			_player.velocity = dir * _player.move_speed
+			_player._update_facing_and_aim()
+			_player.velocity = Vector2.ZERO
+			await _wait(0.05)
+			await _shot("79_back_%d_%s" % [i + 1, "front" if dir == Vector2.DOWN else "back"])
+	_player.select_slot(1)
+	_player.velocity = Vector2.ZERO
+	_player.aim_target_override = null
 
 
 func _test_jump_direction() -> void:
@@ -293,6 +331,7 @@ func _test_kill_with_sword(spawner_name: String) -> void:
 		_player.health = _player.max_health
 		_player.global_position = mob.global_position + Vector2(-30, 0)
 		_player.aim_target_override = mob.hurtbox.global_position
+		_player.draw_weapon()
 		_player._aim_at_target() # lo que hace el input real antes de atacar
 		_player.current_weapon.primary_pressed()
 		await _wait(0.05)
@@ -357,6 +396,7 @@ func _reset_player() -> void:
 	_player.global_position = _dummy.global_position + Vector2(-38, 0)
 	_player.velocity = Vector2.ZERO
 	_player.aim_target_override = _dummy.hurtbox.global_position
+	_player.draw_weapon()
 	_player._aim_at_target()
 
 

@@ -4,12 +4,13 @@
 [ext_resource type="Material" path="res://assets/materials/unshaded_add.tres" id="2_unshadedad"]
 [ext_resource type="Texture2D" path="res://assets/sprites/characters/male/hand_l.png" id="3_handlpng"]
 [ext_resource type="Texture2D" path="res://assets/sprites/spells/hand_flame.png" id="4_handflamep"]
-[ext_resource type="Texture2D" path="res://assets/sprites/weapons/mace.png" id="5_macepng"]
-[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/hand_r.png" id="6_handrpng"]
-[ext_resource type="Texture2D" path="res://assets/sprites/fx/slash_arc.png" id="8_slasharcpn"]
-[ext_resource type="Texture2D" path="res://assets/sprites/fx/shock_ring.png" id="9_shockringp"]
-[ext_resource type="Script" path="res://src/weapons/weapon_trail.gd" id="10_weapontrai"]
-[ext_resource type="Script" path="res://src/combat/hitbox.gd" id="13_hitboxgd"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/hand_r.png" id="5_handrpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/weapons/mace.png" id="6_macepng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/grip_fingers.png" id="7_gripfinger"]
+[ext_resource type="Texture2D" path="res://assets/sprites/fx/slash_arc.png" id="9_slasharcpn"]
+[ext_resource type="Texture2D" path="res://assets/sprites/fx/shock_ring.png" id="10_shockringp"]
+[ext_resource type="Script" path="res://src/weapons/weapon_trail.gd" id="11_weapontrai"]
+[ext_resource type="Script" path="res://src/combat/hitbox.gd" id="14_hitboxgd"]
 
 [sub_resource type="Gradient" id="Gradient_charge"]
 colors = PackedColorArray(1, 0.9, 0.5, 0, 1, 0.85, 0.4, 1)
@@ -3680,17 +3681,22 @@ texture = ExtResource("4_handflamep")
 position = Vector2(18, 2)
 rotation = -1.0
 
+[node name="HandMain" type="Sprite2D" parent="Rig"]
+position = Vector2(0, 1)
+texture = ExtResource("5_handrpng")
+
 [node name="Blade" type="Sprite2D" parent="Rig"]
-texture = ExtResource("5_macepng")
+texture = ExtResource("6_macepng")
 centered = false
 offset = Vector2(-4, -8)
 
+[node name="GripFingers" type="Sprite2D" parent="Rig"]
+position = Vector2(1, 0)
+rotation = 0.0
+texture = ExtResource("7_gripfinger")
+
 [node name="Tip" type="Marker2D" parent="Rig"]
 position = Vector2(29, 0)
-
-[node name="HandMain" type="Sprite2D" parent="Rig"]
-position = Vector2(0, 1)
-texture = ExtResource("6_handrpng")
 
 [node name="ChargeParticles" type="CPUParticles2D" parent="Rig"]
 material = ExtResource("2_unshadedad")
@@ -3710,14 +3716,14 @@ color_ramp = SubResource("Gradient_charge")
 [node name="SlashFX" type="Sprite2D" parent="."]
 visible = false
 material = ExtResource("2_unshadedad")
-texture = ExtResource("8_slasharcpn")
+texture = ExtResource("9_slasharcpn")
 offset = Vector2(24, 0)
 
 [node name="ImpactFX" type="Sprite2D" parent="."]
 visible = false
 material = ExtResource("2_unshadedad")
 position = Vector2(48, 10)
-texture = ExtResource("9_shockringp")
+texture = ExtResource("10_shockringp")
 
 [node name="Trail" type="Line2D" parent="." node_paths=PackedStringArray("target")]
 material = ExtResource("2_unshadedad")
@@ -3725,7 +3731,7 @@ width = 9.0
 width_curve = SubResource("Curve_trail")
 gradient = SubResource("Gradient_trail")
 joint_mode = 2
-script = ExtResource("10_weapontrai")
+script = ExtResource("11_weapontrai")
 target = NodePath("../Rig/Tip")
 
 [node name="Hitboxes" type="Node2D" parent="."]
@@ -3735,7 +3741,7 @@ position = Vector2(46, 10)
 collision_layer = 8
 collision_mask = 16
 monitorable = false
-script = ExtResource("13_hitboxgd")
+script = ExtResource("14_hitboxgd")
 damage_multiplier = 1.4
 knockback_force = 130.0
 hitstop = 0.08
@@ -3750,7 +3756,7 @@ position = Vector2(28, 0)
 collision_layer = 8
 collision_mask = 16
 monitorable = false
-script = ExtResource("13_hitboxgd")
+script = ExtResource("14_hitboxgd")
 damage_multiplier = 1.1
 knockback_force = 160.0
 hitstop = 0.06
@@ -3765,7 +3771,7 @@ position = Vector2(44, 6)
 collision_layer = 8
 collision_mask = 16
 monitorable = false
-script = ExtResource("13_hitboxgd")
+script = ExtResource("14_hitboxgd")
 damage_multiplier = 1.5
 knockback_force = 240.0
 hitstop = 0.1
@@ -3781,7 +3787,7 @@ position = Vector2(24, 0)
 collision_layer = 8
 collision_mask = 16
 monitorable = false
-script = ExtResource("13_hitboxgd")
+script = ExtResource("14_hitboxgd")
 damage_multiplier = 0.6
 knockback_force = 320.0
 hitstop = 0.05
@@ -3796,7 +3802,7 @@ position = Vector2(10, 0)
 collision_layer = 8
 collision_mask = 16
 monitorable = false
-script = ExtResource("13_hitboxgd")
+script = ExtResource("14_hitboxgd")
 damage_multiplier = 1.8
 knockback_force = 260.0
 hitstop = 0.12
@@ -3812,7 +3818,7 @@ position = Vector2(0, 0)
 collision_layer = 8
 collision_mask = 16
 monitorable = false
-script = ExtResource("13_hitboxgd")
+script = ExtResource("14_hitboxgd")
 damage_multiplier = 2.6
 knockback_force = 210.0
 hitstop = 0.1

@@ -1,10 +1,11 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://src/gathering/fishing_rod.gd" id="1_fishingrod"]
-[ext_resource type="Texture2D" path="res://assets/sprites/tools/fishing_rod.png" id="2_fishingrod"]
-[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/hand_r.png" id="3_handrpng"]
-[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/hand_l.png" id="4_handlpng"]
-[ext_resource type="Texture2D" path="res://assets/sprites/tools/bobber.png" id="5_bobberpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/hand_r.png" id="2_handrpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tools/fishing_rod.png" id="3_fishingrod"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/grip_fingers.png" id="4_gripfinger"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/male/hand_l.png" id="5_handlpng"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tools/bobber.png" id="6_bobberpng"]
 
 [sub_resource type="Animation" id="Animation_bite"]
 resource_name = "bite"
@@ -163,21 +164,25 @@ script = ExtResource("1_fishingrod")
 position = Vector2(14, 0)
 rotation = -0.6
 
+[node name="HandMain" type="Sprite2D" parent="Rig"]
+position = Vector2(0, 0)
+texture = ExtResource("2_handrpng")
+
 [node name="Rod" type="Sprite2D" parent="Rig"]
-texture = ExtResource("2_fishingrod")
+texture = ExtResource("3_fishingrod")
 centered = false
 offset = Vector2(-5, -4)
+
+[node name="GripFingers" type="Sprite2D" parent="Rig"]
+position = Vector2(1, 0)
+texture = ExtResource("4_gripfinger")
 
 [node name="Tip" type="Marker2D" parent="Rig"]
 position = Vector2(46, -1)
 
-[node name="HandMain" type="Sprite2D" parent="Rig"]
-position = Vector2(0, 0)
-texture = ExtResource("3_handrpng")
-
 [node name="HandOff" type="Sprite2D" parent="Rig"]
 position = Vector2(8, 1)
-texture = ExtResource("4_handlpng")
+texture = ExtResource("5_handlpng")
 
 [node name="Line" type="Line2D" parent="."]
 width = 1.0
@@ -185,7 +190,7 @@ default_color = Color(0.92, 0.9, 0.85, 0.85)
 
 [node name="Bobber" type="Sprite2D" parent="."]
 z_index = 2
-texture = ExtResource("5_bobberpng")
+texture = ExtResource("6_bobberpng")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {

@@ -6,7 +6,8 @@ extends CharacterBody2D
 ##   de subida / cima / caída que anima CharacterVisual. En el aire pasas por encima de enemigos.
 ##   Atacar en el aire = ataque aéreo + caída en picado (slam al aterrizar).
 ## - Dash (Shift). Más adelante lo darán objetos; ahora viene de serie para probar.
-## - Hotbar estilo Terraria (1-6 / rueda).
+## - Hotbar estilo Terraria (1-6 / rueda). El arma va guardada a la espalda: se desenfunda al atacar
+##   y se vuelve a guardar tras `sheathe_delay` segundos sin usarla.
 ## - Interactuar (E) con recursos cercanos: minería, herboristería y pesca.
 ## - Magia: clic de la rueda lanza el hechizo equipado (bola de fuego) gastando maná.
 ## - Vida: recibe golpes en su Hurtbox; tras un golpe parpadea invulnerable. Saltando alto o en dash
@@ -52,6 +53,10 @@ const AIR_MASK := 1 ## en el aire solo chocas con el mundo
 @export var dash_time := 0.14
 @export var dash_cooldown := 0.6
 
+@export_group("Armas")
+## Segundos sin atacar para guardar el arma a la espalda.
+@export var sheathe_delay := 2.5
+
 @export_group("Inventario")
 @export var hotbar: Array[ItemData] = []
 @export var selected_slot := 0
@@ -81,6 +86,8 @@ const AIR_MASK := 1 ## en el aire solo chocas con el mundo
 @export var appearances: Array[CharacterAppearance] = []
 
 var current_weapon: Weapon
+## true = arma en la mano; false = guardada a la espalda (manos libres).
+var weapon_drawn := false
 ## Si no es null, se apunta aquí en vez de al ratón (mandos, IA, tests).
 var aim_target_override: Variant = null
 var inventory := Inventory.new()
@@ -120,6 +127,7 @@ var _invulnerable_timer := 0.0
 var _hurt_flash := 0.0
 var _since_damage := 100.0
 var _spawn_point := Vector2.ZERO
+var _sheathe_timer := 0.0
 
 @onready var visual_root: Node2D = $VisualRoot
 @onready var character_visual: CharacterVisual = $VisualRoot/CharacterVisual
@@ -151,6 +159,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed("attack_primary"):
 		_stop_gathering()
+		draw_weapon()
 		_aim_at_target()
 		if current_weapon:
 			current_weapon.primary_pressed()
@@ -159,6 +168,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			current_weapon.primary_released()
 	elif event.is_action_pressed("attack_secondary"):
 		_stop_gathering()
+		draw_weapon()
 		_aim_at_target()
 		if current_weapon:
 			current_weapon.secondary_pressed()
@@ -191,6 +201,7 @@ func _physics_process(delta: float) -> void:
 	_dash_cooldown_timer = maxf(0.0, _dash_cooldown_timer - delta)
 	_update_mana(delta)
 	_update_health(delta)
+	_update_sheathe(delta)
 	if is_dead:
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
 		move_and_slide()
@@ -281,11 +292,12 @@ func _update_facing_and_aim() -> void:
 		aim_angle = 0.0 if facing > 0.0 else PI
 	_apply_aim()
 	_update_view(aiming)
-	var behind := sin(aim_angle) < -0.35 if aiming else character_visual.view == CharacterVisual.View.BACK
+	var behind := sin(aim_angle) < -0.35 if aiming else character_visual.is_back_view()
 	aim_pivot.z_index = -1 if behind else 1
 
 
-## Frente / lado / espalda: según hacia dónde apuntas (atacando) o hacia dónde te mueves.
+## Vista del personaje (8 direcciones con el volteo): según hacia dónde apuntas (atacando)
+## o hacia dónde te mueves. Quieto conserva la última.
 func _update_view(aiming: bool) -> void:
 	var dir := Vector2.ZERO
 	if aiming or is_gathering:
@@ -293,13 +305,20 @@ func _update_view(aiming: bool) -> void:
 	elif velocity.length() > 12.0:
 		dir = velocity.normalized()
 	if dir == Vector2.ZERO:
-		return # quieto: conserva la última vista
+		return
+	var angle := rad_to_deg(atan2(dir.y, absf(dir.x))) # -90 arriba ... 90 abajo
 	var view := CharacterVisual.View.SIDE
-	if dir.y < -0.6:
-		view = CharacterVisual.View.BACK
-	elif dir.y > 0.6:
+	if angle > 67.5:
 		view = CharacterVisual.View.FRONT
-	character_visual.set_view(view)
+	elif angle > 22.5:
+		view = CharacterVisual.View.FRONT_SIDE
+	elif angle < -67.5:
+		view = CharacterVisual.View.BACK
+	elif angle < -22.5:
+		view = CharacterVisual.View.BACK_SIDE
+	if view != character_visual.view:
+		character_visual.set_view(view)
+		_update_grip()
 
 
 func _apply_aim() -> void:
@@ -480,15 +499,15 @@ func _update_focus() -> void:
 func _start_gathering(target: Gatherable) -> void:
 	if target.tool_scene == null:
 		return
-	if current_weapon:
-		current_weapon.cancel()
-		current_weapon.visible = false
+	_sheathe_weapon()
 	_gather_target = target
 	velocity = Vector2.ZERO
 	set_prompt("")
 	_tool = target.tool_scene.instantiate() as GatherTool
 	weapon_holder.add_child(_tool)
 	_tool.setup(self, target)
+	_refresh_hands()
+	_update_grip()
 	gathering_started.emit(target)
 
 
@@ -501,8 +520,7 @@ func _stop_gathering() -> void:
 		_tool = null
 	_gather_target = null
 	set_prompt("")
-	if current_weapon:
-		current_weapon.visible = true
+	_refresh_hands()
 	gathering_stopped.emit()
 
 
@@ -590,11 +608,12 @@ func try_cast() -> void:
 		cast_failed.emit("Sin maná")
 		return
 	_stop_gathering()
+	draw_weapon()
 	_aim_at_target()
 	mana -= spell.mana_cost
 	_spell_cooldown = spell.cooldown
 	spell_cast.emit(spell)
-	if current_weapon and current_weapon.visible:
+	if current_weapon and weapon_drawn:
 		current_weapon.cast()
 	else:
 		release_spell()
@@ -634,6 +653,64 @@ func _update_mana(delta: float) -> void:
 		mana_changed.emit(mana, max_mana)
 
 
+# --- Desenfundar / enfundar -----------------------------------------------
+
+## Saca el arma de la espalda a la mano (al atacar o lanzar).
+func draw_weapon() -> void:
+	_sheathe_timer = sheathe_delay
+	if weapon_drawn or current_weapon == null:
+		return
+	weapon_drawn = true
+	_refresh_hands()
+
+
+func _sheathe_weapon() -> void:
+	if not weapon_drawn:
+		return
+	weapon_drawn = false
+	if current_weapon:
+		current_weapon.cancel()
+	_refresh_hands()
+
+
+func _update_sheathe(delta: float) -> void:
+	if not weapon_drawn or current_weapon == null:
+		return
+	if current_weapon.wants_aim() or current_weapon.is_busy() or is_airborne:
+		_sheathe_timer = sheathe_delay
+		return
+	_sheathe_timer -= delta
+	if _sheathe_timer <= 0.0:
+		_sheathe_weapon()
+
+
+## Qué se ve: arma en la mano, herramienta, o manos libres + arma a la espalda.
+func _refresh_hands() -> void:
+	var data := current_weapon.data if current_weapon else null
+	if _tool:
+		if current_weapon:
+			current_weapon.visible = false
+		character_visual.set_free_hands_visible(false)
+		character_visual.set_back_item(data)
+	elif weapon_drawn and current_weapon:
+		current_weapon.visible = true
+		character_visual.set_free_hands_visible(false)
+		character_visual.set_back_item(null)
+	else:
+		if current_weapon:
+			current_weapon.visible = false
+		character_visual.set_free_hands_visible(true)
+		character_visual.set_back_item(data)
+
+
+func _update_grip() -> void:
+	var back := character_visual.is_back_view()
+	if current_weapon:
+		HandUtils.set_grip_back_view(current_weapon, back)
+	if _tool:
+		HandUtils.set_grip_back_view(_tool, back)
+
+
 # --- Hotbar / aspecto -----------------------------------------------------
 
 func select_slot(index: int) -> void:
@@ -651,11 +728,15 @@ func _equip(data: WeaponData) -> void:
 		current_weapon.queue_free()
 		current_weapon = null
 	if data == null or data.weapon_scene == null:
+		_refresh_hands()
 		return
 	current_weapon = data.weapon_scene.instantiate() as Weapon
 	current_weapon.data = data
 	weapon_holder.add_child(current_weapon)
 	current_weapon.setup(self)
+	weapon_drawn = false
+	_refresh_hands()
+	_update_grip()
 
 
 func cycle_appearance() -> void:
