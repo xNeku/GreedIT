@@ -39,29 +39,55 @@ Pilares:
   Los hechizos se ampliarán con la rama de Magia de los talentos.
 - Aparte de eso no hay habilidades activas: todo sale de las armas y lo que las modifica.
 
-### Armas
-- Puedes llevar todas las armas (hotbar estilo Terraria) y cambiar al vuelo.
-- Cada **familia** tiene su propio moveset: puños, espada, daga, maza, arco (implementadas); hacha, lanza, bastón (futuras).
-- **Maestría**: usar una familia da puntos de maestría de esa familia. Desbloquea golpes nuevos en el combo y es
-  requisito para cosas como el dual wield.
-- **Peso y fuerza**: un arma pesada sin fuerza suficiente se puede usar, pero más lenta y con menos daño (penalización suave).
+### Armas (diseño del dueño)
+Familias: **daga, maza, espada, vara (bō), arco, armas de fuego, puños y escudo**. Cada una tendrá evoluciones y
+variantes, y algunas se podrán combinar.
+- **Se usan por manos y por clic**:
+  - Dos armas distintas (p. ej. daga + escudo): cada clic usa el arma de su mano.
+  - Un arma sola o dos del mismo tipo: el clic izquierdo **alterna** los ataques (izquierda/derecha) y el
+    **clic derecho es un especial propio** de ese arma.
+- **No hacen falta atributos para llevar un arma**: cualquiera lleva lo que le dé la gana.
+- **Maestría por arma**: al usarla ganas maestría, que desbloquea cosas dentro de esa arma y te deja escoger en
+  **su propia rama**. Ejemplos:
+  - Daga: lanzarla, dashear con los golpes, velocidad de ataque, desangrar.
+  - Maza: knockups y aturdimientos, cargar golpes de mucho daño.
 
-### Talentos (rollo WoW)
-Cuatro ramas mezclables: **Vida**, **Destreza**, **Daño (Fuerza)** y **Magia**. Cada jugador forja su "clase" mezclando.
-Talentos clave que rompen reglas, por ejemplo:
-- *Ambidiestro* (Destreza): dual wield. Requiere además maestría de la familia y fuerza.
-- *Titán* (Daño + Vida): armas a dos manos en una mano.
-- *Puños arcanos* (Magia + Destreza): los puños escalan con magia y sueltan descargas.
-- *Berserker*, *Danza de armas* (cambiar de arma a mitad de combo da crítico)...
+### Magia (diseño del dueño)
+- Independiente de las armas: un **complemento para cualquier arma** (imbuir el arma, atacar...).
+- Cuanto más usas un hechizo, más mejoras con él.
+- Los hechizos se aprenden con **pergaminos** que sueltan los enemigos. Habrá muchos, con **elementos y
+  combinaciones**.
+- Solo yendo por la rama de Magia del personaje podrás llevar más de un hechizo a la vez y combinar sus efectos.
 
-Técnicamente, talentos, afijos y brebajes son **modificadores que escuchan eventos** (`hit_landed`, aterrizar, cambiar de arma...).
+## 4. Progresión (diseño del dueño)
 
-## 4. Progresión
+El juego gira alrededor de **construir tu personaje**: cualquier rama que cojas tiene que ser viable, o al menos
+divertida. **Buscar combos únicos es lo que hará destacar el juego.** 100 niveles: tiene que costar encontrar dos
+builds iguales.
 
-- XP por matar → subes de nivel → puntos de talento.
+- **Personaje**: cuanto más matas, más XP. Cada nivel da **1 punto en la línea de Legado** (tu genética / talentos).
+  No hay clases: son **atributos combinatorios**.
+- **Árbol de Legado** estilo talentos del WoW: **4 ramas conectadas entre sí** (p. ej. un nodo pide haber avanzado en
+  Fuerza y Agilidad). Atributos base, modificadores del gameplay, nuevas posibilidades y combos. No tienes que ir
+  por una sola rama: hay que ir variando.
+  - **Fuerza**: knockbacks, bufos, romper armaduras, resistencias, tenacidad, provocar.
+  - **Agilidad / Destreza**: velocidad de ataque, movimiento, crítico, dual wield, *triple wield* (dejas la magia y
+    llevas un arma en la boca).
+  - **Vida**: regeneración, más vida, curas, espinas, más aguante (energía).
+  - **Magia**: más maná, crítico mágico, velocidad de lanzamiento, probabilidad de multiplicar (que salga más de un
+    hechizo), en cadena, tamaño...
+- **Maestría de armas** (por arma, ver Combate) y **mejora de hechizos por uso** van aparte del nivel.
 - **Escalado por progreso del mundo** (bosses derrotados, capa actual), **no** por el nivel del jugador.
-  Volver a una zona vieja y arrasar es parte de la gracia.
 - Largo, pero el bucle de 30 segundos (pegar, lootear, picar) tiene que molar por sí solo.
+
+### Cómo se monta por dentro (notas técnicas)
+- **Estadísticas centrales** del jugador (vida, daño, velocidad de ataque, crítico, maná...) con modificadores que se
+  suman de todas partes: Legado, maestrías, equipo, hechizos y efectos temporales.
+- **Nodos de árbol = recursos editables** (`.tres`): estadísticas, cambios de ataques (p. ej. el clic derecho de la
+  daga pasa a lanzarla) y efectos que escuchan eventos (`hit_landed`, al esquivar, al cambiar de arma...).
+  Así los combos salen de juntar piezas sueltas, no de programar cada build.
+- Golpes con **etiquetas** (`HitData.tags`: fuego, sangrado, aturdir...) para que elementos y efectos combinen.
+- En coop cada jugador calcula sus propias estadísticas (manda sobre su personaje); el golpe ya viaja con el daño final.
 
 ## 5. Profesiones, forja y brebajes
 
