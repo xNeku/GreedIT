@@ -22,7 +22,10 @@ Si cambias una convención, actualiza este archivo en el mismo commit.
 
 ```
 assets/                 arte, luces, audio (solo datos, sin lógica)
-  models/               modelos 3D (.glb/.gltf). kaykit_adventurers/ y kaykit_dungeon/ son de muestra (CC0)
+  models/               modelos 3D (.glb/.gltf), todos de muestra y CC0:
+                        quaternius/ (personajes modulares con proporciones de adulto + librería de animaciones),
+                        kaykit_adventurers/ (personajes cabezones, armas y animaciones de armas), kaykit_dungeon/
+    retarget/           mapas de huesos para compartir animaciones entre esqueletos (ver su README)
   sprites/characters/   capas del personaje: male/, female/ (lienzo común 52x70)
   sprites/weapons|props|fx|ui|world/
   lights/               texturas de luz compartidas
@@ -218,8 +221,14 @@ Mismas reglas que todo lo demás (escenas reales, datos en `.tres`, red coop). L
   - El mundo 3D activa la **interpolación de física** (`SceneTree.physics_interpolation`): lo que se mueve en
     `_physics_process` se dibuja suave aunque la pantalla vaya a 120 Hz. La cámara lee
     `get_global_transform_interpolated()` y tiene la interpolación apagada (se mueve en `_process`).
-- **Proporciones**: `BoneScaleModifier` (hijo del `Skeleton3D`) escala huesos encima de las animaciones; en los de
-  muestra encoge la cabeza. Con un modelo propio con buenas proporciones no hace falta.
+- **Personajes principales** (explorador, campesino): esqueleto de Quaternius (estilo Unreal) **retargeteado** al
+  humanoide de Godot (`assets/models/retarget/`). La escena es la Universal Animation Library (`UAL1_Standard.glb`:
+  maniquí + esqueleto + 43 animaciones) con la ropa como equipo de serie (`default_items`: `OUTFIT` y la capucha en
+  `HEAD`). Las animaciones de armas vienen de KayKit (`KayKit_Animations.glb`, retargeteado igual) vía
+  `extra_animation_sources`, y `clip_aliases` cambia la carrera/esquiva/golpe por las de Quaternius.
+  Las armas se pegan a `HandR/GripR` y `HandL/GripL` (BoneAttachment3D + Node3D): se colocan a mano en el editor.
+- **Proporciones**: `BoneScaleModifier` (hijo del `Skeleton3D`) escala huesos encima de las animaciones; en los
+  KayKit (cabezones) encoge la cabeza.
 - **Personaje** = `Avatar3D`: el modelo con esqueleto (`Skeleton3D`) y su `AnimationPlayer`. Las animaciones se
   llaman por nombre (`Idle`, `Running_A`, `1H_Melee_Attack_Chop`...). `looping_clips` dice cuáles van en bucle.
   `body_parts` traduce nombres genéricos (`body`, `head`, `arm_l`...) a las mallas de ese modelo y `outfit` dice qué
@@ -242,16 +251,19 @@ Mismas reglas que todo lo demás (escenas reales, datos en `.tres`, red coop). L
 
 ### Equipo y modelos propios (Blender)
 
-Para que el arte nuevo encaje solo, los modelos se exportan como **glTF (.glb)** con **el mismo esqueleto**
-(los mismos nombres de hueso) que el personaje base. Hoy el base es el de KayKit; cuando hagamos el nuestro,
-estos son los huesos que usa el código (`Avatar3D.slot_bones`):
+Para que el arte nuevo encaje solo, los modelos se exportan como **glTF (.glb)** con un esqueleto humanoide y,
+al importarlo en Godot, se le pone un **Bone Map** (Importar → Skeleton3D → Retarget). Así le valen todas las
+animaciones del proyecto (las de Quaternius, las de armas de KayKit y las de Mixamo). Lo más cómodo: modelar
+encima del esqueleto de Quaternius (`UAL1_Standard.glb`) y reutilizar `assets/models/retarget/ual_bone_map.tres`.
+Huesos que usa el código (`Avatar3D.slot_bones`, nombres de KayKit / del humanoide):
 
 | Ranura | Hueso | Qué va ahí |
 |---|---|---|
-| MAIN_HAND | `handslot.r` | arma principal (el mango en el origen del hueso) |
-| OFF_HAND | `handslot.l` | escudo, segunda daga, libro |
-| HEAD | `head` | casco, sombrero |
-| BACK / CHEST | `chest` | capa / piezas rígidas del pecho |
+| MAIN_HAND | `handslot.r` / `RightHand` (+ `GripR`) | arma principal (el mango en el origen) |
+| OFF_HAND | `handslot.l` / `LeftHand` (+ `GripL`) | escudo, segunda daga, libro |
+| HEAD | `head` / `Head` | casco, sombrero, capucha |
+| BACK / CHEST | `chest` / `UpperChest` | capa / piezas rígidas del pecho |
+| OUTFIT | (con esqueleto) | conjunto de ropa entero de los personajes modulares |
 
 Tres tipos de pieza (`EquipmentData`):
 

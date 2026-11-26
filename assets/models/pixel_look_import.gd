@@ -3,6 +3,7 @@ extends EditorScenePostImport
 ## Script de importación de TODOS los modelos 3D (.glb / .gltf) para el estilo pixel art:
 ##  - luz por bandas (toon) en vez de degradado realista
 ##  - texturas sin suavizado (nearest), que con la resolución baja dan píxeles limpios
+##  - sin relieve (normal map), oclusión ni brillos: solo el color, como un sprite pintado
 ##  - contorno oscuro (`assets/materials/outline_3d.tres`) en personajes, armas y props
 ##    (no en suelos ni paredes, que se pegarían entre baldosas)
 ## Se aplica al importar: en el editor ya se ven así. Para un modelo propio, en su pestaña Importar pon
@@ -34,6 +35,13 @@ func _post_import(scene: Node) -> Object:
 			material.roughness = 1.0
 			material.metallic = 0.0
 			material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+			# Relieve, oclusión y brillos realistas fuera: con la luz por bandas solo meten ruido.
+			material.normal_enabled = false
+			material.ao_enabled = false
+			material.rim_enabled = false
+			material.clearcoat_enabled = false
+			material.roughness_texture = null
+			material.metallic_texture = null
 			if outline:
 				material.next_pass = OUTLINE
 	return scene

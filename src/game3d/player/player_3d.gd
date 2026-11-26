@@ -753,7 +753,7 @@ func _play(clip: String, speed: float = 1.0, restart: bool = false) -> void:
 		if parts.size() > 2 and is_equal_approx(float(parts[2]), speed):
 			return
 		net_anim = "%s#%s#%.2f" % [clip, parts[1], speed] # misma animación, otra velocidad
-		avatar.animation_player.play(clip, avatar.blend_time, speed)
+		avatar.set_speed(clip, speed)
 		return
 	_anim_counter += 1
 	net_anim = "%s#%d#%.2f" % [clip, _anim_counter, speed]
@@ -766,7 +766,7 @@ func _apply_net_anim(old: String, value: String) -> void:
 	var old_parts := old.split("#")
 	var speed := float(parts[2]) if parts.size() > 2 else 1.0
 	if old_parts.size() > 1 and parts.size() > 1 and old_parts[0] == parts[0] and old_parts[1] == parts[1]:
-		avatar.animation_player.play(parts[0], avatar.blend_time, speed)
+		avatar.set_speed(parts[0], speed)
 	else:
 		avatar.play(parts[0], speed, true)
 		_on_clip_started(parts[0])

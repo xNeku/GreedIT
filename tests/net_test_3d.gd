@@ -5,7 +5,7 @@ extends Node
 ##   godot --headless --path . res://tests/net_test_3d.tscn -- --role=host --port=7795
 ##   godot --headless --path . res://tests/net_test_3d.tscn -- --role=client --port=7795
 ##
-## El cliente: se conecta (con el bárbaro), ve al host, cambia de arma y de equipo, pega al muñeco con la espada
+## El cliente: se conecta (con el campesino), ve al host, cambia de arma y de equipo, pega al muñeco con la espada
 ## (el host aplica el daño y lo devuelve a todos) y le dispara con la ballesta.
 ## El host: ve llegar al cliente con su personaje, su arma, su equipo, su posición y sus animaciones,
 ## y ve el daño en el muñeco.
@@ -41,7 +41,7 @@ func _run_host() -> void:
 	var client := _client_player()
 	await _wait(0.3)
 	print("[host] cliente conectado: jugador '%s' con %s" % [client.name, client.avatar.name])
-	if client.avatar_index != 1 or client.avatar.name != "Barbarian":
+	if client.avatar_index != 1 or client.avatar.name != "Peasant":
 		_fail("el personaje del cliente no llegó (%s)" % client.avatar.name)
 	if not await _wait_until(func() -> bool: return dummy.total_hits > 0, 25.0):
 		_fail("el muñeco no recibió el daño del cliente")

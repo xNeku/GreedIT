@@ -1,0 +1,65 @@
+[gd_scene format=3]
+
+[ext_resource type="Resource" path="res://src/game3d/equipment/items/ranger_outfit.tres" id="1_rangeroutf"]
+[ext_resource type="Resource" path="res://src/game3d/equipment/items/ranger_hood.tres" id="2_rangerhood"]
+[ext_resource type="Script" path="res://src/game3d/characters/avatar_3d.gd" id="3_avatar3dgd"]
+[ext_resource type="PackedScene" path="res://assets/models/kaykit_adventurers/animations/KayKit_Animations.glb" id="4_kaykitanim"]
+[ext_resource type="PackedScene" path="res://assets/models/quaternius/Universal Animation Library[Standard]/Unreal-Godot/UAL1_Standard.glb" id="5_ual1standa"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.78, 0.62, 0.5, 1)
+roughness = 1.0
+grow = true
+grow_amount = -0.012
+
+[node name="Ranger" type="Node3D"]
+script = ExtResource("3_avatar3dgd")
+slot_bones = {
+0: "RightHand",
+1: "LeftHand",
+2: "Head",
+3: "UpperChest",
+4: "UpperChest"
+}
+slot_attachments = {
+0: NodePath("Model/Armature/GeneralSkeleton/HandR/GripR"),
+1: NodePath("Model/Armature/GeneralSkeleton/HandL/GripL")
+}
+default_items = {
+5: ExtResource("1_rangeroutf"),
+2: ExtResource("2_rangerhood")
+}
+body_parts = {
+"body": "Mannequin"
+}
+outfit = {
+
+}
+looping_clips = PackedStringArray("Idle", "Jog_Fwd", "Walk", "Sprint", "Sword_Idle", "Spell_Simple_Idle", "Crouch_Idle", "Pistol_Idle", "Running_A", "Jump_Idle", "Blocking", "2H_Melee_Idle", "Unarmed_Idle", "Spellcasting", "1H_Ranged_Aiming", "2H_Ranged_Aiming")
+extra_animation_sources = Array[PackedScene]([ExtResource("4_kaykitanim")])
+clip_aliases = {
+"Running_A": "Jog_Fwd",
+"Dodge_Forward": "Roll",
+"Hit_A": "Hit_Chest"
+}
+
+[node name="Model" parent="." instance=ExtResource("5_ual1standa")]
+
+[node name="HandR" type="BoneAttachment3D" parent="Model/Armature/GeneralSkeleton"]
+bone_name = "RightHand"
+
+[node name="GripR" type="Node3D" parent="Model/Armature/GeneralSkeleton/HandR"]
+transform = Transform3D(0, 0.75, 0, 0.75, 0, 0, 0, 0, -0.75, 0, 0.085, 0.03)
+
+[node name="HandL" type="BoneAttachment3D" parent="Model/Armature/GeneralSkeleton"]
+bone_name = "LeftHand"
+
+[node name="GripL" type="Node3D" parent="Model/Armature/GeneralSkeleton/HandL"]
+transform = Transform3D(0, -0.75, 0, -0.75, 0, 0, 0, 0, -0.75, 0, 0.085, 0.03)
+
+[node name="Mannequin" parent="Model/Armature/GeneralSkeleton"]
+material_override = SubResource("StandardMaterial3D_body")
+
+[editable path="Model"]

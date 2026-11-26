@@ -97,10 +97,19 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [x] Cámara isométrica estilo Diablo (Tab para comparar con la diagonal), más lejos y con zoom (+ / -)
 - [x] Menos granulado: mundo a 960x540, sin tramado ni paleta reducida
 
+## Hito 3D.0d: Personajes con proporciones de adulto (hecho)
+
+- [x] Packs CC0 de Quaternius: ropa modular (explorador y campesino) + Universal Animation Library
+- [x] Retarget al humanoide de Godot: las animaciones de armas de KayKit valen para el esqueleto de Quaternius
+- [x] Ropa y capucha como equipo de serie (OUTFIT / HEAD), armas en un agarre colocable a mano (GripR / GripL)
+- [x] Sin normal maps ni brillos al importar (luz por bandas limpia) y contorno más fino
+
 ## Hito 3D.1: Pasar el juego al 3D (siguiente)
 
-- [ ] Personaje de muestra con proporciones adultas parecido a la referencia (p. ej. Quaternius "Modular Character
-      Outfits - Fantasy" + "Universal Animation Library", CC0) mientras llega el propio de Blender
+- [ ] Cabezas de verdad: Quaternius "Universal Base Characters" (CC0) en vez del maniquí calvo
+- [ ] Ajustar a mano el agarre de cada arma en el explorador (GripR) y animaciones propias de espada/arco
+- [ ] Versión femenina (necesita su propio esqueleto/maniquí)
+
 - [ ] Números de daño y textos en el HUD (2D nítido) en vez de Label3D pixelado
 
 - [ ] Personaje propio hecho en Blender (mismo esqueleto/huesos que el de muestra, ver AGENTS.md)

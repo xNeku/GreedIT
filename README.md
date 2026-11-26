@@ -108,5 +108,6 @@ godot --headless --path . res://tests/net_test_3d.tscn -- --role=client --port=7
 
 ## Créditos
 
+- Personajes modulares y animaciones: [Quaternius](https://quaternius.com) (CC0).
 - Personajes, armas y mazmorra de muestra: [KayKit](https://kaylousberg.com) por Kay Lousberg (CC0).
   Ver `assets/models/*/LICENSE.txt`.

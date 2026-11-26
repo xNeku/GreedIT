@@ -8,7 +8,8 @@ extends ItemData
 ##  - `scene` + `skinned`: un glTF con el MISMO esqueleto (exportado sobre el cuerpo base en Blender).
 ##    Sus mallas se "visten" sobre el esqueleto del personaje y se deforman con él: encaja en cualquier animación.
 
-enum Slot { MAIN_HAND, OFF_HAND, HEAD, BACK, CHEST }
+## OUTFIT = conjunto de ropa entero (cuerpo, brazos, piernas, botas) de los personajes modulares.
+enum Slot { MAIN_HAND, OFF_HAND, HEAD, BACK, CHEST, OUTFIT }
 
 @export var slot: Slot = Slot.MAIN_HAND
 @export var builtin_node := ""

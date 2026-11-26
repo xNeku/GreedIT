@@ -211,6 +211,11 @@ func _test_equipment() -> void:
 	_player.weapon_index = 1 # espada y escudo
 	_player.global_position = _dummy.global_position + Vector3(0, 0, 4)
 	await _wait(0.2)
+	# El explorador (Quaternius): ropa y capucha de serie con su esqueleto; la capucha se quita con H.
+	if _player.avatar.equipped(EquipmentData.Slot.OUTFIT) == null or _player.avatar.equipped(EquipmentData.Slot.HEAD) == null:
+		_fail("el explorador no lleva su ropa y su capucha")
+	_player.avatar_index = 2 # caballero (KayKit): casco de serie
+	await _wait(0.2)
 	var helmet := _player.avatar.skeleton.find_child("Knight_Helmet", true, false) as Node3D
 	if helmet == null or not helmet.visible:
 		_fail("el casco de serie no se ve")
@@ -226,7 +231,7 @@ func _test_equipment() -> void:
 	_player.helmet_on = true
 	_player.cape_on = true
 	_player.shield_on = true
-	_player.avatar_index = 2 # maga, con la armadura de caballero encima
+	_player.avatar_index = 4 # maga (KayKit), con la armadura de caballero encima
 	_player.chest_on = true
 	await _wait(0.3)
 	var armor := _player.avatar.equipped(EquipmentData.Slot.CHEST)
@@ -259,7 +264,7 @@ func _test_avatars() -> void:
 		await _wait(0.15)
 		names.append(_player.avatar.name)
 		await _shot("9%d_%s" % [i, _player.avatar.name])
-	if names.size() != 4 or Array(names).has(""):
+	if names.size() != 6 or Array(names).has(""):
 		_fail("no cambian los personajes: %s" % names)
 	print("personajes: %s" % ", ".join(names))
 
