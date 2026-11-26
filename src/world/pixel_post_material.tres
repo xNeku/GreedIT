@@ -4,6 +4,8 @@
 
 [resource]
 shader = ExtResource("1_pixelpostg")
+shader_parameter/exposure = 0.45
+shader_parameter/filmic = true
 shader_parameter/temperature = -0.3
 shader_parameter/contrast = 1.14
 shader_parameter/saturation = 1.05

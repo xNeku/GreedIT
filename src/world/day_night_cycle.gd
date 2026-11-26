@@ -21,7 +21,7 @@ extends Node
 @export var day_ambient_color := Color("8099c7")
 @export var day_sky := Color(0.56, 0.74, 0.9)
 ## Altura máxima del sol a mediodía (grados).
-@export var sun_max_height := 62.0
+@export var sun_max_height := 45.0
 
 @export_group("Noche (Look Lab)")
 @export var night_light_energy := 0.45

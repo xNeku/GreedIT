@@ -1,8 +1,13 @@
 shader_type canvas_item;
-// Filtro final del mundo (se aplica a la imagen del mundo antes de ampliarla). Mismas fórmulas que el Look Lab:
-// temperatura, contraste, saturación, tinte de sombras, viñeta y (opcional) paleta reducida con tramado.
-// El brillo y la curva de cine (ACES) los pone el Environment del mundo. Valores en pixel_post_material.tres.
+// Filtro final del mundo (se aplica a la imagen del mundo antes de ampliarla). Mismas fórmulas y mismo orden que
+// el Look Lab, para que el juego se vea igual: brillo, curva de cine (ACES), temperatura, contraste, saturación,
+// tinte de sombras, paleta reducida con tramado (opcional) y viñeta. Valores en pixel_post_material.tres.
+// (El Environment del mundo va con tonemap lineal: la curva se aplica aquí. `exposure` está calibrado midiendo
+// capturas del juego contra el Look Lab: la luz de Godot sale más fuerte que la del visor web.)
 
+uniform float exposure : hint_range(0.2, 3.0) = 1.0;
+// Curva de cine (ACES, la misma aproximación que el Look Lab).
+uniform bool filmic = true;
 // Frío (-1) a cálido (+1).
 uniform float temperature : hint_range(-1.0, 1.0) = 0.0;
 uniform float contrast : hint_range(0.5, 2.0) = 1.0;
@@ -18,9 +23,15 @@ uniform float dither : hint_range(0.0, 1.0) = 0.0;
 
 const float BAYER[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
 
+vec3 aces(vec3 x) {
+	return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0);
+}
+
 void fragment() {
 	vec4 src = texture(TEXTURE, UV);
-	vec3 c = src.rgb;
+	vec3 c = pow(src.rgb, vec3(2.2)) * exposure; // a lineal
+	c = filmic ? aces(c) : clamp(c, 0.0, 1.0);
+	c = pow(c, vec3(1.0 / 2.2));
 	c.r += temperature * 0.08;
 	c.b -= temperature * 0.08;
 	c = (c - 0.5) * contrast + 0.5;
