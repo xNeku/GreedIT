@@ -3,7 +3,8 @@
 ARPG cooperativo con cámara en diagonal: **Terraria + Path of Exile**.
 Farmear, forjar, hacerte una build bestia y tumbar bosses con tus colegas.
 
-> Estado: **base 3D 0.7**. El juego pasa a **3D en tiempo real**: personajes con esqueleto y animaciones,
+> Estado: **base 3D 0.7**. El juego pasa a **3D en tiempo real con aspecto pixel art** (se pinta a baja resolución,
+> luz por bandas y contorno de 1 px): personajes con esqueleto y animaciones,
 > equipo por ranuras (armas en las manos, casco, capa, escudo y armaduras que se deforman con el cuerpo),
 > 7 armas, muñecos y una mazmorra con luces y sombras. Coop de 2 a 4 desde el principio.
 > Los modelos son de muestra (KayKit, CC0) hasta que estén los nuestros de Blender.

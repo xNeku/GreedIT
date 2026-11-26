@@ -201,8 +201,21 @@ Mismas reglas que todo lo demás (escenas reales, datos en `.tres`, red coop). L
 
 - **Capas de física 3D**: las mismas que las 2D (1 world, 2 player, 3 enemies, 4 player_attacks, 5 enemy_hurtbox,
   6 player_hurtbox, 7 enemy_attacks, 8 interactables).
-- **Cámara**: `FollowCamera3D` en diagonal (`pitch_degrees`, `distance`), sigue al jugador local. El mundo 3D pone la
-  ventana en `content_scale_mode = canvas_items` (resolución real) y la devuelve al salir.
+- **Estilo pixel art** (el 3D no se ve como 3D realista):
+  - El mundo vive dentro de `PixelView/World` (un `SubViewport`) y se pinta a **baja resolución** (480x270 en 1080p)
+    ampliado sin suavizado, siempre con un número entero de píxeles de pantalla por píxel. `PixelView.pixel_scale`
+    decide lo gordo que es el píxel. El HUD va fuera, a resolución normal (el mundo 3D pone la ventana en
+    `content_scale_mode = canvas_items` y la devuelve al salir).
+  - Filtro final `pixel_post.gdshader` (paleta reducida, tramado, saturación, tinte de sombras). Se ajusta en
+    `pixel_post_material.tres`.
+  - Todos los modelos se importan con `assets/models/pixel_look_import.gd` (luz por bandas, texturas *nearest* y
+    contorno oscuro de 1 px con `assets/materials/outline_3d.tres`). **Un modelo nuevo tiene que llevar ese
+    "Import Script"** (pestaña Importar del .glb) o se verá realista. Materiales hechos a mano: `diffuse_mode` toon,
+    sin especular y `next_pass` = `outline_3d.tres`.
+  - Cámara `FollowCamera3D` **ortográfica** en diagonal (`pitch_degrees`, `size` = alto visible en metros) que se
+    pega a la rejilla de píxeles (`pixel_snap`) y le pasa a `PixelView` el resto (`snap_offset`) para un scroll suave.
+- **Proporciones**: `BoneScaleModifier` (hijo del `Skeleton3D`) escala huesos encima de las animaciones; en los de
+  muestra encoge la cabeza. Con un modelo propio con buenas proporciones no hace falta.
 - **Personaje** = `Avatar3D`: el modelo con esqueleto (`Skeleton3D`) y su `AnimationPlayer`. Las animaciones se
   llaman por nombre (`Idle`, `Running_A`, `1H_Melee_Attack_Chop`...). `looping_clips` dice cuáles van en bucle.
   `body_parts` traduce nombres genéricos (`body`, `head`, `arm_l`...) a las mallas de ese modelo y `outfit` dice qué

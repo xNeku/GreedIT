@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://src/game3d/characters/avatar_3d.gd" id="1_avatar3dgd"]
 [ext_resource type="PackedScene" path="res://assets/models/kaykit_adventurers/characters/Rogue_Hooded.glb" id="2_roguehoode"]
+[ext_resource type="Script" path="res://src/game3d/characters/bone_scale_modifier.gd" id="3_bonescalem"]
 
 [node name="RogueHooded" type="Node3D"]
 script = ExtResource("1_avatar3dgd")
@@ -18,3 +19,11 @@ outfit = {
 }
 
 [node name="Model" parent="." instance=ExtResource("2_roguehoode")]
+
+[node name="Proportions" type="SkeletonModifier3D" parent="Model/Rig/Skeleton3D"]
+script = ExtResource("3_bonescalem")
+bone_scales = {
+"head": 0.7,
+"hand.l": 0.85,
+"hand.r": 0.85
+}

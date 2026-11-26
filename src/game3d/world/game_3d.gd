@@ -1,5 +1,5 @@
 class_name Game3D
-extends Node3D
+extends Node
 ## Mundo 3D. Igual que Game (2D): arranca la red y crea un jugador por peer.
 ##
 ## RED:
@@ -7,14 +7,18 @@ extends Node3D
 ##     y cada uno manda sobre el suyo (authority = su peer id).
 ##   - Un cliente, al conectar, pide su jugador con _request_spawn().
 ##   - Muñecos y props son parte de la escena (existen igual en todos); el host manda sobre ellos.
+##
+## El mundo 3D vive dentro de PixelView/World (SubViewport en baja resolución = estilo pixel art);
+## el HUD va fuera, a resolución normal.
 
 @export var player_scene: PackedScene
 
 var _previous_scale_mode: Window.ContentScaleMode
 
-@onready var players: Node3D = $Players
-@onready var player_spawner: MultiplayerSpawner = $PlayerSpawner
-@onready var spawn_points: Node3D = $PlayerSpawns
+@onready var players: Node3D = %Players
+@onready var dummies: Node3D = %Dummies
+@onready var player_spawner: MultiplayerSpawner = %PlayerSpawner
+@onready var spawn_points: Node3D = %PlayerSpawns
 @onready var hud: HUD3D = $HUD
 
 

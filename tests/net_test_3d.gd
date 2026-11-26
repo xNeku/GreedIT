@@ -34,7 +34,7 @@ func _ready() -> void:
 
 
 func _run_host() -> void:
-	var dummy := _world.get_node("Dummies/Dummy1") as TrainingDummy3D
+	var dummy := _world.dummies.get_node("Dummy1") as TrainingDummy3D
 	if not await _wait_until(func() -> bool: return _world.players.get_child_count() >= 2, 20.0):
 		_fail("el cliente no llegó a aparecer")
 		return _finish()
@@ -83,7 +83,7 @@ func _run_client() -> void:
 	await _wait(0.3)
 
 	# 1) Espada: el host aplica el daño y nos devuelve los efectos.
-	var dummy := _world.get_node("Dummies/Dummy1") as TrainingDummy3D
+	var dummy := _world.dummies.get_node("Dummy1") as TrainingDummy3D
 	for i in 3:
 		me.global_position = dummy.global_position + Vector3(0, 0, 1.6)
 		me.velocity = Vector3.ZERO

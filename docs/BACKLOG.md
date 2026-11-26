@@ -80,7 +80,18 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [x] Coop desde el principio: test de humo 3D y test de red 3D (host + cliente)
 - [x] Menú: elegir mundo 3D (nuevo) o 2D pixel art, y personaje
 
+## Hito 3D.0b: Estilo pixel art (hecho)
+
+- [x] Mundo a baja resolución con escalado entero, cámara ortográfica pegada a la rejilla de píxeles
+- [x] Luz por bandas (toon), texturas nearest y contorno de 1 px en todos los modelos (script de importación)
+- [x] Filtro final: paleta reducida, tramado, tinte de sombras (`pixel_post_material.tres`)
+- [x] Cabeza más pequeña en los personajes de muestra (`BoneScaleModifier`)
+
 ## Hito 3D.1: Pasar el juego al 3D (siguiente)
+
+- [ ] Personaje de muestra con proporciones adultas parecido a la referencia (p. ej. Quaternius "Modular Character
+      Outfits - Fantasy" + "Universal Animation Library", CC0) mientras llega el propio de Blender
+- [ ] Números de daño y textos en el HUD (2D nítido) en vez de Label3D pixelado
 
 - [ ] Personaje propio hecho en Blender (mismo esqueleto/huesos que el de muestra, ver AGENTS.md)
 - [ ] Mobs 3D (goblin, esqueleto, zombi) con la IA de `enemy.gd` adaptada a 3D

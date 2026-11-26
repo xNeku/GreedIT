@@ -3,6 +3,7 @@ extends Camera3D
 ## Cámara en diagonal (estilo Diablo / Path of Exile) que sigue al jugador local con suavizado y temblor.
 ## Solo existe una por ordenador: sigue a SU jugador (Events.local_player_3d_ready).
 
+## Ortográfica = sin perspectiva, como el pixel art. Con `pixel_snap` la cámara se mueve de píxel en píxel.
 ## Ángulo desde arriba (grados): 90 = cenital.
 @export_range(20.0, 90.0) var pitch_degrees := 52.0
 ## Giro alrededor del jugador (grados). 0 = el norte arriba.
@@ -13,6 +14,11 @@ extends Camera3D
 ## Cuánto se adelanta hacia el ratón (unidades).
 @export var mouse_lead := 1.5
 @export var target: Node3D
+## Pegar la cámara a la rejilla de píxeles (evita que los bordes "bailen" al moverse en baja resolución).
+@export var pixel_snap := true
+
+## Lo que la cámara se ha desviado al pegarse a la rejilla, en píxeles. PixelView mueve la imagen esto.
+var snap_offset := Vector2.ZERO
 
 var _shake := 0.0
 var _shake_time := 0.0
@@ -45,8 +51,18 @@ func _update(weight: float, delta: float) -> void:
 	var pitch := deg_to_rad(pitch_degrees)
 	var yaw := deg_to_rad(yaw_degrees)
 	var offset := Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch)) * distance
-	global_position = _focus + offset
-	look_at(_focus + Vector3(0, 0.8, 0), Vector3.UP)
+	var eye := _focus + offset
+	look_at_from_position(eye, _focus + Vector3(0, 0.8, 0), Vector3.UP)
+	snap_offset = Vector2.ZERO
+	var height := float(get_viewport().get_visible_rect().size.y)
+	if pixel_snap and projection == PROJECTION_ORTHOGONAL and height > 0.0:
+		var texel := size / height
+		var right := global_basis.x
+		var up := global_basis.y
+		var p := Vector2(eye.dot(right), eye.dot(up))
+		var snapped := (p / texel).round() * texel
+		global_position = eye + right * (snapped.x - p.x) + up * (snapped.y - p.y)
+		snap_offset = Vector2(snapped.x - p.x, -(snapped.y - p.y)) / texel
 	if _shake_time > 0.0:
 		_shake_time -= delta
 		h_offset = randf_range(-1.0, 1.0) * _shake * 0.3

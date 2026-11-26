@@ -28,8 +28,8 @@ func _run() -> void:
 	_scene = (load("res://src/game3d/world/game_3d.tscn") as PackedScene).instantiate() as Game3D
 	add_child(_scene)
 	await _wait(0.5)
-	_player = _scene.get_node_or_null("Players/1") as Player3D
-	_dummy = _scene.get_node("Dummies/Dummy1") as TrainingDummy3D
+	_player = _scene.players.get_node_or_null("1") as Player3D
+	_dummy = _scene.dummies.get_node("Dummy1") as TrainingDummy3D
 	if _player == null or _player.avatar == null:
 		_fail("no aparece el jugador 3D")
 		return _finish()
