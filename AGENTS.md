@@ -101,11 +101,16 @@ jugadores (`_spawn_player` corre en todos los peers y pone el dueño). Un client
     Sin contorno. El script de importación `assets/models/pixel_look_import.gd` pone este material a todos los
     modelos: **un modelo nuevo tiene que llevar ese "Import Script"**. Materiales hechos a mano: ShaderMaterial con
     ese shader (`albedo_color`, `albedo_texture`).
-  - Filtro final `pixel_post.gdshader` (temperatura, contraste, saturación, tinte de sombras, viñeta), valores en
-    `pixel_post_material.tres`. Brillo y curva de cine (ACES) en el Environment del mundo.
+  - Filtro final `pixel_post.gdshader` (brillo, curva de cine ACES, temperatura, contraste, saturación, tinte de
+    sombras, viñeta), con las mismas fórmulas que el Look Lab; valores en `pixel_post_material.tres`. El Environment
+    va con tonemap lineal. Las bandas de noche solo afectan al sol/la luna (antorchas y hechizos siempre suaves).
   - **Ciclo de día y noche** (`DayNightCycle`, nodo `DayNight` del mundo): el sol sale por el este y se pone por el
     oeste (las sombras giran), de noche la luna con luz fría y las antorchas del grupo `night_lights` encendidas.
-    Los valores de día y de noche son los del Look Lab. La hora la lleva el host y se sincroniza cada 2 s.
+    Colores y fuerzas por hora en degradados y curvas del inspector (amanecer/atardecer cálidos). `light_scale`
+    calibra la luz de Godot con la del Look Lab. La hora la lleva el host y se sincroniza cada 2 s.
+  - **Menú de Esc** (`src/ui/options_menu.tscn`): hora del día (amanecer, mediodía, atardecer, noche, parar el
+    tiempo), fuerza de sol/luna/ambiente/antorchas, bandas de noche y filtros de imagen, en directo. "Copiar ajustes"
+    copia los valores para pegárselos a Claude.
   - Cámara `FollowCamera3D` **ortográfica isométrica** estilo Diablo (giro 45°, 30° desde el suelo = líneas 2:1),
     zoom con + / - (`size` = alto visible en metros). Se pega a la rejilla de píxeles
     (`pixel_snap`) y le pasa a `PixelView` el resto (`snap_offset`) para un scroll suave.
@@ -167,6 +172,21 @@ Dos tipos de pieza (`EquipmentData`):
 
 Las animaciones nuevas (de Blender o Mixamo retargeteadas al esqueleto) se añaden al `AnimationPlayer` del personaje
 con su nombre y se usan desde los `.tres` de las armas.
+
+## Rendimiento (el juego tendrá cientos de entidades)
+
+- **Entidades quietas no gastan**: apaga `_physics_process`/`_process` cuando no hacen nada y enciéndelos al
+  despertar (ver `TrainingDummy3D._sleep`). Textos y cosas que no cambian a cada frame: refrescar unas pocas veces
+  por segundo.
+- **Decoración estática** dentro de un nodo con `StaticBatcher` (`Nature`, `Ground`, `Mountains`): al empezar se
+  juntan en MultiMesh por zonas (pocas llamadas de dibujo). El suelo no proyecta sombra.
+- **Mallas primitivas** (esferas, cápsulas...) siempre con pocos segmentos: las de Godot por defecto tienen miles
+  de triángulos.
+- Pasadas extra de material (`material_overlay`, `next_pass`) solo mientras hacen falta.
+- **Efectos nuevos** (proyectiles, explosiones...): añádelos a `ShaderWarmup` en `game_3d.tscn` para que su shader
+  se compile al cargar y no dé un tirón la primera vez.
+- Medir: `godot --headless --path . --fixed-fps 60 res://tests/perf_test.tscn -- --entities=300` (tiempo real de
+  CPU por frame) y con render (sin `--headless`) para ver llamadas de dibujo y triángulos.
 
 ## Verificar antes de hacer commit
 

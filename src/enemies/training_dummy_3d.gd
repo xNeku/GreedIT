@@ -2,10 +2,13 @@ class_name TrainingDummy3D
 extends StaticBody3D
 ## Muñeco de entrenamiento 3D: da un saltito y se tambalea como un muelle al recibir golpes, suelta paja y
 ## enseña números de daño y el DPS.
+## Rendimiento: quieto no gasta nada (física y _process apagados); se despierta al recibir un golpe y se vuelve a
+## dormir cuando deja de moverse. El texto del DPS se refresca 4 veces por segundo, no en cada frame.
 ## RED: lo controla el host. Su Hurtbox3D le reenvía los golpes y él avisa a todos con `_show_hit`.
 
 @export var damage_label_scene: PackedScene
-## Material que va encima de las mallas del muñeco (material_overlay) y se ilumina al recibir un golpe.
+## Material que se pone encima de las mallas del muñeco (material_overlay) mientras brilla al recibir un golpe
+## (apagado no se pone: así no cuesta una pasada de dibujo extra).
 @export var flash_material: StandardMaterial3D
 @export_group("Tambaleo (muelle)")
 ## Rigidez del muelle que lo devuelve a vertical.
@@ -39,6 +42,7 @@ var _hit_count := 0
 var _last_hit_time := -100.0
 ## Golpes recibidos desde que existe (no se reinicia; útil para tests).
 var total_hits := 0
+var _label_timer := 0.0
 
 @onready var pivot: Node3D = $Pivot
 @onready var hurtbox: Hurtbox3D = $Hurtbox
@@ -51,6 +55,7 @@ func _ready() -> void:
 	_rest_y = pivot.position.y
 	hurtbox.hit_received.connect(func(hit: HitData) -> void: _show_hit.rpc(hit.amount, hit.is_crit, hit.knockback))
 	_update_label()
+	_sleep()
 
 
 @rpc("authority", "call_local", "reliable")
@@ -63,6 +68,7 @@ func _show_hit(amount: int, is_crit: bool, knockback: Vector2) -> void:
 	_last_hit_time = now
 	_tilt_velocity += knockback.normalized() * knockback_to_wobble * (8.0 if is_crit else 5.0)
 	_flash = 1.0
+	_set_overlay(true)
 	_height_velocity = maxf(_height_velocity, 0.0) + knockup * (1.5 if is_crit else 1.0)
 	straw.restart()
 	if damage_label_scene:
@@ -72,6 +78,20 @@ func _show_hit(amount: int, is_crit: bool, knockback: Vector2) -> void:
 		get_parent().add_child(label)
 		label.global_position = label_spawn.global_position + Vector3(randf_range(-0.4, 0.4), 0, 0)
 	_update_label()
+	set_physics_process(true)
+	set_process(true)
+
+
+func _set_overlay(on: bool) -> void:
+	for child in pivot.get_children():
+		if child is MeshInstance3D:
+			(child as MeshInstance3D).material_overlay = flash_material if on else null
+
+
+func _sleep() -> void:
+	set_physics_process(false)
+	if _hit_count == 0:
+		set_process(false)
 
 
 func _physics_process(delta: float) -> void:
@@ -91,15 +111,26 @@ func _physics_process(delta: float) -> void:
 	_flash = move_toward(_flash, 0.0, delta * 6.0)
 	if flash_material:
 		flash_material.albedo_color.a = _flash * 0.8
+	if _flash <= 0.0 and pivot.get_child(0) is MeshInstance3D and (pivot.get_child(0) as MeshInstance3D).material_overlay:
+		_set_overlay(false)
+	if _flash <= 0.0 and _height <= 0.0 and _tilt.length() < 0.002 and _tilt_velocity.length() < 0.01:
+		_tilt = Vector2.ZERO
+		pivot.rotation = Vector3.ZERO
+		_sleep()
 
 
-func _process(_delta: float) -> void:
-	if _hit_count > 0:
-		if _now() - _last_hit_time > reset_after:
-			_hits.clear()
-			_total = 0
-			_hit_count = 0
-		_update_label()
+func _process(delta: float) -> void:
+	_label_timer -= delta
+	if _label_timer > 0.0:
+		return
+	_label_timer = 0.25
+	if _hit_count > 0 and _now() - _last_hit_time > reset_after:
+		_hits.clear()
+		_total = 0
+		_hit_count = 0
+	_update_label()
+	if _hit_count == 0 and not is_physics_processing():
+		set_process(false)
 
 
 func _update_label() -> void:

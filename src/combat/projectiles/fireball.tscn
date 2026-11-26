@@ -51,8 +51,8 @@ cast_shadow = 0
 
 [node name="Light" type="OmniLight3D" parent="."]
 light_color = Color(1, 0.55, 0.2, 1)
-light_energy = 3.0
-omni_range = 6.0
+light_energy = 1.2
+omni_range = 5.0
 
 [node name="Trail" type="CPUParticles3D" parent="."]
 amount = 50

@@ -45,6 +45,7 @@ func _run() -> void:
 		await _test_weapon(i)
 	await _test_hud()
 	await _test_fireball()
+	await _test_menu()
 	_finish()
 
 
@@ -224,6 +225,31 @@ func _test_hud() -> void:
 		_fail("el hueco 1 no tiene icono")
 	print("HUD: vida + 8 huecos OK")
 	await _shot("90_hud")
+
+
+func _test_menu() -> void:
+	var menu := _scene.get_node("OptionsMenu") as OptionsMenu
+	var esc := InputEventAction.new()
+	esc.action = &"leave_game"
+	esc.pressed = true
+	menu._unhandled_input(esc)
+	if not menu.panel.visible:
+		_fail("Esc no abre el menú de opciones")
+	(menu.get_node("%Night") as Button).pressed.emit()
+	if absf(menu.cycle.hour) > 0.01 or not menu.cycle.paused:
+		_fail("el botón Noche no pone la noche")
+	await _wait(0.2)
+	await _shot("95_night")
+	(menu.get_node("%Noon") as Button).pressed.emit()
+	(menu.get_node("%Exposure") as HSlider).value = 1.2
+	if not is_equal_approx(float(menu.post_material.get_shader_parameter(&"exposure")), 1.2):
+		_fail("el brillo del menú no cambia el filtro")
+	(menu.get_node("%Exposure") as HSlider).value = 0.9
+	menu._unhandled_input(esc)
+	if menu.panel.visible:
+		_fail("Esc no cierra el menú")
+	menu.cycle.paused = false
+	print("menú de Esc OK")
 
 
 func _fail(message: String) -> void:

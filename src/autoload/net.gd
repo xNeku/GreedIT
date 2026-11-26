@@ -85,9 +85,3 @@ func _on_connection_failed() -> void:
 
 func _on_server_disconnected() -> void:
 	_fail("El host ha cerrado la partida")
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("leave_game") and get_tree().current_scene \
-			and get_tree().current_scene.scene_file_path == WORLD_SCENE:
-		leave()

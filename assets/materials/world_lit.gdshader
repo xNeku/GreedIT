@@ -1,7 +1,8 @@
 shader_type spatial;
 render_mode specular_disabled;
 // Material de TODO el juego (lo pone el script de importación y los materiales hechos a mano).
-// Luz suave (lambert) o por bandas según el ajuste global `light_bands` (0 = suave, 4 = cuatro bandas):
+// Luz suave (lambert) o por bandas según el ajuste global `light_bands` (0 = suave, 4 = cuatro bandas; solo la luz
+// del sol/la luna, las antorchas y los hechizos siempre suaves):
 // lo cambia el ciclo de día y noche (de día suave, de noche por bandas, como eligió el dueño en el Look Lab).
 
 global uniform float light_bands;
@@ -18,7 +19,8 @@ void fragment() {
 
 void light() {
 	float amount = clamp(dot(NORMAL, LIGHT), 0.0, 1.0) * ATTENUATION;
-	if (light_bands >= 1.0) {
+	// las bandas solo para el sol/la luna: antorchas y hechizos siempre con luz suave
+	if (light_bands >= 1.0 && LIGHT_IS_DIRECTIONAL) {
 		amount = floor(amount * light_bands + 0.5) / light_bands;
 	}
 	DIFFUSE_LIGHT += amount * LIGHT_COLOR / PI;

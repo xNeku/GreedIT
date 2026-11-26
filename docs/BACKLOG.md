@@ -122,6 +122,14 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [x] Mundo más amplio con el pack de entorno: bosquecillos, rocas, troncos, montañas en el borde
 - [x] Zona de salida con 4 muñecos y 4 antorchas
 
+## Hito 3D.3: Luces, menú y rendimiento (hecho)
+
+- [x] Sol dinámico con colores por hora (amanecer y atardecer cálidos), noche más clara
+- [x] Bandas de noche solo en el sol/la luna: antorchas y hechizos con luz suave
+- [x] Menú de Esc con hora del día, luces e imagen en directo
+- [x] Rendimiento: entidades que duermen, decoración agrupada (MultiMesh), suelo sin sombras, mallas low poly,
+      precalentado de shaders, test de rendimiento (`tests/perf_test.tscn`)
+
 ## Siguiente
 
 - [ ] Pantalla de créditos en el juego (el pack de entorno es CC BY 4.0: hay que citar a k0rveen)
