@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/game3d/characters/avatar_3d.gd" id="1_avatar3dgd"]
+[ext_resource type="PackedScene" path="res://assets/models/kaykit_adventurers/characters/Rogue_Hooded.glb" id="2_roguehoode"]
+
+[node name="RogueHooded" type="Node3D"]
+script = ExtResource("1_avatar3dgd")
+body_parts = {
+"head": "Rogue_Head_Hooded",
+"body": "Rogue_Body",
+"arm_l": "Rogue_ArmLeft",
+"arm_r": "Rogue_ArmRight",
+"leg_l": "Rogue_LegLeft",
+"leg_r": "Rogue_LegRight"
+}
+outfit = {
+3: "Rogue_Cape"
+}
+
+[node name="Model" parent="." instance=ExtResource("2_roguehoode")]

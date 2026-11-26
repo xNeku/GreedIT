@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="Weapon3DData" format=3]
+
+[ext_resource type="Script" path="res://src/game3d/equipment/weapon_3d_data.gd" id="1_weapon3dda"]
+[ext_resource type="PackedScene" path="res://assets/models/kaykit_adventurers/weapons/sword_1handed.gltf" id="2_sword1hand"]
+
+[resource]
+script = ExtResource("1_weapon3dda")
+id = &"sword"
+slot = 0
+display_name = "Espada y escudo"
+kind = 0
+scene = ExtResource("2_sword1hand")
+allows_shield = true
+combo_clips = PackedStringArray("1H_Melee_Attack_Slice_Diagonal", "1H_Melee_Attack_Slice_Horizontal", "1H_Melee_Attack_Chop")
+alt_clip = "1H_Melee_Attack_Stab"
+attack_speed = 1.6
+hit_time = 0.35
+hit_window = 0.2
+base_damage = 12.0
+reach = 2.0
+width = 2.2
+knockback = 6.0
+alt_damage_multiplier = 1.7

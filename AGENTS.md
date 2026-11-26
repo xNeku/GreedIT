@@ -6,7 +6,8 @@ Si cambias una convención, actualiza este archivo en el mismo commit.
 ## Contexto
 
 - Motor: **Godot 4.7**, GDScript con tipado estático, renderer *Compatibility* (OpenGL).
-- Juego: ARPG coop top-down pixel art. Diseño en `docs/GDD.md`, tareas en `docs/BACKLOG.md`.
+- Juego: ARPG coop con cámara en diagonal. **El juego va en 3D en tiempo real** (`src/game3d/`); el sandbox 2D
+  pixel art (`src/player`, `src/weapons`...) se mantiene como referencia y se irá pasando a 3D. Diseño en `docs/GDD.md`, tareas en `docs/BACKLOG.md`.
 - Idioma: comentarios, docs y textos del juego en **español**. Identificadores de código en **inglés**.
 
 ## Regla de oro: escenas y nodos reales
@@ -21,6 +22,7 @@ Si cambias una convención, actualiza este archivo en el mismo commit.
 
 ```
 assets/                 arte, luces, audio (solo datos, sin lógica)
+  models/               modelos 3D (.glb/.gltf). kaykit_adventurers/ y kaykit_dungeon/ son de muestra (CC0)
   sprites/characters/   capas del personaje: male/, female/ (lienzo común 52x70)
   sprites/weapons|props|fx|ui|world/
   lights/               texturas de luz compartidas
@@ -38,7 +40,15 @@ src/
                         y training_dummy/
   world/                Game (arranca la red y crea jugadores), escenas de mundo/niveles y props
   ui/                   menú principal, HUD, hotbar, panel de materiales, cartel "E", textos flotantes
-tests/                  test de humo (un jugador), test de red (host + cliente) y test de prototipos
+  game3d/               EL JUEGO EN 3D:
+    characters/         Avatar3D + una carpeta por personaje (escena = avatar_3d.gd + el .glb como "Model")
+    equipment/          EquipmentData, Weapon3DData e items/ (.tres de armas, escudo, armaduras)
+    combat/             Hitbox3D, Hurtbox3D, Projectile3D, DamageLabel3D, OneShotFX, projectiles/, fx/
+    player/             Player3D
+    enemies/            muñeco 3D (y los mobs 3D cuando lleguen)
+    world/              Game3D (red + jugadores), FollowCamera3D, game_3d.tscn (mazmorra de prueba)
+    ui/                 HUD3D
+tests/                  tests de humo y de red (2D y 3D) y test de prototipos
 prototypes/             EXPERIMENTOS (personaje 3D): A = 3D horneado a sprites, B = 3D real. No forman parte del juego.
 tools/baker/            herramientas para generar el personaje 3D y hornearlo a sprites (ver su README)
 docs/                   GDD y backlog
@@ -78,7 +88,7 @@ El juego está escrito como multijugador desde la base, aunque juegues solo (en 
 7. **Botín**: el host decide y se lo manda al dueño: `player.receive_item.rpc_id(player.get_multiplayer_authority(), ruta, n)`.
 8. Lo local de cada jugador (inventario, maná, recolección, prompts, HUD, cámara) vive en su ordenador.
 
-Flujo: `main_menu` → `Net.play(modo)` → carga `sandbox.tscn` → `Game._ready()` llama a `Net.start()` y crea los
+Flujo: `main_menu` → `Net.play(modo)` → carga `Net.world_scene` (`game_3d.tscn` o `sandbox.tscn`) → `Game3D._ready()` / `Game._ready()` llama a `Net.start()` y crea los
 jugadores (`_spawn_player` corre en todos los peers y pone el dueño). Un cliente pide su jugador con `_request_spawn`.
 
 ## Capas de física (2D)
@@ -185,7 +195,51 @@ Animaciones del cuerpo: `idle`, `run` (frente/espalda), `run_diag`, `run_side` (
 personaje. Las manos libres cuelgan de `HandLAnchor`/`HandRAnchor` (su posición por vista está en `hand_rest_l/r`);
 las animaciones mueven `HandL`/`HandR` dentro de su ancla.
 
-## Pixel art
+## Juego en 3D (`src/game3d/`)
+
+Mismas reglas que todo lo demás (escenas reales, datos en `.tres`, red coop). Lo propio del 3D:
+
+- **Capas de física 3D**: las mismas que las 2D (1 world, 2 player, 3 enemies, 4 player_attacks, 5 enemy_hurtbox,
+  6 player_hurtbox, 7 enemy_attacks, 8 interactables).
+- **Cámara**: `FollowCamera3D` en diagonal (`pitch_degrees`, `distance`), sigue al jugador local. El mundo 3D pone la
+  ventana en `content_scale_mode = canvas_items` (resolución real) y la devuelve al salir.
+- **Personaje** = `Avatar3D`: el modelo con esqueleto (`Skeleton3D`) y su `AnimationPlayer`. Las animaciones se
+  llaman por nombre (`Idle`, `Running_A`, `1H_Melee_Attack_Chop`...). `looping_clips` dice cuáles van en bucle.
+  `body_parts` traduce nombres genéricos (`body`, `head`, `arm_l`...) a las mallas de ese modelo y `outfit` dice qué
+  ropa de serie trae (casco, capa).
+- **Jugador** = `Player3D`: el dueño simula; por `Sync` viajan posición, `yaw`, `net_anim` ("clip#contador#velocidad"),
+  arma, personaje, equipo y vida. Los proyectiles se crean en todos con `_shoot` (RPC) y solo el del dueño hace daño.
+- **Armas** = `Weapon3DData` (.tres): escena del arma, animaciones de combo / clic derecho / reposo, momento del golpe
+  (`hit_time`, `hit_window` en 0..1 de la animación), daño, alcance, proyectiles y efecto del clic derecho.
+  Para añadir una: duplica un `.tres` de `src/game3d/equipment/items/` y añádelo a `weapons` en `player_3d.tscn`.
+
+### Equipo y modelos propios (Blender)
+
+Para que el arte nuevo encaje solo, los modelos se exportan como **glTF (.glb)** con **el mismo esqueleto**
+(los mismos nombres de hueso) que el personaje base. Hoy el base es el de KayKit; cuando hagamos el nuestro,
+estos son los huesos que usa el código (`Avatar3D.slot_bones`):
+
+| Ranura | Hueso | Qué va ahí |
+|---|---|---|
+| MAIN_HAND | `handslot.r` | arma principal (el mango en el origen del hueso) |
+| OFF_HAND | `handslot.l` | escudo, segunda daga, libro |
+| HEAD | `head` | casco, sombrero |
+| BACK / CHEST | `chest` | capa / piezas rígidas del pecho |
+
+Tres tipos de pieza (`EquipmentData`):
+
+1. **Rígida** (armas, escudos, cascos): un .glb suelto, modelado con el origen donde la agarra la mano. Se pega al hueso.
+   Si queda torcida, se corrige con `position_offset` / `rotation_offset_degrees` en su `.tres`, no en código.
+2. **Con esqueleto** (`skinned = true`: petos, pantalones, botas, ropa): en Blender se modela **encima del cuerpo base**
+   y se pesa (*weight paint*) al **mismo esqueleto**. Se exporta en un .glb. Al equiparla, sus mallas se pasan al
+   esqueleto del personaje y se deforman con TODAS sus animaciones. `hides_body_parts` oculta lo que tapa
+   (`body`, `arm_l`...) para que no atraviese.
+3. **De serie** (`builtin_node`): una malla que ya trae el modelo del personaje; solo se muestra u oculta.
+
+Las animaciones nuevas (de Blender o Mixamo retargeteadas al esqueleto) se añaden al `AnimationPlayer` del personaje
+con su nombre y se usan desde los `.tres` de las armas.
+
+## Pixel art (sandbox 2D)
 
 - Resolución base **960x540**, filtro *nearest*, snap a píxel activado. No escales sprites por valores no enteros.
 - Contorno de 1 px oscuro (`#180E10`), luz desde arriba a la izquierda.
@@ -196,6 +250,7 @@ las animaciones mueven `HandL`/`HandR` dentro de su ancla.
 ```bash
 godot --headless --path . --import                        # reimporta y muestra errores de scripts/escenas
 godot --headless --path . res://tests/smoke_test.tscn      # debe terminar con "SMOKE OK"
+godot --headless --path . res://tests/smoke_test_3d.tscn   # debe terminar con "SMOKE 3D OK"
 ```
 
 Si tocas algo de red (o cualquier cosa que se vea en coop), pasa también el test de red (dos copias del juego):
@@ -203,6 +258,8 @@ Si tocas algo de red (o cualquier cosa que se vea en coop), pasa también el tes
 ```bash
 godot --headless --path . res://tests/net_test.tscn -- --role=host --port=7790 &
 godot --headless --path . res://tests/net_test.tscn -- --role=client --port=7790   # "NET CLIENT OK" (y el host "NET HOST OK")
+godot --headless --path . res://tests/net_test_3d.tscn -- --role=host --port=7795 &
+godot --headless --path . res://tests/net_test_3d.tscn -- --role=client --port=7795
 ```
 
 Si cambias combate o armas y el test falla, arréglalo o actualiza el test en el mismo commit.

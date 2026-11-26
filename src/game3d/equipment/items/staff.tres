@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="Weapon3DData" format=3]
+
+[ext_resource type="Script" path="res://src/game3d/equipment/weapon_3d_data.gd" id="1_weapon3dda"]
+[ext_resource type="PackedScene" path="res://assets/models/kaykit_adventurers/weapons/staff.gltf" id="2_staffgltf"]
+[ext_resource type="PackedScene" path="res://src/game3d/combat/fx/nova.tscn" id="3_novatscn"]
+[ext_resource type="PackedScene" path="res://src/game3d/combat/projectiles/magic_bolt.tscn" id="4_magicboltt"]
+
+[resource]
+script = ExtResource("1_weapon3dda")
+id = &"staff"
+slot = 0
+display_name = "Bastón"
+kind = 2
+scene = ExtResource("2_staffgltf")
+idle_clip = "Idle"
+combo_clips = PackedStringArray("Spellcast_Shoot")
+alt_clip = "Spellcast_Long"
+alt_is_area = true
+alt_fx_scene = ExtResource("3_novatscn")
+attack_speed = 1.5
+hit_time = 0.45
+base_damage = 14.0
+projectile_scene = ExtResource("4_magicboltt")
+projectile_speed = 16.0
+alt_damage_multiplier = 1.4
+knockback = 10.0

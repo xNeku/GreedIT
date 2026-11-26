@@ -12,12 +12,16 @@ enum Mode { SOLO, HOST, JOIN }
 const DEFAULT_PORT := 7777
 const MAX_PLAYERS := 4
 const MENU_SCENE := "res://src/ui/main_menu.tscn"
-const WORLD_SCENE := "res://src/world/sandbox.tscn"
+## Mundo 3D (la base nueva del juego) y el sandbox 2D pixel art (el anterior).
+const WORLD_3D_SCENE := "res://src/game3d/world/game_3d.tscn"
+const WORLD_2D_SCENE := "res://src/world/sandbox.tscn"
 
 var mode := Mode.SOLO
+## Mundo que se carga al jugar (lo elige el menú).
+var world_scene := WORLD_3D_SCENE
 var address := "127.0.0.1"
 var port := DEFAULT_PORT
-## Personaje elegido en el menú (índice en Player.appearances).
+## Personaje elegido en el menú (índice en Player.appearances en 2D, en Player3D.avatars en 3D).
 var appearance_index := 0
 ## Último error para enseñarlo en el menú.
 var last_error := ""
@@ -29,7 +33,7 @@ func play(new_mode: Mode, new_address: String = "127.0.0.1", new_port: int = DEF
 	address = new_address
 	port = new_port
 	last_error = ""
-	get_tree().change_scene_to_file(WORLD_SCENE)
+	get_tree().change_scene_to_file(world_scene)
 
 
 ## Arranca la red según el modo. Devuelve OK o el error.
@@ -91,5 +95,5 @@ func _on_server_disconnected() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("leave_game") and get_tree().current_scene \
-			and get_tree().current_scene.scene_file_path == WORLD_SCENE:
+			and get_tree().current_scene.scene_file_path in [WORLD_3D_SCENE, WORLD_2D_SCENE]:
 		leave()

@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/game3d/characters/avatar_3d.gd" id="1_avatar3dgd"]
+[ext_resource type="PackedScene" path="res://assets/models/kaykit_adventurers/characters/Mage.glb" id="2_mageglb"]
+
+[node name="Mage" type="Node3D"]
+script = ExtResource("1_avatar3dgd")
+body_parts = {
+"head": "Mage_Head",
+"body": "Mage_Body",
+"arm_l": "Mage_ArmLeft",
+"arm_r": "Mage_ArmRight",
+"leg_l": "Mage_LegLeft",
+"leg_r": "Mage_LegRight"
+}
+outfit = {
+2: "Mage_Hat",
+3: "Mage_Cape"
+}
+
+[node name="Model" parent="." instance=ExtResource("2_mageglb")]

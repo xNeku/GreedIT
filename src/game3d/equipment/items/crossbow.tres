@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="Weapon3DData" format=3]
+
+[ext_resource type="Script" path="res://src/game3d/equipment/weapon_3d_data.gd" id="1_weapon3dda"]
+[ext_resource type="PackedScene" path="res://assets/models/kaykit_adventurers/weapons/crossbow_2handed.gltf" id="2_crossbow2h"]
+[ext_resource type="PackedScene" path="res://src/game3d/combat/projectiles/bolt.tscn" id="3_bolttscn"]
+
+[resource]
+script = ExtResource("1_weapon3dda")
+id = &"crossbow"
+slot = 0
+display_name = "Ballesta"
+kind = 1
+scene = ExtResource("2_crossbow2h")
+idle_clip = "2H_Ranged_Aiming"
+combo_clips = PackedStringArray("2H_Ranged_Shoot")
+alt_clip = "2H_Ranged_Shoot"
+attack_speed = 1.6
+hit_time = 0.3
+base_damage = 11.0
+crit_chance = 0.2
+projectile_scene = ExtResource("3_bolttscn")
+projectile_speed = 26.0
+alt_projectiles = 5
+alt_damage_multiplier = 1.2

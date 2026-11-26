@@ -1,0 +1,124 @@
+[gd_scene format=3]
+
+[ext_resource type="Resource" path="res://src/game3d/equipment/items/fists.tres" id="2_fiststres"]
+[ext_resource type="Resource" path="res://src/game3d/equipment/items/sword.tres" id="3_swordtres"]
+[ext_resource type="Resource" path="res://src/game3d/equipment/items/greatsword.tres" id="4_greatsword"]
+[ext_resource type="Resource" path="res://src/game3d/equipment/items/axe.tres" id="5_axetres"]
+[ext_resource type="Resource" path="res://src/game3d/equipment/items/daggers.tres" id="6_daggerstre"]
+[ext_resource type="Resource" path="res://src/game3d/equipment/items/crossbow.tres" id="7_crossbowtr"]
+[ext_resource type="Resource" path="res://src/game3d/equipment/items/staff.tres" id="8_stafftres"]
+[ext_resource type="PackedScene" path="res://src/game3d/characters/knight/knight.tscn" id="9_knighttscn"]
+[ext_resource type="PackedScene" path="res://src/game3d/characters/barbarian/barbarian.tscn" id="10_barbariant"]
+[ext_resource type="PackedScene" path="res://src/game3d/characters/mage/mage.tscn" id="11_magetscn"]
+[ext_resource type="PackedScene" path="res://src/game3d/characters/rogue/rogue.tscn" id="12_roguetscn"]
+[ext_resource type="Script" path="res://src/game3d/player/player_3d.gd" id="13_player3dgd"]
+[ext_resource type="Script" path="res://src/game3d/equipment/weapon_3d_data.gd" id="14_weapon3dda"]
+[ext_resource type="Resource" path="res://src/game3d/equipment/items/shield_round.tres" id="15_shieldroun"]
+[ext_resource type="Resource" path="res://src/game3d/equipment/items/knight_armor.tres" id="16_knightarmo"]
+[ext_resource type="PackedScene" path="res://src/game3d/combat/damage_label_3d.tscn" id="17_damagelabe"]
+[ext_resource type="Script" path="res://src/game3d/combat/hitbox_3d.gd" id="19_hitbox3dgd"]
+[ext_resource type="Script" path="res://src/game3d/combat/hurtbox_3d.gd" id="22_hurtbox3dg"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_player"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:yaw")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath(".:net_anim")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:weapon_index")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath(".:avatar_index")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+properties/5/path = NodePath(".:helmet_on")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+properties/6/path = NodePath(".:cape_on")
+properties/6/spawn = true
+properties/6/replication_mode = 2
+properties/7/path = NodePath(".:shield_on")
+properties/7/spawn = true
+properties/7/replication_mode = 2
+properties/8/path = NodePath(".:chest_on")
+properties/8/spawn = true
+properties/8/replication_mode = 2
+properties/9/path = NodePath(".:health")
+properties/9/spawn = true
+properties/9/replication_mode = 2
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.45
+height = 2.0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hit"]
+resource_local_to_scene = true
+size = Vector3(2, 2, 2)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_area"]
+radius = 3.0
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hurt"]
+radius = 0.5
+height = 2.2
+
+[node name="Player3D" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("13_player3dgd")
+weapons = Array[ExtResource("14_weapon3dda")]([ExtResource("2_fiststres"), ExtResource("3_swordtres"), ExtResource("4_greatsword"), ExtResource("5_axetres"), ExtResource("6_daggerstre"), ExtResource("7_crossbowtr"), ExtResource("8_stafftres")])
+shield_item = ExtResource("15_shieldroun")
+chest_item = ExtResource("16_knightarmo")
+avatars = Array[PackedScene]([ExtResource("9_knighttscn"), ExtResource("10_barbariant"), ExtResource("11_magetscn"), ExtResource("12_roguetscn")])
+damage_label_scene = ExtResource("17_damagelabe")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="AvatarHolder" type="Node3D" parent="."]
+
+[node name="Hitbox" type="Area3D" parent="AvatarHolder"]
+collision_layer = 8
+collision_mask = 16
+script = ExtResource("19_hitbox3dgd")
+
+[node name="Shape" type="CollisionShape3D" parent="AvatarHolder/Hitbox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1.3)
+shape = SubResource("BoxShape3D_hit")
+
+[node name="Muzzle" type="Marker3D" parent="AvatarHolder"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0.9)
+
+[node name="Light" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0.6)
+light_color = Color(1, 0.9, 0.78, 1)
+light_energy = 0.8
+omni_range = 9.0
+omni_attenuation = 1.4
+
+[node name="AreaHitbox" type="Area3D" parent="."]
+collision_layer = 8
+collision_mask = 16
+script = ExtResource("19_hitbox3dgd")
+
+[node name="Shape" type="CollisionShape3D" parent="AreaHitbox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("SphereShape3D_area")
+
+[node name="Hurtbox" type="Area3D" parent="."]
+collision_layer = 32
+collision_mask = 0
+script = ExtResource("22_hurtbox3dg")
+
+[node name="Shape" type="CollisionShape3D" parent="Hurtbox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_hurt")
+
+[node name="Sync" type="MultiplayerSynchronizer" parent="."]
+root_path = NodePath("..")
+replication_config = SubResource("SceneReplicationConfig_player")

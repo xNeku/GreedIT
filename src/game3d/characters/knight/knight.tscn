@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/game3d/characters/avatar_3d.gd" id="1_avatar3dgd"]
+[ext_resource type="PackedScene" path="res://assets/models/kaykit_adventurers/characters/Knight.glb" id="2_knightglb"]
+
+[node name="Knight" type="Node3D"]
+script = ExtResource("1_avatar3dgd")
+body_parts = {
+"head": "Knight_Head",
+"body": "Knight_Body",
+"arm_l": "Knight_ArmLeft",
+"arm_r": "Knight_ArmRight",
+"leg_l": "Knight_LegLeft",
+"leg_r": "Knight_LegRight"
+}
+outfit = {
+2: "Knight_Helmet",
+3: "Knight_Cape"
+}
+
+[node name="Model" parent="." instance=ExtResource("2_knightglb")]

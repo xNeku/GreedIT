@@ -12,3 +12,6 @@ signal hitstop_requested(duration: float)
 
 ## El jugador que controla este ordenador ya está en el mundo (para enganchar HUD, cámara...).
 signal local_player_ready(player: Player)
+
+## Versión 3D: el jugador de este ordenador ya está en el mundo.
+signal local_player_3d_ready(player: Node)

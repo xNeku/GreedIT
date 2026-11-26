@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3]
+
+[ext_resource type="Script" path="res://src/game3d/equipment/equipment_data.gd" id="1_equipmentd"]
+[ext_resource type="PackedScene" path="res://assets/models/kaykit_adventurers/characters/Knight.glb" id="2_knightglb"]
+
+[resource]
+script = ExtResource("1_equipmentd")
+id = &"knight_armor"
+display_name = "Armadura de caballero"
+description = "Armadura con esqueleto: sus mallas se visten sobre el esqueleto del personaje."
+slot = 4
+scene = ExtResource("2_knightglb")
+skinned = true
+mesh_names = PackedStringArray("Knight_Body", "Knight_ArmLeft", "Knight_ArmRight")
+hides_body_parts = PackedStringArray("body", "arm_l", "arm_r")

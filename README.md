@@ -1,15 +1,36 @@
 # GreedIT
 
-ARPG cooperativo top-down en pixel art: **Terraria + Path of Exile**.
+ARPG cooperativo con cámara en diagonal: **Terraria + Path of Exile**.
 Farmear, forjar, hacerte una build bestia y tumbar bosses con tus colegas.
 
-> Estado: **sandbox 0.6**. Coop de 2 a 4 jugadores, personaje en 8 direcciones, 6 armas, bola de fuego, primeros mobs (goblin, esqueleto y zombi, al norte del mapa), muñecos de entrenamiento y recolección (minería, herboristería y pesca).
+> Estado: **base 3D 0.7**. El juego pasa a **3D en tiempo real**: personajes con esqueleto y animaciones,
+> equipo por ranuras (armas en las manos, casco, capa, escudo y armaduras que se deforman con el cuerpo),
+> 7 armas, muñecos y una mazmorra con luces y sombras. Coop de 2 a 4 desde el principio.
+> Los modelos son de muestra (KayKit, CC0) hasta que estén los nuestros de Blender.
+> El sandbox 2D pixel art anterior sigue disponible desde el menú.
 
 ## Cómo abrirlo
 
 1. Instala **Godot 4.7** (versión estándar, no hace falta la de .NET).
 2. Abre Godot → *Importar* → selecciona `project.godot` de esta carpeta.
-3. Pulsa **F5**. Sale el menú: **Jugar solo**, **Crear partida** o **Unirse**.
+3. Pulsa **F5**. Sale el menú: elige **Mundo** (3D nuevo o 2D pixel art) y personaje, y luego
+   **Jugar solo**, **Crear partida** o **Unirse**.
+
+## Controles (mundo 3D)
+
+| Acción | Tecla |
+|---|---|
+| Moverse | WASD / flechas |
+| Atacar (combo) | Clic izquierdo (apunta al ratón) |
+| Ataque especial | Clic derecho |
+| Saltar | Espacio |
+| Esquivar (invulnerable) | Shift |
+| Cambiar arma | 1-7 / girar la rueda |
+| Cambiar personaje | C |
+| Quitar/poner casco · capa · escudo | H · G · V |
+| Poner/quitar armadura (con esqueleto) | B |
+| Pantalla completa | F11 |
+| Salir al menú | Esc |
 
 ## Prototipos de personaje 3D
 
@@ -28,7 +49,7 @@ En ambos: WASD para moverse, clic izquierdo para atacar y Esc para volver al men
    - Por internet: el host abre el puerto **UDP 7777** en su router, o usáis una VPN tipo ZeroTier / Hamachi y ponéis esa IP.
 3. Hasta 4 jugadores. Cada uno elige chico/chica en el menú.
 
-## Controles
+## Controles (sandbox 2D)
 
 | Acción | Tecla |
 |---|---|
@@ -69,3 +90,16 @@ Test de red (abre dos copias del juego, host y cliente, y comprueba que el coop 
 godot --headless --path . res://tests/net_test.tscn -- --role=host --port=7790 &
 godot --headless --path . res://tests/net_test.tscn -- --role=client --port=7790
 ```
+
+Lo mismo para el mundo 3D (`SMOKE 3D OK`, y `NET CLIENT OK` / `NET HOST OK`):
+
+```bash
+godot --headless --path . res://tests/smoke_test_3d.tscn
+godot --headless --path . res://tests/net_test_3d.tscn -- --role=host --port=7795 &
+godot --headless --path . res://tests/net_test_3d.tscn -- --role=client --port=7795
+```
+
+## Créditos
+
+- Personajes, armas y mazmorra de muestra: [KayKit](https://kaylousberg.com) por Kay Lousberg (CC0).
+  Ver `assets/models/*/LICENSE.txt`.

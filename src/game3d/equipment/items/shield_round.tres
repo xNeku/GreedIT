@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3]
+
+[ext_resource type="Script" path="res://src/game3d/equipment/equipment_data.gd" id="1_equipmentd"]
+[ext_resource type="PackedScene" path="res://assets/models/kaykit_adventurers/weapons/shield_round.gltf" id="2_shieldroun"]
+
+[resource]
+script = ExtResource("1_equipmentd")
+id = &"shield_round"
+display_name = "Escudo redondo"
+slot = 1
+scene = ExtResource("2_shieldroun")

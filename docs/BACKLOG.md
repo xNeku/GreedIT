@@ -58,11 +58,39 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [x] Movimiento más rápido y con respuesta inmediata; carrera con zancada, inclinación y brazos;
       arrancar, frenar y girar con peso
 
-## Decisión pendiente: personaje 2D o 3D
+## Decisión: personaje 2D o 3D (hecho → 3D real)
 
 - [x] Prototipo A: personaje 3D (vóxeles generados desde los sprites) horneado a sprites en 8 direcciones
 - [x] Prototipo B: el mismo personaje en un mundo 3D real (giro libre, luces y sombras 3D)
-- [ ] Elegir camino (2D por capas / A / B) y migrar el personaje, armas y mobs
+- [x] Elegido: **3D en tiempo real** (estilo "HD" con modelos de Blender), para que el arte lo pueda hacer el
+      dueño del proyecto en Blender y los equipos/armaduras encajen solos en cualquier animación
+
+## Hito 3D.0: Base del juego en 3D (hecho)
+
+- [x] Modelos de muestra CC0 (KayKit Adventurers y Dungeon) en `assets/models/`, hasta tener los propios
+- [x] `Avatar3D`: personaje con esqueleto + AnimationPlayer; 4 personajes (caballero, bárbaro, maga, pícara)
+- [x] Equipo por ranuras (`EquipmentData`): armas pegadas a los huesos de la mano, casco/capa de serie,
+      escudo, y **armadura con esqueleto** que se viste sobre cualquier personaje (`skinned`)
+- [x] `Player3D`: movimiento con inercia, giro hacia donde corre, salto, esquiva con invulnerabilidad
+- [x] 7 armas (`Weapon3DData`): puños, espada y escudo, mandoble (giro), hacha (remolino), dagas dobles,
+      ballesta (abanico de virotes) y bastón (proyectil mágico + nova)
+- [x] Hitbox3D / Hurtbox3D / Projectile3D con las mismas reglas de red que el 2D
+- [x] Muñeco 3D (tambaleo, destello, paja, números de daño, DPS)
+- [x] Mazmorra de prueba con antorchas, sombras, niebla, glow; cámara en diagonal que sigue al jugador
+- [x] Coop desde el principio: test de humo 3D y test de red 3D (host + cliente)
+- [x] Menú: elegir mundo 3D (nuevo) o 2D pixel art, y personaje
+
+## Hito 3D.1: Pasar el juego al 3D (siguiente)
+
+- [ ] Personaje propio hecho en Blender (mismo esqueleto/huesos que el de muestra, ver AGENTS.md)
+- [ ] Mobs 3D (goblin, esqueleto, zombi) con la IA de `enemy.gd` adaptada a 3D
+- [ ] Vida del jugador en 3D: muerte, reaparición, invulnerabilidad tras golpe (ahora solo resta vida)
+- [ ] Mantener clic (carga / ráfaga) y ataque aéreo como en el 2D
+- [ ] Bola de fuego (clic de la rueda) y maná
+- [ ] Recolección 3D (minería, herboristería, pesca) e inventario
+- [ ] Armas a la espalda cuando no se usan (ranura BACK + hueso de la espalda)
+- [ ] Giros de área que golpeen varias veces (ahora una vez por ataque)
+- [ ] Estelas de arma 3D y sonidos
 
 ## Hito 1: Sensación de combate (siguiente)
 
