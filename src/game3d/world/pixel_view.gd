@@ -7,9 +7,10 @@ extends SubViewportContainer
 ## cuánto se ha desviado (`snap_offset`): aquí movemos la imagen ese trocito, así el scroll sigue siendo suave.
 ## El HUD va fuera, a resolución normal.
 
-## Tamaño de cada píxel del mundo en unidades de la interfaz (960x540). 2 = mundo a 480x270 (en 1080p, 4x4 píxeles
-## de pantalla). Se redondea para que cada píxel del mundo ocupe un número entero de píxeles de pantalla.
-@export_range(1, 6) var pixel_scale := 2
+## Tamaño de cada píxel del mundo en unidades de la interfaz (960x540). 1 = mundo a 960x540 (en 1080p, 2x2 píxeles
+## de pantalla, aspecto limpio); 2 = 480x270 (muy pixelado). Se redondea para que cada píxel del mundo ocupe un
+## número entero de píxeles de pantalla.
+@export_range(0.5, 6.0, 0.5) var pixel_scale := 1.0
 @export var camera: FollowCamera3D
 
 @onready var world: SubViewport = $World

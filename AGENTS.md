@@ -202,18 +202,22 @@ Mismas reglas que todo lo demás (escenas reales, datos en `.tres`, red coop). L
 - **Capas de física 3D**: las mismas que las 2D (1 world, 2 player, 3 enemies, 4 player_attacks, 5 enemy_hurtbox,
   6 player_hurtbox, 7 enemy_attacks, 8 interactables).
 - **Estilo pixel art** (el 3D no se ve como 3D realista):
-  - El mundo vive dentro de `PixelView/World` (un `SubViewport`) y se pinta a **baja resolución** (480x270 en 1080p)
+  - El mundo vive dentro de `PixelView/World` (un `SubViewport`) y se pinta a **media resolución** (960x540 en 1080p)
     ampliado sin suavizado, siempre con un número entero de píxeles de pantalla por píxel. `PixelView.pixel_scale`
-    decide lo gordo que es el píxel. El HUD va fuera, a resolución normal (el mundo 3D pone la ventana en
+    decide lo gordo que es el píxel (2 = 480x270, ya se ve demasiado granulado en el escenario). El HUD va fuera, a resolución normal (el mundo 3D pone la ventana en
     `content_scale_mode = canvas_items` y la devuelve al salir).
-  - Filtro final `pixel_post.gdshader` (paleta reducida, tramado, saturación, tinte de sombras). Se ajusta en
-    `pixel_post_material.tres`.
+  - Filtro final `pixel_post.gdshader` (saturación, contraste, tinte de sombras; paleta reducida y tramado
+    desactivados porque el escenario parecía roto). Se ajusta en `pixel_post_material.tres`.
   - Todos los modelos se importan con `assets/models/pixel_look_import.gd` (luz por bandas, texturas *nearest* y
     contorno oscuro de 1 px con `assets/materials/outline_3d.tres`). **Un modelo nuevo tiene que llevar ese
     "Import Script"** (pestaña Importar del .glb) o se verá realista. Materiales hechos a mano: `diffuse_mode` toon,
     sin especular y `next_pass` = `outline_3d.tres`.
-  - Cámara `FollowCamera3D` **ortográfica** en diagonal (`pitch_degrees`, `size` = alto visible en metros) que se
-    pega a la rejilla de píxeles (`pixel_snap`) y le pasa a `PixelView` el resto (`snap_offset`) para un scroll suave.
+  - Cámara `FollowCamera3D` **ortográfica**: **isométrica** estilo Diablo (giro 45°, 30° desde el suelo = líneas 2:1)
+    o **diagonal** (Tab cambia), zoom con + / - (`size` = alto visible en metros). Se pega a la rejilla de píxeles
+    (`pixel_snap`) y le pasa a `PixelView` el resto (`snap_offset`) para un scroll suave.
+  - El mundo 3D activa la **interpolación de física** (`SceneTree.physics_interpolation`): lo que se mueve en
+    `_physics_process` se dibuja suave aunque la pantalla vaya a 120 Hz. La cámara lee
+    `get_global_transform_interpolated()` y tiene la interpolación apagada (se mueve en `_process`).
 - **Proporciones**: `BoneScaleModifier` (hijo del `Skeleton3D`) escala huesos encima de las animaciones; en los de
   muestra encoge la cabeza. Con un modelo propio con buenas proporciones no hace falta.
 - **Personaje** = `Avatar3D`: el modelo con esqueleto (`Skeleton3D`) y su `AnimationPlayer`. Las animaciones se
@@ -222,9 +226,19 @@ Mismas reglas que todo lo demás (escenas reales, datos en `.tres`, red coop). L
   ropa de serie trae (casco, capa).
 - **Jugador** = `Player3D`: el dueño simula; por `Sync` viajan posición, `yaw`, `net_anim` ("clip#contador#velocidad"),
   arma, personaje, equipo y vida. Los proyectiles se crean en todos con `_shoot` (RPC) y solo el del dueño hace daño.
-- **Armas** = `Weapon3DData` (.tres): escena del arma, animaciones de combo / clic derecho / reposo, momento del golpe
-  (`hit_time`, `hit_window` en 0..1 de la animación), daño, alcance, proyectiles y efecto del clic derecho.
-  Para añadir una: duplica un `.tres` de `src/game3d/equipment/items/` y añádelo a `weapons` en `player_3d.tscn`.
+- **Movimiento**: WASD relativo a la cámara. Salto estilo Conquer (se agacha y sale hacia donde corres; en lo alto
+  esquivas golpes, `dodge_height`), aterrizaje con polvo. Shift = esquiva.
+- **Armas** = `Weapon3DData` (.tres) con sus **ataques** (`Attack3D`, sub-recursos editables en el inspector):
+  `combo` (clic), `heavy` (mantener: `hold_mode` CHARGE carga hasta `max_charge_multiplier`; REPEAT = ráfaga del
+  combo), `alt` (clic derecho), `alt_hold` (mantener clic derecho) y `air` (atacar en el aire).
+  Cada `Attack3D` dice: animación y velocidad, momento del golpe (`hit_time`/`hit_window` en 0..1), daño, área,
+  avance (`lunge`), salto (`leap` hacia el ratón o hacia atrás, con `land_attack` al aterrizar), caída en picado
+  (`plunge`), proyectiles (cuántos, abanico, escena, tamaño) y efecto (`fx_scene`).
+  Para añadir un arma: duplica un `.tres` de `src/game3d/equipment/items/` y añádelo a `weapons` en `player_3d.tscn`.
+- **Hechizo** (clic de la rueda) = `Spell3DData` (`fireball.tres`): maná, enfriamiento, daño y su `cast` (un Attack3D
+  con el proyectil). Los proyectiles con `explosion_scene` explotan (`Explosion3D`: daño en área, solo en el dueño).
+- En red, los ataques se identifican por clave (`combo0`, `heavy`, `alt`, `alt_hold`, `air`, `spell`, `.../land`):
+  `Player3D._fire` (proyectiles) y `_spawn_fx` (efectos) son RPC; `charging` va por `Sync`.
 
 ### Equipo y modelos propios (Blender)
 

@@ -14,6 +14,7 @@ extends Node
 @export var player_scene: PackedScene
 
 var _previous_scale_mode: Window.ContentScaleMode
+var _previous_interpolation := false
 
 @onready var players: Node3D = %Players
 @onready var dummies: Node3D = %Dummies
@@ -26,10 +27,14 @@ func _enter_tree() -> void:
 	# El 2D pixel art escala el viewport entero; en 3D queremos la resolución real de la pantalla.
 	_previous_scale_mode = get_window().content_scale_mode
 	get_window().content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
+	# La física va a 60 Hz; con interpolación lo que se mueve se dibuja suave aunque la pantalla vaya a 120 Hz.
+	_previous_interpolation = get_tree().physics_interpolation
+	get_tree().physics_interpolation = true
 
 
 func _exit_tree() -> void:
 	get_window().content_scale_mode = _previous_scale_mode
+	get_tree().physics_interpolation = _previous_interpolation
 
 
 func _ready() -> void:

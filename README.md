@@ -21,11 +21,17 @@ Farmear, forjar, hacerte una build bestia y tumbar bosses con tus colegas.
 
 | Acción | Tecla |
 |---|---|
-| Moverse | WASD / flechas |
+| Moverse | WASD / flechas (relativo a la cámara) |
 | Atacar (combo) | Clic izquierdo (apunta al ratón) |
+| Ataque cargado / ráfaga | Mantener clic izquierdo |
 | Ataque especial | Clic derecho |
-| Saltar | Espacio |
+| Especial cargado (mandoble: salto aplastante) | Mantener clic derecho |
+| Ataque aéreo (caída en picado) | Atacar mientras saltas |
+| Bola de fuego (gasta maná) | Clic de la rueda |
+| Saltar (hacia donde corres) | Espacio |
 | Esquivar (invulnerable) | Shift |
+| Cámara isométrica / diagonal | Tab |
+| Zoom | + / - |
 | Cambiar arma | 1-7 / girar la rueda |
 | Cambiar personaje | C |
 | Quitar/poner casco · capa · escudo | H · G · V |

@@ -88,7 +88,7 @@ func _run_client() -> void:
 		me.global_position = dummy.global_position + Vector3(0, 0, 1.6)
 		me.velocity = Vector3.ZERO
 		me.aim_target_override = dummy.global_position
-		me.attack(false)
+		me.primary_down(); me.primary_up()
 		await _wait(0.8)
 	if not await _wait_until(func() -> bool: return dummy.total_hits > 0, 4.0):
 		_fail("mis espadazos no llegan al muñeco")
@@ -100,14 +100,14 @@ func _run_client() -> void:
 	me.weapon_index = 5
 	await _wait(0.2)
 	me.global_position = dummy.global_position + Vector3(0, 0, 6)
-	me.attack(false)
+	me.primary_down(); me.primary_up()
 	if not await _wait_until(func() -> bool: return dummy.total_hits > before, 4.0):
 		_fail("mis virotes no llegan al muñeco")
 	else:
 		print("[cliente] virote en el muñeco: %d golpe(s) más" % (dummy.total_hits - before))
 	me.weapon_index = 1
 	me.global_position = dummy.global_position + Vector3(0, 0, 1.6)
-	me.attack(false) # para que el host vea la animación de espada al final
+	me.primary_down(); me.primary_up() # para que el host vea la animación de espada al final
 	await _wait(1.5)
 	_finish()
 

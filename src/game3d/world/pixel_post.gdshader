@@ -3,9 +3,9 @@ shader_type canvas_item;
 // Los valores se ajustan en pixel_post_material.tres.
 
 // Niveles por canal de color (menos = paleta más corta, más "pixel art"). 0 = sin reducir.
-uniform float color_levels : hint_range(0.0, 64.0, 1.0) = 16.0;
+uniform float color_levels : hint_range(0.0, 64.0, 1.0) = 0.0;
 // Tramado (dithering) entre niveles: 0 = bandas limpias.
-uniform float dither : hint_range(0.0, 1.0) = 0.18;
+uniform float dither : hint_range(0.0, 1.0) = 0.0;
 uniform float saturation : hint_range(0.0, 2.0) = 1.12;
 uniform float contrast : hint_range(0.5, 2.0) = 1.06;
 // Color hacia el que se tiñen las sombras (ambiente de mazmorra).

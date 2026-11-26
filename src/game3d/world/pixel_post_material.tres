@@ -4,9 +4,9 @@
 
 [resource]
 shader = ExtResource("1_pixelpostg")
-shader_parameter/color_levels = 16.0
-shader_parameter/dither = 0.18
+shader_parameter/color_levels = 0.0
+shader_parameter/dither = 0.0
 shader_parameter/saturation = 1.12
 shader_parameter/contrast = 1.1
 shader_parameter/shadow_tint = Color(0.16, 0.12, 0.22, 1)
-shader_parameter/shadow_tint_amount = 0.25
+shader_parameter/shadow_tint_amount = 0.2

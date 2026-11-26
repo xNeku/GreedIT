@@ -1,0 +1,141 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/game3d/combat/one_shot_fx.gd" id="3_oneshotfxg"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ring"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.9, 0.7, 0.85)
+cull_mode = 2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dust"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.72, 0.64, 0.56, 0.8)
+
+[sub_resource type="TorusMesh" id="TorusMesh_torus"]
+material = SubResource("StandardMaterial3D_ring")
+inner_radius = 0.82
+outer_radius = 1.0
+rings = 48
+ring_segments = 6
+
+[sub_resource type="BoxMesh" id="BoxMesh_dbox"]
+material = SubResource("StandardMaterial3D_dust")
+size = Vector3(0.2, 0.2, 0.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rock"]
+diffuse_mode = 3
+albedo_color = Color(0.42, 0.38, 0.42, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_rbox"]
+material = SubResource("StandardMaterial3D_rock")
+size = Vector3(0.14, 0.14, 0.14)
+
+[sub_resource type="Animation" id="Animation_play"]
+resource_name = "play"
+length = 0.7
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Ring:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.35),
+"transitions": PackedFloat32Array(1, 0.4),
+"update": 0,
+"values": [Vector3(0.3, 1, 0.3), Vector3(3.2, 1, 3.2)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Ring:transparency")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, 0.1, 1.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Dust:emitting")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.02),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Rocks:emitting")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.02),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_lib"]
+_data = {
+&"play": SubResource("Animation_play")
+}
+
+[node name="Slam" type="Node3D"]
+script = ExtResource("3_oneshotfxg")
+
+[node name="Ring" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0, 0.12, 0)
+cast_shadow = 0
+mesh = SubResource("TorusMesh_torus")
+
+[node name="Dust" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+emitting = false
+amount = 40
+lifetime = 0.6
+one_shot = true
+explosiveness = 1.0
+mesh = SubResource("BoxMesh_dbox")
+emission_shape = 1
+emission_sphere_radius = 0.6
+direction = Vector3(0, 0.4, 1)
+spread = 180.0
+flatness = 0.85
+initial_velocity_min = 5.0
+initial_velocity_max = 9.0
+damping_min = 6.0
+damping_max = 9.0
+gravity = Vector3(0, -6, 0)
+scale_amount_min = 0.6
+scale_amount_max = 1.6
+
+[node name="Rocks" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+emitting = false
+amount = 14
+lifetime = 0.7
+one_shot = true
+explosiveness = 1.0
+mesh = SubResource("BoxMesh_rbox")
+direction = Vector3(0, 1, 0)
+spread = 45.0
+initial_velocity_min = 5.0
+initial_velocity_max = 8.0
+gravity = Vector3(0, -22, 0)
+angular_velocity_min = -400.0
+angular_velocity_max = 400.0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_lib")
+}

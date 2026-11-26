@@ -87,6 +87,16 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [x] Filtro final: paleta reducida, tramado, tinte de sombras (`pixel_post_material.tres`)
 - [x] Cabeza más pequeña en los personajes de muestra (`BoneScaleModifier`)
 
+## Hito 3D.0c: Combate del 2D en 3D, movimiento y cámara (hecho)
+
+- [x] Ataques por datos (`Attack3D`): combo con avance, carga (mantener), ráfaga, clic derecho, mantener clic
+      derecho (salto aplastante), ataque aéreo con caída en picado y golpe al aterrizar, salto atrás con abanico
+- [x] Bola de fuego con maná (clic de la rueda), explosión en área; barra de maná y chuleta del arma en el HUD
+- [x] Movimiento más directo, relativo a la cámara; salto estilo Conquer con agachada, aterrizaje y polvo
+- [x] Interpolación de física (adiós a los tirones); menos luces con sombra; sin luz que sigue al jugador
+- [x] Cámara isométrica estilo Diablo (Tab para comparar con la diagonal), más lejos y con zoom (+ / -)
+- [x] Menos granulado: mundo a 960x540, sin tramado ni paleta reducida
+
 ## Hito 3D.1: Pasar el juego al 3D (siguiente)
 
 - [ ] Personaje de muestra con proporciones adultas parecido a la referencia (p. ej. Quaternius "Modular Character
@@ -96,8 +106,6 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [ ] Personaje propio hecho en Blender (mismo esqueleto/huesos que el de muestra, ver AGENTS.md)
 - [ ] Mobs 3D (goblin, esqueleto, zombi) con la IA de `enemy.gd` adaptada a 3D
 - [ ] Vida del jugador en 3D: muerte, reaparición, invulnerabilidad tras golpe (ahora solo resta vida)
-- [ ] Mantener clic (carga / ráfaga) y ataque aéreo como en el 2D
-- [ ] Bola de fuego (clic de la rueda) y maná
 - [ ] Recolección 3D (minería, herboristería, pesca) e inventario
 - [ ] Armas a la espalda cuando no se usan (ranura BACK + hueso de la espalda)
 - [ ] Giros de área que golpeen varias veces (ahora una vez por ataque)
