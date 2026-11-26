@@ -1,13 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="ShaderMaterial" format=3]
 
-[ext_resource type="Material" path="res://assets/materials/outline_3d_body.tres" id="1_outline3db"]
+[ext_resource type="Shader" path="res://assets/materials/world_lit.gdshader" id="1_worldlitgd"]
 [ext_resource type="Texture2D" path="res://assets/models/quaternius/Universal Base Characters[Standard]/Base Characters/Godot - UE/T_Hair_1_BaseColor.png" id="2_thair1base"]
 
 [resource]
-next_pass = ExtResource("1_outline3db")
-diffuse_mode = 3
-specular_mode = 2
-albedo_color = Color(0.55, 0.36, 0.22, 1)
-albedo_texture = ExtResource("2_thair1base")
-roughness = 1.0
-texture_filter = 0
+shader = ExtResource("1_worldlitgd")
+shader_parameter/albedo_color = Color(0.55, 0.36, 0.22, 1)
+shader_parameter/albedo_texture = ExtResource("2_thair1base")

@@ -1,23 +1,17 @@
 [gd_scene format=3]
 
-[ext_resource type="Material" path="res://assets/materials/outline_3d.tres" id="1_outline3dt"]
+[ext_resource type="Shader" path="res://assets/materials/world_lit.gdshader" id="1_worldlitgd"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_red"]
-next_pass = ExtResource("1_outline3dt")
-diffuse_mode = 3
-specular_mode = 2
-albedo_color = Color(0.72, 0.14, 0.1, 1)
-roughness = 1.0
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_red"]
+shader = ExtResource("1_worldlitgd")
+shader_parameter/albedo_color = Color(0.72, 0.14, 0.1, 1)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gold"]
-next_pass = ExtResource("1_outline3dt")
-diffuse_mode = 3
-specular_mode = 2
-albedo_color = Color(0.95, 0.72, 0.25, 1)
-roughness = 1.0
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gold"]
+shader = ExtResource("1_worldlitgd")
+shader_parameter/albedo_color = Color(0.95, 0.72, 0.25, 1)
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_shaft"]
-material = SubResource("StandardMaterial3D_red")
+material = SubResource("ShaderMaterial_red")
 top_radius = 0.035
 bottom_radius = 0.035
 height = 2.5
@@ -25,7 +19,7 @@ radial_segments = 8
 rings = 1
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_cap"]
-material = SubResource("StandardMaterial3D_gold")
+material = SubResource("ShaderMaterial_gold")
 top_radius = 0.05
 bottom_radius = 0.05
 height = 0.22

@@ -33,9 +33,10 @@ assets/                 arte (solo datos, sin lógica)
   models/               modelos 3D (.glb/.gltf), de muestra y CC0:
     quaternius/         personaje base (Universal Base Characters), ropa modular y Universal Animation Library
     kaykit_adventurers/ armas (weapons/) y animaciones de armas (animations/KayKit_Animations.glb)
+    lowpoly_environment/ pack de entorno del dueño (árboles, rocas, arbustos, plantas, troncos, montañas)
     retarget/           mapas de huesos para compartir animaciones entre esqueletos (ver su README)
     pixel_look_import.gd  script de importación de todos los modelos (estilo del juego)
-  materials/            contornos (outline_3d*.tres)
+  materials/            world_lit.gdshader: el material de todo el juego
   ui/icons/             iconos de objetos (barra de 8 huecos)
 src/
   autoload/             Events (bus de señales), GameFeel (hitstop, pantalla completa), Net (solo / host / unirse)
@@ -45,7 +46,7 @@ src/
                         projectiles/, fx/
   player/               Player3D
   enemies/              muñeco de entrenamiento (y los enemigos cuando lleguen)
-  world/                Game3D (red + jugadores), game_3d.tscn (el mundo), FollowCamera3D, PixelView + su filtro
+  world/                Game3D (red + jugadores), game_3d.tscn (el mundo), DayNightCycle, FollowCamera3D, PixelView + filtro
   ui/                   menú principal, HUD (orbe de vida + barra de 8 huecos)
 tests/                  test de humo y test de red (host + cliente)
 docs/                   GDD y backlog
@@ -92,16 +93,19 @@ jugadores (`_spawn_player` corre en todos los peers y pone el dueño). Un client
 
 - **Capas de física**: 1 world, 2 player, 3 enemies, 4 player_attacks, 5 enemy_hurtbox, 6 player_hurtbox,
   7 enemy_attacks, 8 interactables.
-- **Estilo pixel art** (el 3D no se ve como 3D realista):
-  - El mundo vive dentro de `PixelView/World` (un `SubViewport`) y se pinta a **media resolución** (960x540 en 1080p)
-    ampliado sin suavizado, siempre con un número entero de píxeles de pantalla por píxel. `PixelView.pixel_scale`
-    decide lo gordo que es el píxel. El HUD va fuera, a resolución normal (el proyecto usa `canvas_items`).
-  - Filtro final `pixel_post.gdshader` (saturación, contraste, tinte de sombras; paleta reducida y tramado
-    desactivados porque el escenario parecía roto). Se ajusta en `pixel_post_material.tres`.
-  - Todos los modelos se importan con `assets/models/pixel_look_import.gd` (luz por bandas, texturas *nearest* y
-    contorno oscuro de 1 px con `assets/materials/outline_3d.tres`). **Un modelo nuevo tiene que llevar ese
-    "Import Script"** (pestaña Importar del .glb) o se verá realista. Materiales hechos a mano: `diffuse_mode` toon,
-    sin especular y `next_pass` = `outline_3d.tres`.
+- **Look** (elegido por el dueño en el Look Lab, https://claude.ai/artifact/72cQRp1pfboZeHSb1yLZGM):
+  - El mundo vive dentro de `PixelView/World` (un `SubViewport`) y se pinta a 960x540 en 1080p, ampliado sin
+    suavizado (`PixelView.pixel_scale`). El HUD va fuera, a resolución normal (el proyecto usa `canvas_items`).
+  - **Un solo material para todo**: `assets/materials/world_lit.gdshader` (color + textura sin suavizar, sin brillos).
+    Luz **suave de día y por bandas de noche** según el ajuste global `light_bands` (0 = suave, 4 = cuatro bandas).
+    Sin contorno. El script de importación `assets/models/pixel_look_import.gd` pone este material a todos los
+    modelos: **un modelo nuevo tiene que llevar ese "Import Script"**. Materiales hechos a mano: ShaderMaterial con
+    ese shader (`albedo_color`, `albedo_texture`).
+  - Filtro final `pixel_post.gdshader` (temperatura, contraste, saturación, tinte de sombras, viñeta), valores en
+    `pixel_post_material.tres`. Brillo y curva de cine (ACES) en el Environment del mundo.
+  - **Ciclo de día y noche** (`DayNightCycle`, nodo `DayNight` del mundo): el sol sale por el este y se pone por el
+    oeste (las sombras giran), de noche la luna con luz fría y las antorchas del grupo `night_lights` encendidas.
+    Los valores de día y de noche son los del Look Lab. La hora la lleva el host y se sincroniza cada 2 s.
   - Cámara `FollowCamera3D` **ortográfica isométrica** estilo Diablo (giro 45°, 30° desde el suelo = líneas 2:1),
     zoom con + / - (`size` = alto visible en metros). Se pega a la rejilla de píxeles
     (`pixel_snap`) y le pasa a `PixelView` el resto (`snap_offset`) para un scroll suave.

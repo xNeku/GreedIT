@@ -114,10 +114,18 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [x] Muñecos con saltito al recibir golpes (knockup); muerte y reaparición del jugador
 - [x] Rendimiento: hitboxes apagadas cuando no golpean, sin luces con sombra de más, interpolación en el proyecto
 
+## Hito 3D.2: Look y mundo de inicio (hecho)
+
+- [x] Look Lab (artefacto) para elegir luz, sombreado, imagen y color de día y de noche
+- [x] Look elegido en el juego: luz suave de día, por bandas de noche, sin contorno, filtro de color y viñeta
+- [x] Ciclo de día y noche con el sol y la luna moviéndose (sombras que giran), antorchas de noche
+- [x] Mundo más amplio con el pack de entorno: bosquecillos, rocas, troncos, montañas en el borde
+- [x] Zona de salida con 4 muñecos y 4 antorchas
+
 ## Siguiente
 
-- [ ] **Escenario de inicio** (llanura/bosque) con los assets que elija el dueño
-- [ ] Herramienta para que el dueño elija filtros/luz/color (día y noche) viendo el resultado
+- [ ] Confirmar la licencia del pack de entorno (assets/models/lowpoly_environment)
+- [ ] Reloj o indicador de la hora (si el dueño lo quiere)
 - [ ] Ajustar a mano el agarre de cada arma (GripR) y animaciones propias
 - [ ] Números de daño en el HUD (nítidos) en vez de Label3D pixelado
 - [ ] Personaje propio hecho en Blender (mismo esqueleto, ver AGENTS.md)
