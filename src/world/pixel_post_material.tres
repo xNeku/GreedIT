@@ -4,13 +4,13 @@
 
 [resource]
 shader = ExtResource("1_pixelpostg")
-shader_parameter/exposure = 0.9
+shader_parameter/exposure = 1.05
 shader_parameter/filmic = true
-shader_parameter/temperature = -0.3
-shader_parameter/contrast = 1.14
-shader_parameter/saturation = 1.05
+shader_parameter/temperature = -0.05
+shader_parameter/contrast = 0.98
+shader_parameter/saturation = 1.04
 shader_parameter/shadow_tint = Color(0.122, 0.157, 0.337, 1)
 shader_parameter/shadow_tint_amount = 0.25
-shader_parameter/vignette = 0.15
+shader_parameter/vignette = 0.3
 shader_parameter/color_levels = 0.0
 shader_parameter/dither = 0.0

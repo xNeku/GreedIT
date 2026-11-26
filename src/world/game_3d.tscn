@@ -185,6 +185,7 @@ offset_right = 962.0
 offset_bottom = 542.0
 script = ExtResource("4_pixelviewg")
 camera = NodePath("World/Camera")
+pixel_scale = 1.5
 
 [node name="World" type="SubViewport" parent="PixelView"]
 handle_input_locally = false
@@ -1485,6 +1486,13 @@ omni_attenuation = 1.6
 script = ExtResource("52_daynightcy")
 sun = NodePath("../Sun")
 world_environment = NodePath("../Environment")
+day_length = 1200.0
+sun_strength = 1.3
+moon_strength = 1.45
+day_ambient_strength = 2.35
+night_ambient_strength = 1.7
+torch_energy = 5.0
+night_light_bands = 3.0
 sun_colors = SubResource("Gradient_sun")
 sun_energy = SubResource("Curve_sun_e")
 ambient_colors = SubResource("Gradient_amb")
