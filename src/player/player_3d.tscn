@@ -1,0 +1,163 @@
+[gd_scene format=3]
+
+[ext_resource type="Resource" path="res://src/equipment/items/sword.tres" id="2_swordtres"]
+[ext_resource type="Resource" path="res://src/equipment/items/greatsword.tres" id="3_greatsword"]
+[ext_resource type="Resource" path="res://src/equipment/items/axe.tres" id="4_axetres"]
+[ext_resource type="Resource" path="res://src/equipment/items/daggers.tres" id="5_daggerstre"]
+[ext_resource type="Resource" path="res://src/equipment/items/crossbow.tres" id="6_crossbowtr"]
+[ext_resource type="Resource" path="res://src/equipment/items/bo.tres" id="7_botres"]
+[ext_resource type="Script" path="res://src/player/player_3d.gd" id="8_player3dgd"]
+[ext_resource type="PackedScene" path="res://src/characters/hero/hero.tscn" id="9_herotscn"]
+[ext_resource type="Script" path="res://src/equipment/weapon_3d_data.gd" id="10_weapon3dda"]
+[ext_resource type="Resource" path="res://src/equipment/items/fists.tres" id="11_fiststres"]
+[ext_resource type="Resource" path="res://src/equipment/items/shield_round.tres" id="12_shieldroun"]
+[ext_resource type="Resource" path="res://src/equipment/items/fireball.tres" id="13_fireballtr"]
+[ext_resource type="Script" path="res://src/combat/hitbox_3d.gd" id="15_hitbox3dgd"]
+[ext_resource type="Script" path="res://src/combat/hurtbox_3d.gd" id="22_hurtbox3dg"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_player"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:yaw")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath(".:net_anim")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:charging")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath(".:slot_index")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+properties/5/path = NodePath(".:health")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.4
+height = 1.9
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hit"]
+resource_local_to_scene = true
+size = Vector3(2, 2, 2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_glow"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(1, 0.85, 0.5, 0.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_chg"]
+material = SubResource("StandardMaterial3D_glow")
+size = Vector3(0.06, 0.06, 0.06)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dust"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.72, 0.66, 0.5, 0.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_dustm"]
+material = SubResource("StandardMaterial3D_dust")
+size = Vector3(0.12, 0.12, 0.12)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_area"]
+resource_local_to_scene = true
+radius = 3.0
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hurt"]
+radius = 0.45
+height = 2.0
+
+[node name="Player3D" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("8_player3dgd")
+avatar_scene = ExtResource("9_herotscn")
+hotbar = Array[ExtResource("10_weapon3dda")]([ExtResource("2_swordtres"), ExtResource("3_greatsword"), ExtResource("4_axetres"), ExtResource("5_daggerstre"), ExtResource("6_crossbowtr"), ExtResource("7_botres"), null, null])
+unarmed = ExtResource("11_fiststres")
+shield_item = ExtResource("12_shieldroun")
+spell = ExtResource("13_fireballtr")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="AvatarHolder" type="Node3D" parent="."]
+
+[node name="Hitbox" type="Area3D" parent="AvatarHolder"]
+collision_layer = 8
+collision_mask = 16
+monitoring = false
+script = ExtResource("15_hitbox3dgd")
+
+[node name="Shape" type="CollisionShape3D" parent="AvatarHolder/Hitbox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1.3)
+shape = SubResource("BoxShape3D_hit")
+
+[node name="Muzzle" type="Marker3D" parent="AvatarHolder"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0.8)
+
+[node name="ChargeParticles" type="CPUParticles3D" parent="AvatarHolder"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+emitting = false
+amount = 36
+lifetime = 0.45
+local_coords = true
+mesh = SubResource("BoxMesh_chg")
+emission_shape = 1
+emission_sphere_radius = 1.0
+gravity = Vector3(0, 1.5, 0)
+radial_accel_min = -9.0
+radial_accel_max = -6.0
+scale_amount_min = 0.6
+scale_amount_max = 1.3
+color = Color(1, 0.8, 0.4, 1)
+
+[node name="Dust" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+emitting = false
+amount = 16
+lifetime = 0.45
+one_shot = true
+explosiveness = 0.95
+local_coords = false
+mesh = SubResource("BoxMesh_dustm")
+emission_shape = 1
+emission_sphere_radius = 0.35
+direction = Vector3(0, 1, 0)
+spread = 80.0
+flatness = 0.6
+initial_velocity_min = 1.5
+initial_velocity_max = 3.5
+gravity = Vector3(0, -4, 0)
+damping_min = 3.0
+damping_max = 5.0
+scale_amount_min = 0.6
+scale_amount_max = 1.4
+
+[node name="AreaHitbox" type="Area3D" parent="."]
+collision_layer = 8
+collision_mask = 16
+monitoring = false
+script = ExtResource("15_hitbox3dgd")
+
+[node name="Shape" type="CollisionShape3D" parent="AreaHitbox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("SphereShape3D_area")
+
+[node name="Hurtbox" type="Area3D" parent="."]
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("22_hurtbox3dg")
+
+[node name="Shape" type="CollisionShape3D" parent="Hurtbox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+shape = SubResource("CapsuleShape3D_hurt")
+
+[node name="Sync" type="MultiplayerSynchronizer" parent="."]
+root_path = NodePath("..")
+replication_config = SubResource("SceneReplicationConfig_player")

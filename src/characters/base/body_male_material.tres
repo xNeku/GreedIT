@@ -1,0 +1,12 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Material" path="res://assets/materials/outline_3d_body.tres" id="1_outline3db"]
+[ext_resource type="Texture2D" path="res://assets/models/quaternius/Universal Base Characters[Standard]/Base Characters/Godot - UE/T_Superhero_Male_Dark.png" id="2_tsuperhero"]
+
+[resource]
+next_pass = ExtResource("1_outline3db")
+diffuse_mode = 3
+specular_mode = 2
+albedo_texture = ExtResource("2_tsuperhero")
+roughness = 1.0
+texture_filter = 0

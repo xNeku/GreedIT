@@ -1,0 +1,62 @@
+[gd_resource type="Resource" script_class="Weapon3DData" format=3]
+
+[ext_resource type="Script" path="res://src/equipment/attack_3d.gd" id="1_attack3dgd"]
+[ext_resource type="Script" path="res://src/equipment/weapon_3d_data.gd" id="2_weapon3dda"]
+
+[sub_resource type="Resource" id="Resource_3"]
+script = ExtResource("1_attack3dgd")
+clip = "Unarmed_Melee_Attack_Punch_A"
+speed = 2.1
+hit_time = 0.33
+lunge = 4.0
+
+[sub_resource type="Resource" id="Resource_4"]
+script = ExtResource("1_attack3dgd")
+clip = "Unarmed_Melee_Attack_Punch_B"
+speed = 2.1
+hit_time = 0.38
+lunge = 4.0
+
+[sub_resource type="Resource" id="Resource_5"]
+script = ExtResource("1_attack3dgd")
+clip = "Unarmed_Melee_Attack_Punch_B"
+speed = 1.6
+hit_time = 0.4
+lunge = 10.0
+knockback_multiplier = 2.0
+shake = 0.3
+
+[sub_resource type="Resource" id="Resource_6"]
+script = ExtResource("1_attack3dgd")
+clip = "Unarmed_Melee_Attack_Kick"
+speed = 1.8
+hit_time = 0.4
+damage_multiplier = 1.5
+knockback_multiplier = 2.5
+lunge = 3.0
+
+[sub_resource type="Resource" id="Resource_7"]
+script = ExtResource("1_attack3dgd")
+clip = "Unarmed_Melee_Attack_Kick"
+speed = 2.0
+
+[resource]
+script = ExtResource("2_weapon3dda")
+id = &"fists"
+slot = 0
+display_name = "Puños"
+kind = 0
+idle_clip = "Unarmed_Idle"
+base_damage = 6.0
+crit_chance = 0.15
+reach = 1.5
+width = 1.5
+knockback = 4.0
+moves_hint = "Clic: puñetazos · Mantén: puñetazo cargado · Der: patada · En el aire: golpe aéreo"
+hold_mode = 1
+max_charge_multiplier = 3.0
+combo = Array[ExtResource("1_attack3dgd")]([SubResource("Resource_3"), SubResource("Resource_4")])
+heavy = SubResource("Resource_5")
+alt = SubResource("Resource_6")
+alt_cooldown = 0.4
+air = SubResource("Resource_7")

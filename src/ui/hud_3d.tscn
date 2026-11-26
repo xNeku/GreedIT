@@ -1,0 +1,91 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/ui/hud_3d.gd" id="1_hud3dgd"]
+[ext_resource type="Shader" path="res://src/ui/health_orb.gdshader" id="2_healthorbg"]
+[ext_resource type="PackedScene" path="res://src/ui/hotbar_slot_3d.tscn" id="4_hotbarslot"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_orb"]
+shader = ExtResource("2_healthorbg")
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_hud3dgd")
+
+[node name="HealthOrb" type="ColorRect" parent="."]
+unique_name_in_owner = true
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -92.0
+offset_right = 92.0
+offset_bottom = -12.0
+grow_vertical = 0
+material = SubResource("ShaderMaterial_orb")
+
+[node name="Bottom" type="VBoxContainer" parent="."]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -160.0
+offset_top = -52.0
+offset_right = 160.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 4
+
+[node name="Hotbar" type="HBoxContainer" parent="Bottom"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 4
+
+[node name="Slot1" parent="Bottom/Hotbar" instance=ExtResource("4_hotbarslot")]
+layout_mode = 2
+
+[node name="Key" parent="Bottom/Hotbar/Slot1"]
+text = "1"
+
+[node name="Slot2" parent="Bottom/Hotbar" instance=ExtResource("4_hotbarslot")]
+layout_mode = 2
+
+[node name="Key" parent="Bottom/Hotbar/Slot2"]
+text = "2"
+
+[node name="Slot3" parent="Bottom/Hotbar" instance=ExtResource("4_hotbarslot")]
+layout_mode = 2
+
+[node name="Key" parent="Bottom/Hotbar/Slot3"]
+text = "3"
+
+[node name="Slot4" parent="Bottom/Hotbar" instance=ExtResource("4_hotbarslot")]
+layout_mode = 2
+
+[node name="Key" parent="Bottom/Hotbar/Slot4"]
+text = "4"
+
+[node name="Slot5" parent="Bottom/Hotbar" instance=ExtResource("4_hotbarslot")]
+layout_mode = 2
+
+[node name="Key" parent="Bottom/Hotbar/Slot5"]
+text = "5"
+
+[node name="Slot6" parent="Bottom/Hotbar" instance=ExtResource("4_hotbarslot")]
+layout_mode = 2
+
+[node name="Key" parent="Bottom/Hotbar/Slot6"]
+text = "6"
+
+[node name="Slot7" parent="Bottom/Hotbar" instance=ExtResource("4_hotbarslot")]
+layout_mode = 2
+
+[node name="Key" parent="Bottom/Hotbar/Slot7"]
+text = "7"
+
+[node name="Slot8" parent="Bottom/Hotbar" instance=ExtResource("4_hotbarslot")]
+layout_mode = 2
+
+[node name="Key" parent="Bottom/Hotbar/Slot8"]
+text = "8"

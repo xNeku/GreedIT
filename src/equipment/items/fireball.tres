@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="Spell3DData" format=3]
+
+[ext_resource type="Script" path="res://src/equipment/attack_3d.gd" id="1_attack3dgd"]
+[ext_resource type="PackedScene" path="res://src/combat/projectiles/fireball.tscn" id="2_fireballts"]
+[ext_resource type="Script" path="res://src/equipment/spell_3d_data.gd" id="4_spell3ddat"]
+
+[sub_resource type="Resource" id="Resource_3"]
+script = ExtResource("1_attack3dgd")
+clip = "Spellcast_Shoot"
+speed = 2.3
+hit_time = 0.35
+projectiles = 1
+move_multiplier = 0.5
+projectile_scene = ExtResource("2_fireballts")
+
+[resource]
+script = ExtResource("4_spell3ddat")
+id = &"fireball"
+display_name = "Bola de fuego"
+mana_cost = 20.0
+cooldown = 0.5
+base_damage = 22.0
+crit_chance = 0.1
+crit_multiplier = 1.8
+max_range = 14.0
+cast = SubResource("Resource_3")
+projectile_speed = 17.0

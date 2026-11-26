@@ -1,0 +1,144 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/world/game_3d.gd" id="1_game3dgd"]
+[ext_resource type="PackedScene" path="res://src/player/player_3d.tscn" id="2_player3dts"]
+[ext_resource type="Material" path="res://src/world/pixel_post_material.tres" id="3_pixelpostm"]
+[ext_resource type="Script" path="res://src/world/pixel_view.gd" id="4_pixelviewg"]
+[ext_resource type="Script" path="res://src/world/camera_3d_follow.gd" id="6_camera3dfo"]
+[ext_resource type="PackedScene" path="res://src/enemies/training_dummy_3d.tscn" id="11_trainingdu"]
+[ext_resource type="PackedScene" path="res://src/ui/hud_3d.tscn" id="12_hud3dtscn"]
+
+[sub_resource type="Environment" id="Environment_env"]
+background_mode = 1
+background_color = Color(0.55, 0.75, 0.95, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.5, 0.6, 0.78, 1)
+ambient_light_energy = 0.42
+tonemap_mode = 2
+tonemap_exposure = 0.95
+glow_enabled = true
+glow_intensity = 0.3
+glow_bloom = 0.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_groundmat"]
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.33, 0.5, 0.24, 1)
+roughness = 1.0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
+material = SubResource("StandardMaterial3D_groundmat")
+size = Vector2(140, 140)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(140, 1, 140)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_edge"]
+size = Vector3(120, 6, 1)
+
+[node name="Game3D" type="Node"]
+script = ExtResource("1_game3dgd")
+player_scene = ExtResource("2_player3dts")
+
+[node name="PixelView" type="SubViewportContainer" parent="." node_paths=PackedStringArray("camera")]
+material = ExtResource("3_pixelpostm")
+texture_filter = 1
+offset_right = 962.0
+offset_bottom = 542.0
+script = ExtResource("4_pixelviewg")
+camera = NodePath("World/Camera")
+
+[node name="World" type="SubViewport" parent="PixelView"]
+handle_input_locally = false
+snap_2d_transforms_to_pixel = true
+size = Vector2i(962, 542)
+render_target_update_mode = 4
+positional_shadow_atlas_size = 0
+
+[node name="Environment" type="WorldEnvironment" parent="PixelView/World"]
+environment = SubResource("Environment_env")
+
+[node name="Sun" type="DirectionalLight3D" parent="PixelView/World"]
+transform = Transform3D(0.8192, 0, 0.5736, 0.452, 0.6157, -0.6455, -0.3531, 0.788, 0.5043, 0, 20, 0)
+light_color = Color(1, 0.94, 0.82, 1)
+light_energy = 1.15
+shadow_enabled = true
+shadow_opacity = 0.75
+directional_shadow_mode = 0
+directional_shadow_max_distance = 45.0
+
+[node name="Camera" type="Camera3D" parent="PixelView/World"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14, 12)
+physics_interpolation_mode = 2
+projection = 1
+size = 13.0
+near = 0.5
+far = 90.0
+current = true
+distance = 40.0
+mouse_lead = 1.0
+script = ExtResource("6_camera3dfo")
+
+[node name="Ground" type="MeshInstance3D" parent="PixelView/World"]
+mesh = SubResource("PlaneMesh_ground")
+
+[node name="Collision" type="StaticBody3D" parent="PixelView/World"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Floor" type="CollisionShape3D" parent="PixelView/World/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_floor")
+
+[node name="EdgeN" type="CollisionShape3D" parent="PixelView/World/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -60)
+shape = SubResource("BoxShape3D_edge")
+
+[node name="EdgeS" type="CollisionShape3D" parent="PixelView/World/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 60)
+shape = SubResource("BoxShape3D_edge")
+
+[node name="EdgeW" type="CollisionShape3D" parent="PixelView/World/Collision"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -60, 3, 0)
+shape = SubResource("BoxShape3D_edge")
+
+[node name="EdgeE" type="CollisionShape3D" parent="PixelView/World/Collision"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 60, 3, 0)
+shape = SubResource("BoxShape3D_edge")
+
+[node name="Dummies" type="Node3D" parent="PixelView/World"]
+unique_name_in_owner = true
+
+[node name="Dummy1" parent="PixelView/World/Dummies" instance=ExtResource("11_trainingdu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
+
+[node name="Dummy2" parent="PixelView/World/Dummies" instance=ExtResource("11_trainingdu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -3)
+
+[node name="Dummy3" parent="PixelView/World/Dummies" instance=ExtResource("11_trainingdu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -3)
+
+[node name="PlayerSpawns" type="Node3D" parent="PixelView/World"]
+unique_name_in_owner = true
+
+[node name="Spawn1" type="Marker3D" parent="PixelView/World/PlayerSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+
+[node name="Spawn2" type="Marker3D" parent="PixelView/World/PlayerSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 5)
+
+[node name="Spawn3" type="Marker3D" parent="PixelView/World/PlayerSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 5)
+
+[node name="Spawn4" type="Marker3D" parent="PixelView/World/PlayerSpawns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 7)
+
+[node name="Players" type="Node3D" parent="PixelView/World"]
+unique_name_in_owner = true
+
+[node name="PlayerSpawner" type="MultiplayerSpawner" parent="PixelView/World"]
+unique_name_in_owner = true
+spawn_path = NodePath("../Players")
+spawn_limit = 4
+
+[node name="HUD" parent="." instance=ExtResource("12_hud3dtscn")]

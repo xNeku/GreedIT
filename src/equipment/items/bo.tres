@@ -1,0 +1,106 @@
+[gd_resource type="Resource" script_class="Weapon3DData" format=3]
+
+[ext_resource type="Script" path="res://src/equipment/attack_3d.gd" id="1_attack3dgd"]
+[ext_resource type="Script" path="res://src/equipment/weapon_3d_data.gd" id="2_weapon3dda"]
+[ext_resource type="PackedScene" path="res://src/equipment/weapons/bo_staff.tscn" id="3_bostafftsc"]
+[ext_resource type="PackedScene" path="res://src/combat/fx/whirl.tscn" id="7_whirltscn"]
+[ext_resource type="PackedScene" path="res://src/combat/fx/slam.tscn" id="10_slamtscn"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/bo.png" id="14_bopng"]
+
+[sub_resource type="Resource" id="Resource_4"]
+script = ExtResource("1_attack3dgd")
+clip = "2H_Melee_Attack_Stab"
+speed = 1.9
+hit_time = 0.38
+lunge = 8.0
+
+[sub_resource type="Resource" id="Resource_5"]
+script = ExtResource("1_attack3dgd")
+clip = "2H_Melee_Attack_Slice"
+speed = 1.8
+hit_time = 0.4
+lunge = 4.0
+
+[sub_resource type="Resource" id="Resource_6"]
+script = ExtResource("1_attack3dgd")
+clip = "2H_Melee_Attack_Chop"
+speed = 1.7
+hit_time = 0.42
+lunge = 5.0
+damage_multiplier = 1.3
+shake = 0.2
+
+[sub_resource type="Resource" id="Resource_8"]
+script = ExtResource("1_attack3dgd")
+clip = "2H_Melee_Attack_Spinning"
+speed = 1.4
+hit_time = 0.05
+hit_window = 0.9
+area = true
+area_radius = 3.2
+damage_multiplier = 0.9
+move_multiplier = 0.6
+fx_scene = ExtResource("7_whirltscn")
+fx_attached = true
+
+[sub_resource type="Resource" id="Resource_9"]
+script = ExtResource("1_attack3dgd")
+clip = "2H_Melee_Attack_Spin"
+speed = 1.8
+hit_time = 0.15
+hit_window = 0.65
+area = true
+area_radius = 3.2
+damage_multiplier = 0.9
+fx_scene = ExtResource("7_whirltscn")
+fx_attached = true
+
+[sub_resource type="Resource" id="Resource_11"]
+script = ExtResource("1_attack3dgd")
+clip = ""
+hit_time = 0.0
+hit_window = 0.6
+area = true
+area_radius = 2.8
+damage_multiplier = 1.5
+knockback_multiplier = 1.6
+shake = 0.4
+fx_scene = ExtResource("10_slamtscn")
+fx_on_hit = true
+
+[sub_resource type="Resource" id="Resource_12"]
+script = ExtResource("1_attack3dgd")
+clip = "2H_Melee_Attack_Chop"
+hit_time = 0.42
+leap = 1
+leap_distance = 9.0
+leap_time = 0.55
+land_attack = SubResource("Resource_11")
+
+[sub_resource type="Resource" id="Resource_13"]
+script = ExtResource("1_attack3dgd")
+clip = "2H_Melee_Attack_Chop"
+speed = 2.2
+
+[resource]
+script = ExtResource("2_weapon3dda")
+id = &"bo"
+slot = 0
+display_name = "Bō"
+kind = 0
+scene = ExtResource("3_bostafftsc")
+idle_clip = "2H_Melee_Idle"
+base_damage = 11.0
+crit_chance = 0.12
+reach = 3.0
+width = 2.6
+knockback = 8.0
+moves_hint = "Clic: estocadas y barridos · Mantén: molinillo · Der: remolino · Mantén der: salto con pértiga · En el aire: golpe aéreo"
+hold_mode = 1
+max_charge_multiplier = 1.6
+combo = Array[ExtResource("1_attack3dgd")]([SubResource("Resource_4"), SubResource("Resource_5"), SubResource("Resource_6")])
+heavy = SubResource("Resource_8")
+alt = SubResource("Resource_9")
+alt_hold = SubResource("Resource_12")
+air = SubResource("Resource_13")
+icon = ExtResource("14_bopng")

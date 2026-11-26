@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3]
+
+[ext_resource type="Script" path="res://src/equipment/equipment_data.gd" id="1_equipmentd"]
+[ext_resource type="PackedScene" path="res://assets/models/quaternius/Universal Base Characters[Standard]/Hairstyles/Rigged to Head Bone/glTF (Godot -Unreal)/Hair_Buzzed.gltf" id="2_hairbuzzed"]
+[ext_resource type="Material" path="res://src/characters/base/hair_brown_material.tres" id="3_hairbrownm"]
+
+[resource]
+script = ExtResource("1_equipmentd")
+id = &"hair_buzzed"
+display_name = "Pelo rapado"
+slot = 8
+skinned = true
+scene = ExtResource("2_hairbuzzed")
+material_override = ExtResource("3_hairbrownm")

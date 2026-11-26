@@ -104,46 +104,39 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [x] Ropa y capucha como equipo de serie (OUTFIT / HEAD), armas en un agarre colocable a mano (GripR / GripL)
 - [x] Sin normal maps ni brillos al importar (luz por bandas limpia) y contorno más fino
 
-## Hito 3D.1: Pasar el juego al 3D (siguiente)
+## Hito 3D.1: Limpieza (hecho)
 
-- [x] Cabezas de verdad: Universal Base Characters (CC0): cuerpo (solo cabeza visible), ojos, cejas, pelo y barba
-- [ ] Elegir pelo, barba y color de piel/pelo en el menú (los .tres ya existen: hair_parted, hair_buzzed, hair_long, beard)
-- [ ] Ajustar a mano el agarre de cada arma en el explorador (GripR) y animaciones propias de espada/arco
-- [ ] Versión femenina (necesita su propio esqueleto/maniquí)
+- [x] Fuera el sandbox 2D, los prototipos, el horneador de sprites, los personajes cabezones y la mazmorra
+      (siguen en el historial de git si hace falta recuperar algo: enemigos 2D, recolección, etc.)
+- [x] Un solo personaje (cuerpo base en ropa interior), cámara solo isométrica, menú simplificado
+- [x] HUD: orbe de vida estilo Diablo + barra de 8 huecos con iconos (hueco vacío = puños)
+- [x] Bō (bastón largo para pegar) en vez del bastón mágico; ataques en el aire sin caída en picado
+- [x] Muñecos con saltito al recibir golpes (knockup); muerte y reaparición del jugador
+- [x] Rendimiento: hitboxes apagadas cuando no golpean, sin luces con sombra de más, interpolación en el proyecto
 
-- [ ] Números de daño y textos en el HUD (2D nítido) en vez de Label3D pixelado
+## Siguiente
 
-- [ ] Personaje propio hecho en Blender (mismo esqueleto/huesos que el de muestra, ver AGENTS.md)
-- [ ] Mobs 3D (goblin, esqueleto, zombi) con la IA de `enemy.gd` adaptada a 3D
-- [ ] Vida del jugador en 3D: muerte, reaparición, invulnerabilidad tras golpe (ahora solo resta vida)
+- [ ] **Escenario de inicio** (llanura/bosque) con los assets que elija el dueño
+- [ ] Herramienta para que el dueño elija filtros/luz/color (día y noche) viendo el resultado
+- [ ] Ajustar a mano el agarre de cada arma (GripR) y animaciones propias
+- [ ] Números de daño en el HUD (nítidos) en vez de Label3D pixelado
+- [ ] Personaje propio hecho en Blender (mismo esqueleto, ver AGENTS.md)
+- [ ] Enemigos 3D (la IA del 2D está en el historial: enemy.gd)
 - [ ] Recolección 3D (minería, herboristería, pesca) e inventario
-- [ ] Armas a la espalda cuando no se usan (ranura BACK + hueso de la espalda)
+- [ ] Armas a la espalda cuando no se usan
 - [ ] Giros de área que golpeen varias veces (ahora una vez por ataque)
-- [ ] Estelas de arma 3D y sonidos
-
-## Hito 1: Sensación de combate (siguiente)
-
-- [ ] Ajustar a mano tiempos y poses de cada arma en el editor según feedback de juego
-- [ ] Sonidos placeholder (golpe, swing, salto, aterrizaje)
-- [ ] Trails de arma (Line2D) y partículas de impacto por tipo de arma
-- [ ] Buffer de input más fino y ventana de cancelación configurable por animación
-- [ ] Saltar por encima de obstáculos bajos (capa "low_obstacles" que se ignora en el aire)
-- [ ] Al morir, soltar el saco de materiales con temporizador (ahora solo reapareces)
-- [ ] Mando: apuntado con stick (ya existe `Player.aim_target_override`)
-- [ ] Repasar a mano los sprites de perfil y 3/4 (generados a partir del frente y la espalda)
-- [ ] Vistas 3/4 y perfil para los mobs
-- [ ] Animación de desenfundar/enfundar (ahora es instantáneo)
+- [ ] Estelas de arma y sonidos
+- [ ] Mando: apuntado con stick (ya existe `Player3D.aim_target_override`)
 
 ## Hito 2: Enemigos y progresión
 
-- [ ] Vistas de espalda/lado de los mobs (ahora siempre de frente, volteados)
-- [ ] Pathfinding (NavigationAgent2D) cuando haya paredes de verdad
+- [ ] Pathfinding (NavigationAgent3D) cuando haya obstáculos de verdad
 - [ ] XP y subida de nivel
 - [ ] Primer boss
 
 ## Hito 3: Mundo
 
-- [ ] Generación por semilla con `FastNoiseLite` + `TileMapLayer` por chunks
+- [ ] Generación por semilla con `FastNoiseLite` por chunks
 - [ ] Bioma bosque + cueva
 - [ ] Punto de spawn (cofre infinito, hamaca) y área de estaciones
 - [ ] Vetas de distintos minerales por bioma (ahora solo cobre)
@@ -153,7 +146,6 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 
 - [ ] Suavizado de la posición de los jugadores/mobs remotos (interpolación) para conexiones con lag
 - [ ] Nombre de jugador y lista de conectados en el HUD
-- [ ] Pesca: que los demás vean la boya y la captura (ahora solo ven la pose)
 - [ ] Chunks del mundo cargados por jugador (cuando exista el mundo generado)
 
 ## Magia (siguiente)

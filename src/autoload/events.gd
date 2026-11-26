@@ -9,9 +9,5 @@ signal hit_landed(hit: HitData, target: Node)
 signal camera_shake_requested(strength: float, duration: float)
 ## Petición de "hitstop" (congelar el juego unos milisegundos para dar peso al golpe).
 signal hitstop_requested(duration: float)
-
 ## El jugador que controla este ordenador ya está en el mundo (para enganchar HUD, cámara...).
-signal local_player_ready(player: Player)
-
-## Versión 3D: el jugador de este ordenador ya está en el mundo.
-signal local_player_3d_ready(player: Node)
+signal local_player_ready(player: Player3D)

@@ -1,0 +1,47 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://assets/materials/outline_3d.tres" id="1_outline3dt"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_red"]
+next_pass = ExtResource("1_outline3dt")
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.72, 0.14, 0.1, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gold"]
+next_pass = ExtResource("1_outline3dt")
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.95, 0.72, 0.25, 1)
+roughness = 1.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_shaft"]
+material = SubResource("StandardMaterial3D_red")
+top_radius = 0.035
+bottom_radius = 0.035
+height = 2.5
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_cap"]
+material = SubResource("StandardMaterial3D_gold")
+top_radius = 0.05
+bottom_radius = 0.05
+height = 0.22
+radial_segments = 8
+rings = 1
+
+[node name="BoStaff" type="Node3D"]
+
+[node name="Shaft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+mesh = SubResource("CylinderMesh_shaft")
+
+[node name="CapTop" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+mesh = SubResource("CylinderMesh_cap")
+
+[node name="CapBottom" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.8, 0)
+mesh = SubResource("CylinderMesh_cap")

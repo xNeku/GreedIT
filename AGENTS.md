@@ -6,9 +6,17 @@ Si cambias una convención, actualiza este archivo en el mismo commit.
 ## Contexto
 
 - Motor: **Godot 4.7**, GDScript con tipado estático, renderer *Compatibility* (OpenGL).
-- Juego: ARPG coop con cámara en diagonal. **El juego va en 3D en tiempo real** (`src/game3d/`); el sandbox 2D
-  pixel art (`src/player`, `src/weapons`...) se mantiene como referencia y se irá pasando a 3D. Diseño en `docs/GDD.md`, tareas en `docs/BACKLOG.md`.
+- Juego: ARPG coop **3D con cámara isométrica** (estilo Diablo). Diseño en `docs/GDD.md`, tareas en `docs/BACKLOG.md`.
 - Idioma: comentarios, docs y textos del juego en **español**. Identificadores de código en **inglés**.
+
+## Norma de arte: las decisiones artísticas las toma el dueño
+
+- **Nunca** decidas tú el aspecto: filtros, shaders, luz, color, estilo del escenario, modelos o UI nueva.
+  Enséñale opciones (capturas de ejemplo) y que elija. Lo mismo para generar escenario o arte: **no generes
+  nada artístico sin permiso** (gasta tokens y no es lo que quiere).
+- Los assets del mundo los elige él (te pide sitios donde buscarlos). Que el personaje de muestra sea low poly
+  no obliga a que el resto del juego lo sea.
+- Lo técnico (rendimiento, bugs, código, red) sí puedes decidirlo tú.
 
 ## Regla de oro: escenas y nodos reales
 
@@ -21,39 +29,25 @@ Si cambias una convención, actualiza este archivo en el mismo commit.
 ## Estructura
 
 ```
-assets/                 arte, luces, audio (solo datos, sin lógica)
-  models/               modelos 3D (.glb/.gltf), todos de muestra y CC0:
-                        quaternius/ (personajes modulares con proporciones de adulto + librería de animaciones),
-                        kaykit_adventurers/ (personajes cabezones, armas y animaciones de armas), kaykit_dungeon/
+assets/                 arte (solo datos, sin lógica)
+  models/               modelos 3D (.glb/.gltf), de muestra y CC0:
+    quaternius/         personaje base (Universal Base Characters), ropa modular y Universal Animation Library
+    kaykit_adventurers/ armas (weapons/) y animaciones de armas (animations/KayKit_Animations.glb)
     retarget/           mapas de huesos para compartir animaciones entre esqueletos (ver su README)
-  sprites/characters/   capas del personaje: male/, female/ (lienzo común 52x70)
-  sprites/weapons|props|fx|ui|world/
-  lights/               texturas de luz compartidas
+    pixel_look_import.gd  script de importación de todos los modelos (estilo del juego)
+  materials/            contornos (outline_3d*.tres)
+  ui/icons/             iconos de objetos (barra de 8 huecos)
 src/
   autoload/             Events (bus de señales), GameFeel (hitstop, pantalla completa), Net (solo / host / unirse)
-  combat/               HitData, Hitbox, Hurtbox, DamageNumber, shader de flash
-  items/                ItemData, WeaponData (recursos de datos)
-  characters/           CharacterVisual (cuerpo por capas), CharacterAppearance + CharacterLayers (.tres), HandUtils
-  player/               Player, PlayerCamera
-  weapons/              weapon.gd (base), projectile.gd, weapon_trail.gd, una carpeta por arma (.tscn + .tres)
-  gathering/            Gatherable (recurso infinito), GatherTool / FishingRod, tools/, resources/
-  spells/               SpellData, SpellExplosion, una carpeta por hechizo (fireball/: proyectil, explosión, .tres)
-  items/materials/      materiales (.tres de ItemData)
-  enemies/              Enemy (IA base), EnemyProjectile, MobSpawner, una carpeta por mob (goblin/, skeleton/, zombie/)
-                        y training_dummy/
-  world/                Game (arranca la red y crea jugadores), escenas de mundo/niveles y props
-  ui/                   menú principal, HUD, hotbar, panel de materiales, cartel "E", textos flotantes
-  game3d/               EL JUEGO EN 3D:
-    characters/         Avatar3D + una carpeta por personaje (escena = avatar_3d.gd + el .glb como "Model")
-    equipment/          EquipmentData, Weapon3DData e items/ (.tres de armas, escudo, armaduras)
-    combat/             Hitbox3D, Hurtbox3D, Projectile3D, DamageLabel3D, OneShotFX, projectiles/, fx/
-    player/             Player3D
-    enemies/            muñeco 3D (y los mobs 3D cuando lleguen)
-    world/              Game3D (red + jugadores), FollowCamera3D, game_3d.tscn (mazmorra de prueba)
-    ui/                 HUD3D
-tests/                  tests de humo y de red (2D y 3D) y test de prototipos
-prototypes/             EXPERIMENTOS (personaje 3D): A = 3D horneado a sprites, B = 3D real. No forman parte del juego.
-tools/baker/            herramientas para generar el personaje 3D y hornearlo a sprites (ver su README)
+  characters/           Avatar3D, hero/ (el personaje), base/ (materiales y shaders del cuerpo base)
+  equipment/            ItemData, EquipmentData, Weapon3DData, Attack3D, Spell3DData; items/ (.tres) y weapons/ (bō)
+  combat/               HitData, Hitbox3D, Hurtbox3D, Projectile3D, Explosion3D, DamageLabel3D, OneShotFX,
+                        projectiles/, fx/
+  player/               Player3D
+  enemies/              muñeco de entrenamiento (y los enemigos cuando lleguen)
+  world/                Game3D (red + jugadores), game_3d.tscn (el mundo), FollowCamera3D, PixelView + su filtro
+  ui/                   menú principal, HUD (orbe de vida + barra de 8 huecos)
+tests/                  test de humo y test de red (host + cliente)
 docs/                   GDD y backlog
 ```
 
@@ -78,174 +72,64 @@ El juego está escrito como multijugador desde la base, aunque juegues solo (en 
    (en el jugador, `Player.is_local()`). Las copias de los demás solo dibujan.
 3. **Daño**: lo calcula quien golpea y lo **aplica quien manda sobre la víctima**. `Hurtbox.receive_hit()` ya
    reenvía el golpe por RPC si hace falta: tú solo llama a `receive_hit()` desde la copia que manda sobre el atacante
-   (`Weapon.deal_hit` y `SpellExplosion` ya comprueban que el jugador sea local; los ataques de mobs, que seas el host).
+   (`Player3D._on_hitbox_hit` y `Explosion3D` ya comprueban que el jugador sea local; los ataques de mobs, que seas el host).
 4. **Efectos para todos**: quien aplica el golpe avisa con una RPC `@rpc("authority", "call_local")`
-   (p. ej. `Enemy._show_hit`, `TrainingDummy._show_hit`) que pinta números, destellos y partículas en todos.
+   (p. ej. `TrainingDummy3D._show_hit`) que pinta números, destellos y partículas en todos.
 5. **Estado continuo** (posición, vida, animación...) → nodo `Sync` (`MultiplayerSynchronizer`) de la escena.
-   **Momentos puntuales** (saltar, atacar, cambiar de arma...) → RPC. En el jugador: `Player._net_event()` con
-   `NetEvent`, y las acciones de arma con `Player.weapon_action()` (la ejecuta aquí y la replica).
+   **Momentos puntuales** (disparos, efectos) → RPC (`Player3D._fire`, `Player3D._spawn_fx`). La animación del
+   jugador viaja como texto en `net_anim` ("clip#contador#velocidad").
 6. **Crear cosas en red**: los nodos que deben existir en todos los peers los crea el host y los replica un
-   `MultiplayerSpawner` (`PlayerSpawner`, `MobNetSpawner` en `sandbox.tscn`). Añade la escena a su lista y usa
+   `MultiplayerSpawner` (`PlayerSpawner` en `game_3d.tscn`). Añade la escena a su lista y usa
    `add_child(nodo, true)` para que el nombre sea igual en todos. Proyectiles y efectos rápidos no van por spawner:
    cada peer crea su copia (las de los demás son solo visuales, `visual_only`).
 7. **Botín**: el host decide y se lo manda al dueño: `player.receive_item.rpc_id(player.get_multiplayer_authority(), ruta, n)`.
 8. Lo local de cada jugador (inventario, maná, recolección, prompts, HUD, cámara) vive en su ordenador.
 
-Flujo: `main_menu` → `Net.play(modo)` → carga `Net.world_scene` (`game_3d.tscn` o `sandbox.tscn`) → `Game3D._ready()` / `Game._ready()` llama a `Net.start()` y crea los
+Flujo: `main_menu` → `Net.play(modo)` → carga `game_3d.tscn` → `Game3D._ready()` llama a `Net.start()` y crea los
 jugadores (`_spawn_player` corre en todos los peers y pone el dueño). Un cliente pide su jugador con `_request_spawn`.
 
-## Capas de física (2D)
+## El juego
 
-| # | Nombre | Quién la usa |
-|---|---|---|
-| 1 | world | paredes, columnas, props sólidos |
-| 2 | player | cuerpo del jugador |
-| 3 | enemies | cuerpo de enemigos / muñecos |
-| 4 | player_attacks | Hitbox y proyectiles del jugador |
-| 5 | enemy_hurtbox | Hurtbox de enemigos |
-| 6 | player_hurtbox | Hurtbox del jugador |
-| 7 | enemy_attacks | Hitbox y proyectiles de los enemigos |
-| 8 | interactables | InteractArea de recursos y objetos con los que se usa la E |
-
-Capa de render 2 (`no_shadow`): sprites altos (columnas, braseros) que reciben luz pero no se oscurecen con su propia sombra.
-
-Materiales compartidos en `assets/materials/`: `unshaded.tres` (ignora la oscuridad, para UI en el mundo) y
-`unshaded_add.tres` (aditivo y sin sombrear, para estelas, chispas y destellos).
-
-## Cómo funciona el combate
-
-1. `Player` recibe el input y se lo pasa al arma equipada (`primary_pressed`, `secondary_pressed`...).
-2. `Weapon` (base) decide qué animación toca: pulsar = combo `light_N`; mantener = `charge`→`heavy` o ráfaga;
-   clic derecho = `alt`; mantener clic derecho = `alt_charge`→`alt_heavy` (si `alt_hold_enabled`);
-   en el aire = `air` (+ caída en picado) → `slam` al aterrizar; tras `leap_attack()` → `leap_land`.
-3. La animación enciende `Hitbox.active` en los frames de golpe y puede llamar a `lunge()`, `shake()`,
-   `spawn_projectile()` o `leap_attack()` (salto de ataque: maza, pértiga del bō, salto atrás del arco).
-4. `Hitbox` detecta un `Hurtbox` → `Weapon.deal_hit()` crea un `HitData` (daño, crítico, empuje) → `Hurtbox.hit_received`.
-5. Cada golpe se emite también por `Events.hit_landed`. Ahí se engancharán talentos, afijos de forja y brebajes.
-
-### Poses y manos
-
-- Las poses se animan en el **espacio del arma**: +X = hacia donde apuntas. El `AimPivot` del jugador rota y se espeja solo.
-- **Enfundada / desenfundada**: si no la usas, el arma va **a la espalda** (`CharacterVisual/.../BackWeapon`,
-  con los datos `back_*` del `WeaponData`) y se ven las **manos libres** del cuerpo (`HandL`/`HandR`, que se
-  balancean al andar). Al atacar o lanzar se desenfunda; tras `Player.sheathe_delay` segundos sin usarla se guarda.
-  De frente el arma de la espalda va detrás del cuerpo (solo asoma); de espaldas va encima.
-- Desenfundada, en reposo (`idle`) el arma va **a un costado** y mira hacia donde mira el personaje (que mira hacia
-  donde corre). Al atacar, el personaje se gira hacia el ratón. Manos en reposo: `HandMain` (18, 2) y `HandOff` (-19, 2).
-- **Empuñadura**: dentro de `Rig`, el orden es `HandMain` → sprite del arma → `GripFingers` (dedos que rodean el mango).
-  Así el mango tapa el puño y los dedos tapan el mango. De espaldas (`HandUtils.set_grip_back_view`) la mano pasa
-  por encima del arma y los dedos se ocultan. Las herramientas siguen el mismo esquema.
-- Las manos (`HandMain` / `HandOff`) **nunca rotan**: `HandUtils.keep_upright()` las endereza cada frame.
-  Anima solo su posición (y escala si quieres un puñetazo más gordo).
-- De momento todas las armas van a **una mano**; la otra flota libre (el arco la usa para tensar la cuerda).
-- Extras opcionales en la escena: `Trail` (estela, se enciende con `Trail:emitting`), `ChargeParticles`,
-  `SlashFX`, `ThrustFX`, `ImpactFX`. Todos se encienden desde las animaciones.
-
-### Añadir un arma nueva
-
-1. Duplica la carpeta de un arma parecida (p. ej. `src/weapons/sword/`).
-2. En la escena: cambia el sprite, coloca las manos (`HandMain` / `HandOff`), ajusta los Hitbox y sus multiplicadores.
-3. Edita las animaciones con los nombres estándar (ver cabecera de `weapon.gd`). Las que no existan simplemente no se usan.
-4. En el `.tres`: daño, críticos, modo de mantener (CHARGE o REPEAT), apunta `weapon_scene` a tu escena.
-5. Añade el `.tres` a la `hotbar` del jugador (inspector de `src/player/player.tscn`).
-
-### Enemigos
-
-- `enemy.gd` es una IA por estados: IDLE/WANDER (deambula cerca de su sitio) → CHASE (te ve a `detection_radius`)
-  → ATTACK (animación `attack`) → HURT (aturdido) → DEAD. Todo se ajusta con `@export` en el inspector.
-- Escena de un mob: `Visual/Body` (con `LegL`, `LegR`, `Upper` del sprite troceado y el shader de flash en `Body`),
-  `Hurtbox` (capa 5), `AttackPivot/AttackHitbox` (capa 7, apunta al jugador al empezar el ataque),
-  `AttackPivot/Muzzle` (opcional, proyectiles), `HealthBar/Fill`, `DeathParticles` y `AnimationPlayer`
-  con `idle`, `walk`, `attack`, `hurt` y `die`.
-- La animación `attack` tiene un **aviso** (el cuerpo se tiñe y se echa atrás) antes del golpe, para poder esquivar.
-  Pistas de método: `attack_lunge()`, `fire_projectile()`, `attack_shake()`.
-- `MobSpawner` (Marker2D) mantiene N mobs vivos y los reaparece al morir. Al morir sueltan `drop` directo al inventario.
-- El jugador esquiva los golpes saltando alto (`dodge_height`) o en dash, y tras un golpe es invulnerable un momento.
-- Para un mob nuevo: trocea su sprite en `upper` / `leg_l` / `leg_r` (mismo lienzo, pies abajo en el centro),
-  duplica la escena de uno parecido y cambia texturas, números y la animación `attack`.
-
-### Magia
-
-- Clic de la rueda (`cast_spell`) lanza `Player.spell` (un `SpellData`) gastando maná (`max_mana`, `mana_regen`).
-- El arma hace el gesto con la mano libre (animación `cast`, con la llama `HandOff/HandFlame`) y llama a `release_spell()`.
-  Si el arma no tiene `cast` (o estás en pleno salto de ataque), el hechizo sale directamente.
-- Un hechizo = escena de proyectil (p. ej. `fireball.gd`) + escena de explosión (`SpellExplosion`, daño en área
-  con una consulta de física) + `.tres` con los números. Los golpes también se emiten por `Events.hit_landed`.
-
-### Recolección (minería, herboristería, pesca)
-
-- Un recurso es una escena con `gatherable.gd` (`src/gathering/resources/`): sprite, `InteractArea` (capa 8),
-  `GatherPoint`, partículas `Chips` y los datos (`drop`, `hits_to_gather`, `tool_scene`, `action_text`). Es **infinito**.
-- Al acercarte, el jugador muestra el cartel "E + acción". Al pulsar E saca la herramienta (`tool_scene`) y guarda el arma.
-- Herramientas (`src/gathering/tools/`): escena con `gather_tool.gd` y animación `use` en bucle que llama a `tool_hit()`.
-  La caña usa `fishing_rod.gd` (lanzar, esperar, ¡pica!, pulsar E a tiempo).
-- Moverse, atacar, saltar o cambiar de arma deja de recolectar. Lo recogido va a `Player.inventory` y al panel del HUD.
-
-### Personaje por capas
-
-Las capas del personaje comparten un lienzo de **52x70 px** con los pies abajo en el centro:
-`leg_l/r`, `boot_l/r`, `torso`, `cloth_bottom`, `cloth_top`, `head`, `eyes`, `hair`. Las manos (`hand_l/r`) van recortadas
-porque flotan y las mueve el arma. Un `CharacterAppearance` (.tres) dice qué textura usa cada capa.
-Para un pelo, ropa o armadura nueva: pinta sobre el lienzo de 52x70 y asígnala en un `CharacterAppearance`.
-
-Vistas (`CharacterVisual.View`, estilo Diablo / Path of Exile): **FRONT**, **FRONT_SIDE**, **SIDE**, **BACK_SIDE**
-y **BACK** (con el volteo, 8 direcciones). Cada vista tiene su juego de capas (`CharacterLayers`) dentro del
-`CharacterAppearance`: frente en `male/*.png`, espalda en `male/*_back.png`, y `male/front_side/`, `male/side/`
-(perfil) y `male/back_side/` con todas las capas. Si añades pelo, ropa o armadura, píntalo en las 5 vistas.
-
-Animaciones del cuerpo: `idle`, `run` (frente/espalda), `run_diag`, `run_side` (zancada), `run_start`, `run_stop`,
-`turn`, `jump_windup`, `rise`, `peak`, `fall`, `land`, `land_heavy`. La velocidad de la carrera se ajusta sola a la del
-personaje. Las manos libres cuelgan de `HandLAnchor`/`HandRAnchor` (su posición por vista está en `hand_rest_l/r`);
-las animaciones mueven `HandL`/`HandR` dentro de su ancla.
-
-## Juego en 3D (`src/game3d/`)
-
-Mismas reglas que todo lo demás (escenas reales, datos en `.tres`, red coop). Lo propio del 3D:
-
-- **Capas de física 3D**: las mismas que las 2D (1 world, 2 player, 3 enemies, 4 player_attacks, 5 enemy_hurtbox,
-  6 player_hurtbox, 7 enemy_attacks, 8 interactables).
+- **Capas de física**: 1 world, 2 player, 3 enemies, 4 player_attacks, 5 enemy_hurtbox, 6 player_hurtbox,
+  7 enemy_attacks, 8 interactables.
 - **Estilo pixel art** (el 3D no se ve como 3D realista):
   - El mundo vive dentro de `PixelView/World` (un `SubViewport`) y se pinta a **media resolución** (960x540 en 1080p)
     ampliado sin suavizado, siempre con un número entero de píxeles de pantalla por píxel. `PixelView.pixel_scale`
-    decide lo gordo que es el píxel (2 = 480x270, ya se ve demasiado granulado en el escenario). El HUD va fuera, a resolución normal (el mundo 3D pone la ventana en
-    `content_scale_mode = canvas_items` y la devuelve al salir).
+    decide lo gordo que es el píxel. El HUD va fuera, a resolución normal (el proyecto usa `canvas_items`).
   - Filtro final `pixel_post.gdshader` (saturación, contraste, tinte de sombras; paleta reducida y tramado
     desactivados porque el escenario parecía roto). Se ajusta en `pixel_post_material.tres`.
   - Todos los modelos se importan con `assets/models/pixel_look_import.gd` (luz por bandas, texturas *nearest* y
     contorno oscuro de 1 px con `assets/materials/outline_3d.tres`). **Un modelo nuevo tiene que llevar ese
     "Import Script"** (pestaña Importar del .glb) o se verá realista. Materiales hechos a mano: `diffuse_mode` toon,
     sin especular y `next_pass` = `outline_3d.tres`.
-  - Cámara `FollowCamera3D` **ortográfica**: **isométrica** estilo Diablo (giro 45°, 30° desde el suelo = líneas 2:1)
-    o **diagonal** (Tab cambia), zoom con + / - (`size` = alto visible en metros). Se pega a la rejilla de píxeles
+  - Cámara `FollowCamera3D` **ortográfica isométrica** estilo Diablo (giro 45°, 30° desde el suelo = líneas 2:1),
+    zoom con + / - (`size` = alto visible en metros). Se pega a la rejilla de píxeles
     (`pixel_snap`) y le pasa a `PixelView` el resto (`snap_offset`) para un scroll suave.
-  - El mundo 3D activa la **interpolación de física** (`SceneTree.physics_interpolation`): lo que se mueve en
+  - **Interpolación de física** activada en el proyecto: lo que se mueve en
     `_physics_process` se dibuja suave aunque la pantalla vaya a 120 Hz. La cámara lee
     `get_global_transform_interpolated()` y tiene la interpolación apagada (se mueve en `_process`).
-- **Personajes principales** (explorador, campesino): esqueleto de Quaternius (estilo Unreal) **retargeteado** al
-  humanoide de Godot (`assets/models/retarget/`). La escena es la Universal Animation Library (`UAL1_Standard.glb`:
-  esqueleto + 43 animaciones; su maniquí va oculto) con todo lo demás como equipo de serie (`default_items`):
-  `BODY` (cuerpo de Universal Base Characters; su shader `body_head_only` solo dibuja cuello y cabeza, lo demás lo
-  tapa la ropa), `FACE` (ojos y cejas), `HAIR`, `BEARD`, `OUTFIT` (ropa) y `HEAD` (capucha, que oculta el pelo).
-  Para cambiar pelo, barba o ropa basta con cambiar ese `.tres` en el inspector del personaje. Las animaciones de armas vienen de KayKit (`KayKit_Animations.glb`, retargeteado igual) vía
-  `extra_animation_sources`, y `clip_aliases` cambia la carrera/esquiva/golpe por las de Quaternius.
-  Las armas se pegan a `HandR/GripR` y `HandL/GripL` (BoneAttachment3D + Node3D): se colocan a mano en el editor.
-- **Proporciones**: `BoneScaleModifier` (hijo del `Skeleton3D`) escala huesos encima de las animaciones; en los
-  KayKit (cabezones) encoge la cabeza.
-- **Personaje** = `Avatar3D`: el modelo con esqueleto (`Skeleton3D`) y su `AnimationPlayer`. Las animaciones se
-  llaman por nombre (`Idle`, `Running_A`, `1H_Melee_Attack_Chop`...). `looping_clips` dice cuáles van en bucle.
-  `body_parts` traduce nombres genéricos (`body`, `head`, `arm_l`...) a las mallas de ese modelo y `outfit` dice qué
-  ropa de serie trae (casco, capa).
+- **Personaje** = `Avatar3D` (`src/characters/hero/hero.tscn`): la Universal Animation Library de Quaternius
+  (`UAL1_Standard.glb`: esqueleto + animaciones; su maniquí va oculto) **retargeteada** al humanoide de Godot
+  (`assets/models/retarget/`). Lo que lleva puesto es equipo de serie (`default_items`): `BODY` (cuerpo en ropa
+  interior de Universal Base Characters), `FACE` (ojos y cejas), `HAIR` y `BEARD`. Las animaciones de armas vienen de
+  KayKit (`KayKit_Animations.glb`, retargeteado igual) vía `extra_animation_sources`; `clip_aliases` cambia la
+  carrera/esquiva/golpe por las de Quaternius. Las armas se pegan a `HandR/GripR` y `HandL/GripL` (se colocan a mano
+  en el editor). Cuando lleve ropa encima, el cuerpo debe usar `body_male_covered_material.tres` (solo dibuja cuello
+  y cabeza) para que no asome por la ropa.
 - **Jugador** = `Player3D`: el dueño simula; por `Sync` viajan posición, `yaw`, `net_anim` ("clip#contador#velocidad"),
-  arma, personaje, equipo y vida. Los proyectiles se crean en todos con `_shoot` (RPC) y solo el del dueño hace daño.
+  `charging`, el hueco elegido (`slot_index`) y la vida. Barra de 8 huecos (`hotbar`, 1-8 / rueda); hueco vacío =
+  `unarmed` (puños). Al morir reaparece en su punto de salida; tras un golpe es invulnerable un momento.
 - **Movimiento**: WASD relativo a la cámara. Salto estilo Conquer (se agacha y sale hacia donde corres; en lo alto
-  esquivas golpes, `dodge_height`), aterrizaje con polvo. Shift = esquiva.
+  esquivas golpes, `dodge_height`), aterrizaje con polvo. Shift = esquiva. Los ataques en el aire se hacen en el
+  aire, sin caer en picado.
 - **Armas** = `Weapon3DData` (.tres) con sus **ataques** (`Attack3D`, sub-recursos editables en el inspector):
   `combo` (clic), `heavy` (mantener: `hold_mode` CHARGE carga hasta `max_charge_multiplier`; REPEAT = ráfaga del
   combo), `alt` (clic derecho), `alt_hold` (mantener clic derecho) y `air` (atacar en el aire).
   Cada `Attack3D` dice: animación y velocidad, momento del golpe (`hit_time`/`hit_window` en 0..1), daño, área,
   avance (`lunge`), salto (`leap` hacia el ratón o hacia atrás, con `land_attack` al aterrizar), caída en picado
   (`plunge`), proyectiles (cuántos, abanico, escena, tamaño) y efecto (`fx_scene`).
-  Para añadir un arma: duplica un `.tres` de `src/game3d/equipment/items/` y añádelo a `weapons` en `player_3d.tscn`.
+  Para añadir un arma: duplica un `.tres` de `src/equipment/items/`, ponle icono (`assets/ui/icons/`) y métela en un
+  hueco de `hotbar` en `player_3d.tscn`. El bō es una escena propia (`src/equipment/weapons/bo_staff.tscn`).
 - **Hechizo** (clic de la rueda) = `Spell3DData` (`fireball.tres`): maná, enfriamiento, daño y su `cast` (un Attack3D
   con el proyectil). Los proyectiles con `explosion_scene` explotan (`Explosion3D`: daño en área, solo en el dueño).
 - En red, los ataques se identifican por clave (`combo0`, `heavy`, `alt`, `alt_hold`, `air`, `spell`, `.../land`):
@@ -257,51 +141,41 @@ Para que el arte nuevo encaje solo, los modelos se exportan como **glTF (.glb)**
 al importarlo en Godot, se le pone un **Bone Map** (Importar → Skeleton3D → Retarget). Así le valen todas las
 animaciones del proyecto (las de Quaternius, las de armas de KayKit y las de Mixamo). Lo más cómodo: modelar
 encima del esqueleto de Quaternius (`UAL1_Standard.glb`) y reutilizar `assets/models/retarget/ual_bone_map.tres`.
-Huesos que usa el código (`Avatar3D.slot_bones`, nombres de KayKit / del humanoide):
+Huesos que usa el código (`Avatar3D.slot_bones`, nombres del humanoide):
 
 | Ranura | Hueso | Qué va ahí |
 |---|---|---|
-| MAIN_HAND | `handslot.r` / `RightHand` (+ `GripR`) | arma principal (el mango en el origen) |
-| OFF_HAND | `handslot.l` / `LeftHand` (+ `GripL`) | escudo, segunda daga, libro |
-| HEAD | `head` / `Head` | casco, sombrero, capucha |
-| BACK / CHEST | `chest` / `UpperChest` | capa / piezas rígidas del pecho |
+| MAIN_HAND | `RightHand` (+ `GripR`) | arma principal (el mango en el origen) |
+| OFF_HAND | `LeftHand` (+ `GripL`) | escudo, segunda daga, libro |
+| HEAD | `Head` | casco, sombrero, capucha |
+| BACK / CHEST | `UpperChest` | capa / piezas rígidas del pecho |
 | OUTFIT | (con esqueleto) | conjunto de ropa entero de los personajes modulares |
 | BODY / FACE / HAIR / BEARD | (con esqueleto) | cuerpo base, ojos y cejas, pelo y barba |
 
-Tres tipos de pieza (`EquipmentData`):
+Dos tipos de pieza (`EquipmentData`):
 
 1. **Rígida** (armas, escudos, cascos): un .glb suelto, modelado con el origen donde la agarra la mano. Se pega al hueso.
    Si queda torcida, se corrige con `position_offset` / `rotation_offset_degrees` en su `.tres`, no en código.
 2. **Con esqueleto** (`skinned = true`: petos, pantalones, botas, ropa): en Blender se modela **encima del cuerpo base**
    y se pesa (*weight paint*) al **mismo esqueleto**. Se exporta en un .glb. Al equiparla, sus mallas se pasan al
    esqueleto del personaje y se deforman con TODAS sus animaciones. `hides_body_parts` oculta lo que tapa
-   (`body`, `arm_l`...) para que no atraviese.
-3. **De serie** (`builtin_node`): una malla que ya trae el modelo del personaje; solo se muestra u oculta.
+   (nombres de `Avatar3D.body_parts`) para que no atraviese.
 
 Las animaciones nuevas (de Blender o Mixamo retargeteadas al esqueleto) se añaden al `AnimationPlayer` del personaje
 con su nombre y se usan desde los `.tres` de las armas.
 
-## Pixel art (sandbox 2D)
-
-- Resolución base **960x540**, filtro *nearest*, snap a píxel activado. No escales sprites por valores no enteros.
-- Contorno de 1 px oscuro (`#180E10`), luz desde arriba a la izquierda.
-- Los sprites que salen del suelo tienen el origen en los pies (offset negativo en Y) para que funcione el *y-sort*.
-
 ## Verificar antes de hacer commit
 
 ```bash
-godot --headless --path . --import                        # reimporta y muestra errores de scripts/escenas
-godot --headless --path . res://tests/smoke_test.tscn      # debe terminar con "SMOKE OK"
-godot --headless --path . res://tests/smoke_test_3d.tscn   # debe terminar con "SMOKE 3D OK"
+godot --headless --path . --import                       # reimporta y muestra errores de scripts/escenas
+godot --headless --path . res://tests/smoke_test.tscn     # debe terminar con "SMOKE OK"
 ```
 
 Si tocas algo de red (o cualquier cosa que se vea en coop), pasa también el test de red (dos copias del juego):
 
 ```bash
-godot --headless --path . res://tests/net_test.tscn -- --role=host --port=7790 &
-godot --headless --path . res://tests/net_test.tscn -- --role=client --port=7790   # "NET CLIENT OK" (y el host "NET HOST OK")
-godot --headless --path . res://tests/net_test_3d.tscn -- --role=host --port=7795 &
-godot --headless --path . res://tests/net_test_3d.tscn -- --role=client --port=7795
+godot --headless --path . res://tests/net_test.tscn -- --role=host --port=7795 &
+godot --headless --path . res://tests/net_test.tscn -- --role=client --port=7795   # "NET CLIENT OK" (y el host "NET HOST OK")
 ```
 
 Si cambias combate o armas y el test falla, arréglalo o actualiza el test en el mismo commit.

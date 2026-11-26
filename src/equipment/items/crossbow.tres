@@ -1,0 +1,56 @@
+[gd_resource type="Resource" script_class="Weapon3DData" format=3]
+
+[ext_resource type="Script" path="res://src/equipment/attack_3d.gd" id="1_attack3dgd"]
+[ext_resource type="Script" path="res://src/equipment/weapon_3d_data.gd" id="2_weapon3dda"]
+[ext_resource type="PackedScene" path="res://assets/models/kaykit_adventurers/weapons/crossbow_2handed.gltf" id="3_crossbow2h"]
+[ext_resource type="PackedScene" path="res://src/combat/projectiles/bolt.tscn" id="4_bolttscn"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/crossbow.png" id="8_crossbowpn"]
+
+[sub_resource type="Resource" id="Resource_5"]
+script = ExtResource("1_attack3dgd")
+clip = "2H_Ranged_Shoot"
+speed = 1.9
+hit_time = 0.3
+projectiles = 1
+move_multiplier = 0.5
+
+[sub_resource type="Resource" id="Resource_6"]
+script = ExtResource("1_attack3dgd")
+clip = "2H_Ranged_Shoot"
+speed = 1.3
+hit_time = 0.45
+leap = 2
+leap_distance = 5.0
+leap_time = 0.45
+projectiles = 5
+spread_degrees = 40.0
+damage_multiplier = 0.8
+
+[sub_resource type="Resource" id="Resource_7"]
+script = ExtResource("1_attack3dgd")
+clip = "2H_Ranged_Shoot"
+speed = 2.0
+hit_time = 0.3
+projectiles = 3
+spread_degrees = 20.0
+
+[resource]
+script = ExtResource("2_weapon3dda")
+id = &"crossbow"
+slot = 0
+display_name = "Ballesta"
+kind = 1
+scene = ExtResource("3_crossbow2h")
+idle_clip = "2H_Ranged_Aiming"
+base_damage = 11.0
+crit_chance = 0.2
+projectile_scene = ExtResource("4_bolttscn")
+projectile_speed = 28.0
+moves_hint = "Clic: disparo · Mantén: ráfaga · Der: salto atrás con abanico · En el aire: triple disparo"
+hold_mode = 2
+repeat_speed_scale = 1.4
+combo = Array[ExtResource("1_attack3dgd")]([SubResource("Resource_5")])
+alt = SubResource("Resource_6")
+alt_cooldown = 0.9
+air = SubResource("Resource_7")
+icon = ExtResource("8_crossbowpn")

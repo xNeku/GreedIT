@@ -1,0 +1,172 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://assets/materials/outline_3d.tres" id="2_outline3dt"]
+[ext_resource type="Script" path="res://src/enemies/training_dummy_3d.gd" id="7_trainingdu"]
+[ext_resource type="PackedScene" path="res://src/combat/damage_label_3d.tscn" id="8_damagelabe"]
+[ext_resource type="Script" path="res://src/combat/hurtbox_3d.gd" id="17_hurtbox3dg"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_flash"]
+resource_local_to_scene = true
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 1, 1, 0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wood"]
+diffuse_mode = 3
+specular_mode = 2
+next_pass = ExtResource("2_outline3dt")
+albedo_color = Color(0.36, 0.23, 0.14, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_straw"]
+diffuse_mode = 3
+specular_mode = 2
+next_pass = ExtResource("2_outline3dt")
+albedo_color = Color(0.86, 0.7, 0.36, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sack"]
+diffuse_mode = 3
+specular_mode = 2
+next_pass = ExtResource("2_outline3dt")
+albedo_color = Color(0.72, 0.6, 0.42, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rope"]
+diffuse_mode = 3
+specular_mode = 2
+next_pass = ExtResource("2_outline3dt")
+albedo_color = Color(0.5, 0.32, 0.2, 1)
+roughness = 1.0
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_col"]
+radius = 0.5
+height = 2.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_base"]
+material = SubResource("StandardMaterial3D_wood")
+top_radius = 0.5
+bottom_radius = 0.6
+height = 0.16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_post"]
+material = SubResource("StandardMaterial3D_wood")
+top_radius = 0.08
+bottom_radius = 0.1
+height = 1.8
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
+material = SubResource("StandardMaterial3D_straw")
+radius = 0.42
+height = 1.3
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_belt"]
+material = SubResource("StandardMaterial3D_rope")
+top_radius = 0.43
+bottom_radius = 0.43
+height = 0.1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_arms"]
+material = SubResource("StandardMaterial3D_wood")
+top_radius = 0.07
+bottom_radius = 0.07
+height = 1.7
+
+[sub_resource type="SphereMesh" id="SphereMesh_head"]
+material = SubResource("StandardMaterial3D_sack")
+radius = 0.32
+height = 0.64
+
+[sub_resource type="BoxMesh" id="BoxMesh_bit"]
+material = SubResource("StandardMaterial3D_straw")
+size = Vector3(0.04, 0.18, 0.04)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hurt"]
+radius = 0.6
+height = 2.6
+
+[node name="TrainingDummy3D" type="StaticBody3D"]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("7_trainingdu")
+damage_label_scene = ExtResource("8_damagelabe")
+flash_material = SubResource("StandardMaterial3D_flash")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_col")
+
+[node name="Base" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)
+mesh = SubResource("CylinderMesh_base")
+
+[node name="Pivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+
+[node name="Post" type="MeshInstance3D" parent="Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CylinderMesh_post")
+material_overlay = SubResource("StandardMaterial3D_flash")
+
+[node name="Body" type="MeshInstance3D" parent="Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+mesh = SubResource("CapsuleMesh_body")
+material_overlay = SubResource("StandardMaterial3D_flash")
+
+[node name="Belt" type="MeshInstance3D" parent="Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+mesh = SubResource("CylinderMesh_belt")
+material_overlay = SubResource("StandardMaterial3D_flash")
+
+[node name="Arms" type="MeshInstance3D" parent="Pivot"]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 1.65, 0)
+mesh = SubResource("CylinderMesh_arms")
+material_overlay = SubResource("StandardMaterial3D_flash")
+
+[node name="Head" type="MeshInstance3D" parent="Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, 0)
+mesh = SubResource("SphereMesh_head")
+material_overlay = SubResource("StandardMaterial3D_flash")
+
+[node name="Straw" type="CPUParticles3D" parent="Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+emitting = false
+amount = 24
+lifetime = 0.8
+one_shot = true
+explosiveness = 1.0
+local_coords = false
+mesh = SubResource("BoxMesh_bit")
+emission_shape = 1
+emission_sphere_radius = 0.3
+direction = Vector3(0, 1, 0)
+spread = 70.0
+initial_velocity_min = 3.0
+initial_velocity_max = 6.0
+angular_velocity_min = -360.0
+angular_velocity_max = 360.0
+gravity = Vector3(0, -14, 0)
+
+[node name="LabelSpawn" type="Marker3D" parent="Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, 0)
+
+[node name="Hurtbox" type="Area3D" parent="."]
+collision_layer = 16
+collision_mask = 0
+script = ExtResource("17_hurtbox3dg")
+
+[node name="Shape" type="CollisionShape3D" parent="Hurtbox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+shape = SubResource("CapsuleShape3D_hurt")
+
+[node name="StatsLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.7, 0)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+render_priority = 5
+modulate = Color(1, 0.93, 0.75, 1)
+outline_modulate = Color(0.09, 0.05, 0.07, 1)
+text = "¡Pégame!"
+font_size = 32
+outline_size = 10

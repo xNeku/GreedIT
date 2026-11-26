@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3]
+
+[ext_resource type="Script" path="res://src/equipment/equipment_data.gd" id="1_equipmentd"]
+[ext_resource type="PackedScene" path="res://assets/models/quaternius/Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Outfits/Male_Ranger.gltf" id="2_maleranger"]
+
+[resource]
+script = ExtResource("1_equipmentd")
+id = &"ranger_outfit"
+display_name = "Ropa de explorador"
+slot = 5
+skinned = true
+scene = ExtResource("2_maleranger")
+mesh_names = PackedStringArray("Male_Ranger_Acc_Pauldron", "Male_Ranger_Arms", "Male_Ranger_Arms_Bracer", "Male_Ranger_Body", "Male_Ranger_Body_Belt_1", "Male_Ranger_Body_Belt_2", "Male_Ranger_Feet_Boots", "Male_Ranger_Legs")
