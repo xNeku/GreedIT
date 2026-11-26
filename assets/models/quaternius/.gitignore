@@ -1,0 +1,16 @@
+# Packs de Quaternius (CC0): copia aquí las carpetas tal cual las descargas.
+# Git solo sube los modelos y texturas que usa Godot; lo demás (Unity, Unreal, FBX, .blend, zips...) se queda
+# en tu ordenador y no ocupa en el repo.
+*
+!*/
+!*.glb
+!*.gltf
+!*.bin
+!*.png
+!*.jpg
+!*.txt
+!*.glb.import
+!*.gltf.import
+!*.png.import
+!*.jpg.import
+!.gitignore
