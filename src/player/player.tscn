@@ -15,11 +15,12 @@
 [ext_resource type="Resource" path="res://src/characters/appearances/female.tres" id="13_femaletres"]
 [ext_resource type="Texture2D" path="res://assets/lights/light_radial.tres" id="14_lightradia"]
 [ext_resource type="PackedScene" path="res://src/combat/damage_number.tscn" id="17_damagenumb"]
-[ext_resource type="Resource" path="res://src/spells/fireball/fireball.tres" id="18_fireballtr"]
-[ext_resource type="Texture2D" path="res://assets/sprites/fx/shadow_blob.png" id="19_shadowblob"]
-[ext_resource type="Texture2D" path="res://assets/sprites/fx/shock_ring.png" id="20_shockringp"]
-[ext_resource type="PackedScene" path="res://src/ui/interact_prompt.tscn" id="25_interactpr"]
-[ext_resource type="Script" path="res://src/combat/hurtbox.gd" id="26_hurtboxgd"]
+[ext_resource type="PackedScene" path="res://src/ui/floating_text.tscn" id="18_floatingte"]
+[ext_resource type="Resource" path="res://src/spells/fireball/fireball.tres" id="19_fireballtr"]
+[ext_resource type="Texture2D" path="res://assets/sprites/fx/shadow_blob.png" id="20_shadowblob"]
+[ext_resource type="Texture2D" path="res://assets/sprites/fx/shock_ring.png" id="21_shockringp"]
+[ext_resource type="PackedScene" path="res://src/ui/interact_prompt.tscn" id="26_interactpr"]
+[ext_resource type="Script" path="res://src/combat/hurtbox.gd" id="27_hurtboxgd"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_feet"]
 radius = 7.0
@@ -119,14 +120,53 @@ radius = 14.0
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hurt"]
 size = Vector2(18, 40)
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_player"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:velocity")
+properties/1/spawn = false
+properties/1/replication_mode = 1
+properties/2/path = NodePath(".:z")
+properties/2/spawn = false
+properties/2/replication_mode = 1
+properties/3/path = NodePath(".:aim_angle")
+properties/3/spawn = false
+properties/3/replication_mode = 1
+properties/4/path = NodePath(".:facing")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+properties/5/path = NodePath(".:net_view")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+properties/6/path = NodePath(".:weapon_drawn")
+properties/6/spawn = true
+properties/6/replication_mode = 2
+properties/7/path = NodePath(".:selected_slot")
+properties/7/spawn = true
+properties/7/replication_mode = 0
+properties/8/path = NodePath(".:appearance_index")
+properties/8/spawn = true
+properties/8/replication_mode = 2
+properties/9/path = NodePath(".:health")
+properties/9/spawn = true
+properties/9/replication_mode = 2
+properties/10/path = NodePath(".:is_dead")
+properties/10/spawn = true
+properties/10/replication_mode = 2
+properties/11/path = NodePath(".:is_airborne")
+properties/11/spawn = false
+properties/11/replication_mode = 2
+
 [node name="Player" type="CharacterBody2D" groups=["player"]]
 collision_layer = 2
 damage_number_scene = ExtResource("17_damagenumb")
+floating_text_scene = ExtResource("18_floatingte")
 collision_mask = 5
 motion_mode = 1
 script = ExtResource("1_playergd")
 hotbar = Array[ExtResource("4_itemdatagd")]([ExtResource("6_fiststres"), ExtResource("7_swordtres"), ExtResource("8_daggertres"), ExtResource("9_macetres"), ExtResource("10_bowtres"), ExtResource("11_botres")])
-spell = ExtResource("18_fireballtr")
+spell = ExtResource("19_fireballtr")
 appearances = Array[ExtResource("5_charactera")]([ExtResource("12_maletres"), ExtResource("13_femaletres")])
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -135,7 +175,7 @@ shape = SubResource("CircleShape2D_feet")
 
 [node name="Shadow" type="Sprite2D" parent="."]
 position = Vector2(0, -1)
-texture = ExtResource("19_shadowblob")
+texture = ExtResource("20_shadowblob")
 
 [node name="VisualRoot" type="Node2D" parent="."]
 
@@ -150,7 +190,7 @@ position = Vector2(0, -26)
 
 [node name="SlamRing" type="Sprite2D" parent="GroundFX"]
 visible = false
-texture = ExtResource("20_shockringp")
+texture = ExtResource("21_shockringp")
 
 [node name="Dust" type="CPUParticles2D" parent="GroundFX"]
 emitting = false
@@ -198,7 +238,7 @@ monitorable = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
 shape = SubResource("CircleShape2D_interact")
 
-[node name="Prompt" parent="." instance=ExtResource("25_interactpr")]
+[node name="Prompt" parent="." instance=ExtResource("26_interactpr")]
 position = Vector2(0, -86)
 
 [node name="Camera" type="Camera2D" parent="."]
@@ -212,7 +252,11 @@ position = Vector2(0, -24)
 collision_layer = 32
 collision_mask = 0
 monitoring = false
-script = ExtResource("26_hurtboxgd")
+script = ExtResource("27_hurtboxgd")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
 shape = SubResource("RectangleShape2D_hurt")
+
+[node name="Sync" type="MultiplayerSynchronizer" parent="."]
+root_path = NodePath("..")
+replication_config = SubResource("SceneReplicationConfig_player")

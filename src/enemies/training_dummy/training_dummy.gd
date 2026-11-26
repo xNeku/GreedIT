@@ -43,7 +43,17 @@ func _ready() -> void:
 	_update_label()
 
 
+## Solo en el host (el Hurtbox le reenvía los golpes); los efectos se ven en todos.
 func _on_hit_received(hit: HitData) -> void:
+	_show_hit.rpc(hit.amount, hit.is_crit, hit.knockback)
+
+
+@rpc("authority", "call_local", "reliable")
+func _show_hit(amount: int, is_crit: bool, knockback: Vector2) -> void:
+	var hit := HitData.new()
+	hit.amount = amount
+	hit.is_crit = is_crit
+	hit.knockback = knockback
 	var now := _now()
 	_hits.append(Vector2(now, hit.amount))
 	_total += hit.amount

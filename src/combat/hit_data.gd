@@ -20,3 +20,25 @@ static func roll(base: float, multiplier: float, crit_chance: float, crit_multip
 		damage *= crit_multiplier
 	hit.amount = maxi(1, roundi(damage))
 	return hit
+
+
+
+## Para mandarlo por red.
+func to_dict() -> Dictionary:
+	return {
+		"amount": amount, "crit": is_crit, "kb": knockback, "name": attack_name, "tags": tags,
+		"source": String(source.get_path()) if source and source.is_inside_tree() else "",
+	}
+
+
+static func from_dict(data: Dictionary, context: Node) -> HitData:
+	var hit := HitData.new()
+	hit.amount = data.get("amount", 0)
+	hit.is_crit = data.get("crit", false)
+	hit.knockback = data.get("kb", Vector2.ZERO)
+	hit.attack_name = data.get("name", &"")
+	hit.tags = data.get("tags", PackedStringArray())
+	var source_path: String = data.get("source", "")
+	if source_path != "":
+		hit.source = context.get_node_or_null(NodePath(source_path))
+	return hit

@@ -168,6 +168,13 @@ func cast() -> void:
 	_play_attack(&"cast")
 
 
+## De perfil y en reposo la mano libre queda detrás del cuerpo (que es estrecho): se oculta.
+func set_off_hand_hidden(hidden: bool) -> void:
+	var off_hand := find_child("HandOff", true, false) as CanvasItem
+	if off_hand:
+		off_hand.visible = not hidden
+
+
 ## Vuelve a la pose de reposo adecuada (suelo o aire) si no está atacando.
 func refresh_pose() -> void:
 	if not is_busy():
@@ -340,8 +347,11 @@ func _on_hitbox_hurtbox_entered(hurtbox: Hurtbox, hitbox: Hitbox) -> void:
 
 
 ## Calcula y aplica un golpe. Lo usan los Hitbox y los proyectiles.
+## RED: solo el dueño del jugador calcula golpes (en las copias remotas el arma es solo visual).
 func deal_hit(hurtbox: Hurtbox, multiplier: float, knockback_force: float, attack_name: StringName,
 		tags: PackedStringArray, hitstop: float, shake_strength: float, from_position: Vector2) -> void:
+	if player == null or not player.is_local():
+		return
 	var hit := HitData.new()
 	var crit_chance := data.crit_chance
 	if current_attack in [&"air", &"slam", &"leap_land"] or player.is_airborne:

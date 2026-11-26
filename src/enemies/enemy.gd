@@ -11,6 +11,9 @@ extends CharacterBody2D
 ##   - AnimationPlayer con: idle, walk, attack (avisa, golpea y se recupera), hurt, die
 ##     Pistas de método disponibles en "attack": attack_lunge(), fire_projectile(), attack_shake().
 ## Los números (vida, velocidad, daño, alcance...) son @export: ajústalos en el inspector.
+##
+## RED: la IA y la vida las lleva el HOST. Los clientes reciben por el nodo "Sync" la posición,
+## `facing`, `health` y `net_anim` (qué animación toca), y por RPC los golpes (números, destello).
 
 signal died(enemy: Enemy)
 
@@ -58,7 +61,25 @@ enum State { IDLE, WANDER, CHASE, ATTACK, HURT, DEAD }
 @export var damage_number_scene: PackedScene
 @export var floating_text_scene: PackedScene
 
-var health := 0.0
+var health := 0.0:
+	set(value):
+		health = value
+		if is_node_ready():
+			_update_health_bar()
+## Hacia dónde mira (1 / -1). Sincronizado.
+var facing := 1.0:
+	set(value):
+		facing = value
+		if is_node_ready():
+			visual.scale.x = facing
+## "nombre#contador" de la animación actual. Sincronizado: al cambiar, se reproduce en todos.
+var net_anim := "":
+	set(value):
+		if value == net_anim:
+			return
+		net_anim = value
+		if is_node_ready():
+			_play_net_anim()
 var state := State.IDLE
 var target: Player
 
@@ -67,7 +88,8 @@ var _wander_target := Vector2.ZERO
 var _timer := 0.0
 var _attack_cooldown_timer := 0.0
 var _flash := 0.0
-var _facing := 1.0
+var _anim_counter := 0
+var _last_attacker: Player
 
 @onready var visual: Node2D = $Visual
 @onready var body: Node2D = $Visual/Body
@@ -83,19 +105,43 @@ var _facing := 1.0
 
 
 func _ready() -> void:
-	health = max_health
 	_home = global_position
 	hurtbox.hit_received.connect(_on_hit_received)
 	attack_hitbox.hurtbox_entered.connect(_on_attack_hurtbox_entered)
 	animation_player.animation_finished.connect(_on_animation_finished)
 	health_bar.visible = false
-	_enter_wander()
+	visual.scale.x = facing
+	if is_multiplayer_authority():
+		health = max_health
+		_enter_wander()
+	else:
+		_play_net_anim()
+
+
+## Reproduce una animación en todos los peers (vía `net_anim`).
+func _play(anim: StringName) -> void:
+	_anim_counter += 1
+	net_anim = "%s#%d" % [anim, _anim_counter]
+
+
+func _play_net_anim() -> void:
+	var anim := StringName(net_anim.get_slice("#", 0))
+	if anim == &"" or not animation_player.has_animation(anim):
+		return
+	animation_player.stop()
+	animation_player.play(anim)
+	if anim == &"die":
+		health_bar.visible = false
+		death_particles.restart()
 
 
 func _physics_process(delta: float) -> void:
+	if not is_multiplayer_authority():
+		_update_visuals(delta)
+		return
 	_attack_cooldown_timer = maxf(0.0, _attack_cooldown_timer - delta)
-	if target == null or not is_instance_valid(target):
-		target = get_tree().get_first_node_in_group(&"player") as Player
+	if not _target_alive() or state in [State.IDLE, State.WANDER]:
+		target = _nearest_player()
 	match state:
 		State.IDLE, State.WANDER:
 			_update_wander(delta)
@@ -172,11 +218,12 @@ func _start_attack(dir: Vector2) -> void:
 	_set_state(State.ATTACK)
 	attack_pivot.rotation = dir.angle()
 	_face(dir.x)
-	animation_player.stop()
-	animation_player.play(&"attack")
+	_play(&"attack")
 
 
 func _on_animation_finished(anim: StringName) -> void:
+	if not is_multiplayer_authority():
+		return
 	match anim:
 		&"attack":
 			attack_hitbox.active = false
@@ -189,27 +236,42 @@ func _on_animation_finished(anim: StringName) -> void:
 
 # --- Daño recibido --------------------------------------------------------
 
+## Solo en el host (el Hurtbox le reenvía los golpes).
 func _on_hit_received(hit: HitData) -> void:
 	if state == State.DEAD:
 		return
 	health -= hit.amount
-	_flash = 1.0
-	_spawn_damage_number(hit)
-	health_bar.visible = true
-	health_fill.size.x = _bar_width * clampf(health / max_health, 0.0, 1.0)
 	if hit.source is Player:
 		target = hit.source
+		_last_attacker = hit.source
 	velocity = hit.knockback * (1.0 - knockback_resistance) * 1.6
+	_show_hit.rpc(hit.amount, hit.is_crit)
 	if health <= 0.0:
 		_die()
 	elif not (super_armor and state == State.ATTACK):
 		attack_hitbox.active = false
 		_set_state(State.HURT)
 		_timer = stagger_time
-		animation_player.stop()
-		animation_player.play(&"hurt")
+		_play(&"hurt")
 	elif state != State.ATTACK:
 		_set_state(State.CHASE)
+
+
+## Efectos del golpe en todos los peers.
+@rpc("authority", "call_local", "reliable")
+func _show_hit(amount: int, is_crit: bool) -> void:
+	_flash = 1.0
+	var hit := HitData.new()
+	hit.amount = amount
+	hit.is_crit = is_crit
+	_spawn_damage_number(hit)
+	_update_health_bar()
+
+
+func _update_health_bar() -> void:
+	if health < max_health and health > 0.0:
+		health_bar.visible = true
+	health_fill.size.x = _bar_width * clampf(health / max_health, 0.0, 1.0)
 
 
 func _die() -> void:
@@ -219,24 +281,17 @@ func _die() -> void:
 	set_deferred("collision_layer", 0)
 	set_deferred("collision_mask", 1)
 	hurtbox.set_deferred("monitorable", false)
-	death_particles.restart()
-	animation_player.stop()
-	animation_player.play(&"die")
+	_play(&"die")
 	_give_loot()
 	died.emit(self)
 
 
+## El botín va al jugador que dio el último golpe (o al más cercano), en SU ordenador.
 func _give_loot() -> void:
-	if drop == null or not _target_alive() or randf() > drop_chance:
+	var killer := _last_attacker if _last_attacker and is_instance_valid(_last_attacker) else _nearest_player()
+	if drop == null or killer == null or randf() > drop_chance:
 		return
-	var amount := randi_range(drop_min, drop_max)
-	target.inventory.add(drop, amount)
-	if floating_text_scene:
-		var text := floating_text_scene.instantiate() as FloatingText
-		text.text = "+%d %s" % [amount, drop.display_name]
-		text.icon = drop.icon
-		_add_to_overlay(text)
-		text.global_position = global_position + Vector2(0, -60)
+	killer.receive_item.rpc_id(killer.get_multiplayer_authority(), drop.resource_path, randi_range(drop_min, drop_max))
 
 
 func _spawn_damage_number(hit: HitData) -> void:
@@ -257,6 +312,8 @@ func _add_to_overlay(node: Node2D) -> void:
 # --- Ataque (pistas de método de la animación "attack") -------------------
 
 func _on_attack_hurtbox_entered(target_hurtbox: Hurtbox, hitbox: Hitbox) -> void:
+	if not is_multiplayer_authority():
+		return
 	var hit := HitData.roll(attack_damage, hitbox.damage_multiplier, attack_crit_chance, 1.5)
 	hit.knockback = Vector2.from_angle(attack_pivot.rotation) * hitbox.knockback_force
 	hit.source = self
@@ -272,21 +329,34 @@ func attack_shake(strength: float) -> void:
 
 ## Embestida hacia donde ataca.
 func attack_lunge(speed: float) -> void:
-	velocity = Vector2.from_angle(attack_pivot.rotation) * speed
+	if is_multiplayer_authority():
+		velocity = Vector2.from_angle(attack_pivot.rotation) * speed
 
 
 ## Dispara `projectile_scene` hacia el objetivo desde AttackPivot/Muzzle.
+## El host crea el proyectil de verdad; los clientes, una copia solo visual.
 func fire_projectile() -> void:
-	if projectile_scene == null:
+	if projectile_scene == null or not is_multiplayer_authority():
 		return
 	var muzzle := attack_pivot.get_node_or_null("Muzzle") as Node2D
 	var origin := muzzle.global_position if muzzle else global_position
-	var projectile := projectile_scene.instantiate() as EnemyProjectile
 	var aim := (target.global_position + Vector2(0, -20) - origin) if _target_alive() else Vector2.from_angle(attack_pivot.rotation)
-	projectile.direction = aim.normalized()
+	_spawn_projectile(origin, aim.normalized(), false)
+	_spawn_projectile_visual.rpc(origin, aim.normalized())
+
+
+@rpc("authority", "call_remote", "reliable")
+func _spawn_projectile_visual(origin: Vector2, direction: Vector2) -> void:
+	_spawn_projectile(origin, direction, true)
+
+
+func _spawn_projectile(origin: Vector2, direction: Vector2, visual_only: bool) -> void:
+	var projectile := projectile_scene.instantiate() as EnemyProjectile
+	projectile.direction = direction
 	projectile.speed = projectile_speed
 	projectile.damage = attack_damage
 	projectile.source = self
+	projectile.visual_only = visual_only
 	get_parent().add_child(projectile)
 	projectile.global_position = origin
 
@@ -301,10 +371,24 @@ func _target_alive() -> bool:
 	return target != null and is_instance_valid(target) and not target.is_dead
 
 
+## Jugador vivo más cercano (en coop hay varios).
+func _nearest_player() -> Player:
+	var best: Player = null
+	var best_distance := INF
+	for node in get_tree().get_nodes_in_group(&"player"):
+		var player := node as Player
+		if player == null or player.is_dead:
+			continue
+		var d := global_position.distance_squared_to(player.global_position)
+		if d < best_distance:
+			best_distance = d
+			best = player
+	return best
+
+
 func _face(dir_x: float) -> void:
 	if absf(dir_x) > 0.1:
-		_facing = signf(dir_x)
-		visual.scale.x = _facing
+		facing = signf(dir_x)
 
 
 func _play_locomotion() -> void:
@@ -313,8 +397,8 @@ func _play_locomotion() -> void:
 	var anim := &"walk" if velocity.length() > 8.0 else &"idle"
 	if absf(velocity.x) > 4.0:
 		_face(velocity.x)
-	if animation_player.current_animation != anim:
-		animation_player.play(anim)
+	if net_anim.get_slice("#", 0) != String(anim):
+		_play(anim)
 
 
 func _update_visuals(delta: float) -> void:

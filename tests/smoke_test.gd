@@ -32,7 +32,7 @@ func _run() -> void:
 	_scene = (load("res://src/world/sandbox.tscn") as PackedScene).instantiate()
 	add_child(_scene)
 	await _wait(0.3)
-	_player = _scene.get_node("World/Player")
+	_player = _scene.get_node("World/Players/1")
 	_dummy = _scene.get_node("World/TrainingDummy1")
 	await _shot("00_overview")
 

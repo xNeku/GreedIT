@@ -23,7 +23,9 @@ func _ready() -> void:
 
 
 func _deal_damage() -> void:
-	if spell == null:
+	# RED: solo la copia de quien lanzó el hechizo hace daño; las demás son visuales.
+	if spell == null or caster == null or not is_instance_valid(caster) or not caster.is_multiplayer_authority():
+		Events.camera_shake_requested.emit(shake * 0.4, 0.12)
 		return
 	var shape := CircleShape2D.new()
 	shape.radius = radius

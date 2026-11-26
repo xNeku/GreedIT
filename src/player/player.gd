@@ -1,17 +1,19 @@
 class_name Player
 extends CharacterBody2D
-## Jugador top-down.
-## - Movimiento con inercia (WASD). Mira hacia donde corre; al atacar, se gira hacia el ratón.
-## - Salto: hacia donde te mueves (quieto = salto en el sitio), con anticipación (se agacha) y fases
-##   de subida / cima / caída que anima CharacterVisual. En el aire pasas por encima de enemigos.
+## Jugador top-down (estilo Diablo / Path of Exile), preparado para coop.
+##
+## RED: cada jugador manda sobre su propio personaje (multiplayer authority = su peer id).
+##   - En su ordenador se simula todo (input, física, armas, vida, inventario).
+##   - En los demás es una COPIA REMOTA: recibe posición/estado por el MultiplayerSynchronizer ("Sync")
+##     y los momentos puntuales (saltar, atacar, cambiar de arma...) por la RPC _net_event().
+##   - En solo funciona igual (OfflineMultiplayerPeer: somos el peer 1 y mandamos sobre todo).
+##
+## - Movimiento rápido y con respuesta inmediata (WASD). Mira hacia donde corre; al atacar, al ratón.
+## - Salto hacia donde corres, con anticipación. En el aire pasas por encima de enemigos y esquivas golpes.
 ##   Atacar en el aire = ataque aéreo + caída en picado (slam al aterrizar).
-## - Dash (Shift). Más adelante lo darán objetos; ahora viene de serie para probar.
-## - Hotbar estilo Terraria (1-6 / rueda). El arma va guardada a la espalda: se desenfunda al atacar
-##   y se vuelve a guardar tras `sheathe_delay` segundos sin usarla.
-## - Interactuar (E) con recursos cercanos: minería, herboristería y pesca.
-## - Magia: clic de la rueda lanza el hechizo equipado (bola de fuego) gastando maná.
-## - Vida: recibe golpes en su Hurtbox; tras un golpe parpadea invulnerable. Saltando alto o en dash
-##   esquivas los golpes. Fuera de combate regenera. Al morir reaparece en el punto de inicio.
+## - Dash (Shift). Hotbar 1-6 / rueda. El arma va a la espalda si no la usas.
+## - E: minería, herboristería, pesca. Clic de la rueda: hechizo (bola de fuego).
+## - Vida: invulnerable un momento tras un golpe, regenera fuera de combate, al morir reaparece.
 
 signal hotbar_changed(items: Array[ItemData], selected: int)
 signal jumped
@@ -29,19 +31,24 @@ signal respawned
 const GROUND_MASK := 1 | 4 ## world + enemies
 const AIR_MASK := 1 ## en el aire solo chocas con el mundo
 
+## Eventos que el dueño manda a las copias remotas.
+enum NetEvent { JUMP, LAND, DASH, WEAPON, SLOT, GATHER, HURT, DIED, RESPAWN, APPEARANCE }
+## Acciones de arma que se replican.
+enum WeaponAction { PRIMARY_DOWN, PRIMARY_UP, SECONDARY_DOWN, SECONDARY_UP, CAST }
+
 @export_group("Movimiento")
-@export var move_speed := 115.0
-@export var acceleration := 1000.0
-@export var friction := 1300.0
-## Aceleración al cambiar de sentido (giros más secos).
-@export var turn_acceleration := 1900.0
+@export var move_speed := 160.0
+@export var acceleration := 2400.0
+@export var friction := 2800.0
+## Aceleración al cambiar de sentido (giros secos, estilo ARPG).
+@export var turn_acceleration := 3600.0
 ## Multiplicador de velocidad mientras atacas.
 @export var attack_move_multiplier := 0.35
 
 @export_group("Salto")
 ## Distancia del salto si te estás moviendo (saltas hacia donde corres).
-@export var jump_distance := 105.0
-@export var jump_duration := 0.46
+@export var jump_distance := 120.0
+@export var jump_duration := 0.44
 @export var jump_height := 26.0
 ## Segundos agachándose antes de despegar (anticipación).
 @export var jump_windup := 0.05
@@ -49,7 +56,7 @@ const AIR_MASK := 1 ## en el aire solo chocas con el mundo
 @export var plunge_fall_speed := 280.0
 
 @export_group("Dash")
-@export var dash_speed := 380.0
+@export var dash_speed := 460.0
 @export var dash_time := 0.14
 @export var dash_cooldown := 0.6
 
@@ -80,26 +87,47 @@ const AIR_MASK := 1 ## en el aire solo chocas con el mundo
 @export var dodge_height := 12.0
 @export var respawn_delay := 1.6
 @export var damage_number_scene: PackedScene
+@export var floating_text_scene: PackedScene
 
 @export_group("Aspecto")
 ## Pulsa C para ir cambiando entre estos aspectos.
 @export var appearances: Array[CharacterAppearance] = []
 
-var current_weapon: Weapon
-## true = arma en la mano; false = guardada a la espalda (manos libres).
-var weapon_drawn := false
-## Si no es null, se apunta aquí en vez de al ratón (mandos, IA, tests).
-var aim_target_override: Variant = null
-var inventory := Inventory.new()
+# --- Estado sincronizado por red (ver nodo Sync) -------------------------
 ## Altura actual sobre el suelo (px). 0 = en el suelo.
 var z := 0.0
 var is_airborne := false
 var aim_angle := 0.0
 ## 1 = mira a la derecha, -1 = a la izquierda.
 var facing := 1.0
-var mana := 100.0
 var health := 100.0
 var is_dead := false
+## Vista del personaje (CharacterVisual.View) para las copias remotas.
+var net_view := 0:
+	set(value):
+		net_view = value
+		if is_node_ready() and not is_multiplayer_authority():
+			character_visual.set_view(value)
+			_update_grip()
+## true = arma en la mano; false = guardada a la espalda (manos libres).
+var weapon_drawn := false:
+	set(value):
+		if value == weapon_drawn:
+			return
+		weapon_drawn = value
+		if is_node_ready():
+			_refresh_hands()
+var appearance_index := 0:
+	set(value):
+		appearance_index = value
+		if is_node_ready():
+			_apply_appearance_index()
+
+var current_weapon: Weapon
+## Si no es null, se apunta aquí en vez de al ratón (mandos, IA, tests).
+var aim_target_override: Variant = null
+var inventory := Inventory.new()
+var mana := 100.0
 var is_gathering: bool:
 	get:
 		return _gather_target != null
@@ -116,7 +144,6 @@ var _last_z := 0.0
 var _dash_timer := 0.0
 var _dash_cooldown_timer := 0.0
 var _dash_direction := Vector2.ZERO
-var _appearance_index := 0
 var _interactables: Array[Gatherable] = []
 var _focused: Gatherable
 var _gather_target: Gatherable
@@ -139,42 +166,53 @@ var _sheathe_timer := 0.0
 @onready var interact_area: Area2D = $InteractArea
 @onready var prompt: InteractPrompt = $Prompt
 @onready var hurtbox: Hurtbox = $Hurtbox
+@onready var camera: Camera2D = $Camera
 
 
 func _ready() -> void:
 	collision_mask = GROUND_MASK
-	interact_area.area_entered.connect(_on_interact_area_entered)
-	interact_area.area_exited.connect(_on_interact_area_exited)
-	if not appearances.is_empty():
-		character_visual.appearance = appearances[0]
-	mana = max_mana
 	health = max_health
+	mana = max_mana
 	_spawn_point = global_position
+	_apply_appearance_index()
 	hurtbox.hit_received.connect(_on_hit_received)
+	if is_local():
+		interact_area.area_entered.connect(_on_interact_area_entered)
+		interact_area.area_exited.connect(_on_interact_area_exited)
+		camera.enabled = true
+		camera.make_current()
+		Events.local_player_ready.emit(self)
+	else:
+		# Copia remota: sin cámara, sin interacción, sin chocar con nada (su dueño la mueve).
+		camera.enabled = false
+		interact_area.monitoring = false
+		collision_layer = 0
+		collision_mask = 0
 	select_slot(selected_slot)
 
 
+## ¿Es el jugador que controla este ordenador?
+func is_local() -> bool:
+	return is_multiplayer_authority()
+
+
 func _unhandled_input(event: InputEvent) -> void:
-	if is_dead:
+	if not is_local() or is_dead:
 		return
 	if event.is_action_pressed("attack_primary"):
 		_stop_gathering()
 		draw_weapon()
 		_aim_at_target()
-		if current_weapon:
-			current_weapon.primary_pressed()
+		weapon_action(WeaponAction.PRIMARY_DOWN)
 	elif event.is_action_released("attack_primary"):
-		if current_weapon:
-			current_weapon.primary_released()
+		weapon_action(WeaponAction.PRIMARY_UP)
 	elif event.is_action_pressed("attack_secondary"):
 		_stop_gathering()
 		draw_weapon()
 		_aim_at_target()
-		if current_weapon:
-			current_weapon.secondary_pressed()
+		weapon_action(WeaponAction.SECONDARY_DOWN)
 	elif event.is_action_released("attack_secondary"):
-		if current_weapon:
-			current_weapon.secondary_released()
+		weapon_action(WeaponAction.SECONDARY_UP)
 	elif event.is_action_pressed("jump"):
 		try_jump()
 	elif event.is_action_pressed("dash"):
@@ -198,6 +236,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if not is_local():
+		_update_remote(delta)
+		return
 	_dash_cooldown_timer = maxf(0.0, _dash_cooldown_timer - delta)
 	_update_mana(delta)
 	_update_health(delta)
@@ -205,6 +246,7 @@ func _physics_process(delta: float) -> void:
 	if is_dead:
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
 		move_and_slide()
+		_update_visuals(delta)
 		return
 	var input_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	if is_gathering and input_dir != Vector2.ZERO:
@@ -240,12 +282,25 @@ func _physics_process(delta: float) -> void:
 	_update_visuals(delta)
 
 
+## Copia remota: solo dibuja lo que le llega por red.
+func _update_remote(delta: float) -> void:
+	_apply_aim()
+	var aiming := current_weapon != null and current_weapon.visible and current_weapon.wants_aim()
+	aim_pivot.z_index = -1 if (sin(aim_angle) < -0.35 if aiming else character_visual.is_back_view()) else 1
+	_hurt_flash = move_toward(_hurt_flash, 0.0, delta * 5.0)
+	visual_root.modulate = Color(1.0, 1.0 - _hurt_flash * 0.65, 1.0 - _hurt_flash * 0.65)
+	visual_root.rotation = -PI / 2.0 * facing if is_dead else 0.0
+	_update_visuals(delta)
+
+
 func _update_visuals(delta: float) -> void:
 	visual_root.position.y = -roundf(z)
 	var shadow_scale := lerpf(1.0, 0.55, clampf(z / 40.0, 0.0, 1.0))
 	shadow.scale = Vector2(shadow_scale, shadow_scale)
-	character_visual.set_moving(velocity.length() > 12.0 and not is_airborne and _windup_timer <= 0.0)
-	if is_airborne:
+	var speed := velocity.length()
+	character_visual.set_moving(speed > 20.0 and not is_airborne and _windup_timer <= 0.0)
+	character_visual.set_speed_ratio(speed / move_speed)
+	if is_airborne or z > 0.0:
 		var vz := (z - _last_z) / maxf(delta, 0.0001)
 		if _plunging or vz < -35.0:
 			character_visual.set_air_phase(CharacterVisual.AirPhase.FALLING)
@@ -258,6 +313,94 @@ func _update_visuals(delta: float) -> void:
 	_last_z = z
 
 
+# --- Red -----------------------------------------------------------------
+
+## El dueño avisa a las copias remotas de algo puntual.
+func _send(event: NetEvent, a: Variant = null, b: Variant = null) -> void:
+	if is_local() and multiplayer.has_multiplayer_peer() and not multiplayer.multiplayer_peer is OfflineMultiplayerPeer:
+		_net_event.rpc(event, a, b)
+
+
+@rpc("authority", "call_remote", "reliable")
+func _net_event(event: int, a: Variant = null, b: Variant = null) -> void:
+	match event:
+		NetEvent.JUMP:
+			character_visual.play_jump_windup()
+			dust.restart()
+			if current_weapon:
+				current_weapon.on_jump_started()
+		NetEvent.LAND:
+			character_visual.play_land(a or b)
+			dust.restart()
+			if a or b:
+				fx_player.play(&"slam")
+			if current_weapon:
+				current_weapon.on_landed(a)
+		NetEvent.DASH:
+			dust.restart()
+			if current_weapon:
+				current_weapon.cancel()
+		NetEvent.WEAPON:
+			if a != WeaponAction.PRIMARY_UP and a != WeaponAction.SECONDARY_UP:
+				weapon_drawn = true
+			_apply_weapon_action(a)
+		NetEvent.SLOT:
+			selected_slot = a
+			_equip(hotbar[a] as WeaponData)
+		NetEvent.GATHER:
+			if a == "":
+				_stop_gathering()
+			else:
+				var target := get_node_or_null(NodePath(a)) as Gatherable
+				if target:
+					_start_gathering(target)
+		NetEvent.HURT:
+			_hurt_flash = 1.0
+			_spawn_damage_number(a, b)
+		NetEvent.DIED:
+			character_visual.play_land(true)
+		NetEvent.RESPAWN:
+			visual_root.rotation = 0.0
+		NetEvent.APPEARANCE:
+			appearance_index = a
+
+
+## Botín que nos manda el servidor (p. ej. al matar un mob). Solo actúa en el dueño.
+@rpc("any_peer", "call_local", "reliable")
+func receive_item(item_path: String, amount: int) -> void:
+	if not is_local():
+		return
+	var item := load(item_path) as ItemData
+	if item == null:
+		return
+	inventory.add(item, amount)
+	_show_floating_text("+%d %s" % [amount, item.display_name], item.icon)
+
+
+# --- Armas ---------------------------------------------------------------
+
+## Ejecuta una acción de arma aquí y la replica a los demás.
+func weapon_action(action: WeaponAction) -> void:
+	_apply_weapon_action(action)
+	_send(NetEvent.WEAPON, action)
+
+
+func _apply_weapon_action(action: int) -> void:
+	if current_weapon == null:
+		return
+	match action:
+		WeaponAction.PRIMARY_DOWN:
+			current_weapon.primary_pressed()
+		WeaponAction.PRIMARY_UP:
+			current_weapon.primary_released()
+		WeaponAction.SECONDARY_DOWN:
+			current_weapon.secondary_pressed()
+		WeaponAction.SECONDARY_UP:
+			current_weapon.secondary_released()
+		WeaponAction.CAST:
+			current_weapon.cast()
+
+
 # --- Orientación y apuntado -----------------------------------------------
 
 func aim_direction() -> Vector2:
@@ -265,6 +408,8 @@ func aim_direction() -> Vector2:
 
 
 func get_aim_target() -> Vector2:
+	if not is_local():
+		return aim_pivot.global_position + aim_direction() * 120.0
 	if aim_target_override != null:
 		return aim_target_override
 	return get_global_mouse_position()
@@ -318,6 +463,7 @@ func _update_view(aiming: bool) -> void:
 		view = CharacterVisual.View.BACK_SIDE
 	if view != character_visual.view:
 		character_visual.set_view(view)
+		net_view = view
 		_update_grip()
 
 
@@ -326,6 +472,12 @@ func _apply_aim() -> void:
 	aim_pivot.rotation = aim_angle
 	# Si apuntas a la izquierda, volteamos el arma para que no quede boca abajo.
 	aim_pivot.scale.y = -1.0 if cos(aim_angle) < 0.0 else 1.0
+	# De perfil el cuerpo es más estrecho: el arma en reposo se pega un poco al cuerpo.
+	var resting := current_weapon == null or not current_weapon.wants_aim()
+	var tuck := {CharacterVisual.View.SIDE: -7.0, CharacterVisual.View.FRONT_SIDE: -3.0, CharacterVisual.View.BACK_SIDE: -3.0}
+	weapon_holder.position.x = tuck.get(character_visual.view, 0.0) if resting else 0.0
+	if current_weapon:
+		current_weapon.set_off_hand_hidden(resting and character_visual.view == CharacterVisual.View.SIDE)
 
 
 # --- Salto ----------------------------------------------------------------
@@ -336,7 +488,7 @@ func try_jump() -> void:
 
 
 func jump(direction: Vector2) -> void:
-	if is_airborne or _windup_timer > 0.0 or _dash_timer > 0.0:
+	if is_airborne or _windup_timer > 0.0 or _dash_timer > 0.0 or is_dead:
 		return
 	_stop_gathering()
 	_pending_jump = direction.normalized() if direction.length() > 0.1 else Vector2.ZERO
@@ -346,6 +498,7 @@ func jump(direction: Vector2) -> void:
 	character_visual.play_jump_windup()
 	if current_weapon:
 		current_weapon.on_jump_started()
+	_send(NetEvent.JUMP)
 
 
 func _launch_jump() -> void:
@@ -360,7 +513,10 @@ func _launch_jump() -> void:
 
 
 ## Salto lanzado por un arma (salto con maza, pértiga del bō...). Devuelve si ha despegado.
+## En una copia remota no mueve nada (la posición llega por red) pero devuelve true para la animación.
 func weapon_leap(direction: Vector2, distance: float, height: float, duration: float) -> bool:
+	if not is_local():
+		return true
 	if is_airborne:
 		return false
 	_windup_timer = 0.0
@@ -383,7 +539,7 @@ func _start_air(direction: Vector2, distance: float, height: float, duration: fl
 
 ## Llamado por el arma al hacer un ataque aéreo: caes en picado.
 func start_plunge() -> void:
-	if is_airborne:
+	if is_local() and is_airborne:
 		_plunging = true
 
 
@@ -418,13 +574,14 @@ func _land() -> void:
 		Events.camera_shake_requested.emit(4.0, 0.2)
 	if current_weapon:
 		current_weapon.on_landed(was_plunging)
+	_send(NetEvent.LAND, was_plunging, was_leap)
 	landed.emit(was_plunging)
 
 
 # --- Dash -----------------------------------------------------------------
 
 func try_dash() -> void:
-	if is_airborne or _dash_cooldown_timer > 0.0 or _windup_timer > 0.0:
+	if is_airborne or _dash_cooldown_timer > 0.0 or _windup_timer > 0.0 or is_dead:
 		return
 	_stop_gathering()
 	var input_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
@@ -434,11 +591,12 @@ func try_dash() -> void:
 	dust.restart()
 	if current_weapon:
 		current_weapon.cancel()
+	_send(NetEvent.DASH)
 
 
 ## Empuje hacia donde apuntas (lo llaman las animaciones de ataque).
 func lunge(speed: float) -> void:
-	if is_airborne or _dash_timer > 0.0:
+	if not is_local() or is_airborne or _dash_timer > 0.0:
 		return
 	velocity = aim_direction() * speed
 
@@ -457,7 +615,7 @@ func interact() -> void:
 
 ## Texto del cartel "E" sobre la cabeza. Vacío = ocultar.
 func set_prompt(text: String, urgent: bool = false) -> void:
-	if text.is_empty():
+	if not is_local() or text.is_empty():
 		prompt.hide_prompt()
 	else:
 		prompt.show_prompt(text, urgent)
@@ -508,6 +666,7 @@ func _start_gathering(target: Gatherable) -> void:
 	_tool.setup(self, target)
 	_refresh_hands()
 	_update_grip()
+	_send(NetEvent.GATHER, String(target.get_path()))
 	gathering_started.emit(target)
 
 
@@ -521,11 +680,13 @@ func _stop_gathering() -> void:
 	_gather_target = null
 	set_prompt("")
 	_refresh_hands()
+	_send(NetEvent.GATHER, "")
 	gathering_stopped.emit()
 
 
 # --- Vida -----------------------------------------------------------------
 
+## Solo se llama en el dueño (el Hurtbox reenvía los golpes a quien manda sobre este jugador).
 func _on_hit_received(hit: HitData) -> void:
 	if is_dead or _invulnerable_timer > 0.0 or _dash_timer > 0.0 or z > dodge_height:
 		return
@@ -534,7 +695,8 @@ func _on_hit_received(hit: HitData) -> void:
 	_invulnerable_timer = invulnerability_time
 	_hurt_flash = 1.0
 	health_changed.emit(health, max_health)
-	_spawn_damage_number(hit)
+	_spawn_damage_number(hit.amount, hit.is_crit)
+	_send(NetEvent.HURT, hit.amount, hit.is_crit)
 	_stop_gathering()
 	if not is_airborne:
 		velocity = hit.knockback * 1.3
@@ -544,16 +706,30 @@ func _on_hit_received(hit: HitData) -> void:
 		_die()
 
 
-func _spawn_damage_number(hit: HitData) -> void:
+func _spawn_damage_number(amount: int, is_crit: bool) -> void:
 	if damage_number_scene == null:
 		return
 	var number := damage_number_scene.instantiate() as DamageNumber
-	number.amount = hit.amount
-	number.is_crit = hit.is_crit
+	number.amount = amount
+	number.is_crit = is_crit
 	number.color_override = Color(1.0, 0.35, 0.3)
-	var container := get_tree().get_first_node_in_group(&"world_overlay")
-	(container if container else get_parent()).add_child(number)
+	_add_to_overlay(number)
 	number.global_position = global_position + Vector2(0, -78)
+
+
+func _show_floating_text(text: String, icon: Texture2D) -> void:
+	if floating_text_scene == null:
+		return
+	var floating := floating_text_scene.instantiate() as FloatingText
+	floating.text = text
+	floating.icon = icon
+	_add_to_overlay(floating)
+	floating.global_position = global_position + Vector2(0, -70)
+
+
+func _add_to_overlay(node: Node2D) -> void:
+	var container := get_tree().get_first_node_in_group(&"world_overlay")
+	(container if container else get_parent()).add_child(node)
 
 
 func _update_health(delta: float) -> void:
@@ -578,6 +754,7 @@ func _die() -> void:
 	set_prompt("")
 	character_visual.play_land(true)
 	visual_root.rotation = -PI / 2.0 * facing # cae de lado
+	_send(NetEvent.DIED)
 	died.emit()
 	get_tree().create_timer(respawn_delay).timeout.connect(_respawn)
 
@@ -591,6 +768,7 @@ func _respawn() -> void:
 	mana = max_mana
 	_invulnerable_timer = 2.0
 	health_changed.emit(health, max_health)
+	_send(NetEvent.RESPAWN)
 	respawned.emit()
 
 
@@ -599,7 +777,7 @@ func _respawn() -> void:
 ## Clic de la rueda: lanza el hechizo hacia el ratón. El arma hace el gesto con la mano libre
 ## y llama a release_spell() en el momento justo.
 func try_cast() -> void:
-	if spell == null:
+	if spell == null or is_dead:
 		return
 	if _spell_cooldown > 0.0:
 		cast_failed.emit("Recargando")
@@ -614,12 +792,13 @@ func try_cast() -> void:
 	_spell_cooldown = spell.cooldown
 	spell_cast.emit(spell)
 	if current_weapon and weapon_drawn:
-		current_weapon.cast()
+		weapon_action(WeaponAction.CAST)
 	else:
 		release_spell()
 
 
 ## Crea el proyectil del hechizo en la mano libre (o delante del pecho).
+## En las copias remotas también se crea, pero solo visual: el daño lo hace la copia del dueño.
 func release_spell() -> void:
 	if spell == null or spell.projectile_scene == null:
 		return
@@ -661,16 +840,14 @@ func draw_weapon() -> void:
 	if weapon_drawn or current_weapon == null:
 		return
 	weapon_drawn = true
-	_refresh_hands()
 
 
 func _sheathe_weapon() -> void:
 	if not weapon_drawn:
 		return
-	weapon_drawn = false
 	if current_weapon:
 		current_weapon.cancel()
-	_refresh_hands()
+	weapon_drawn = false
 
 
 func _update_sheathe(delta: float) -> void:
@@ -719,6 +896,7 @@ func select_slot(index: int) -> void:
 	_stop_gathering()
 	selected_slot = clampi(index, 0, hotbar.size() - 1)
 	_equip(hotbar[selected_slot] as WeaponData)
+	_send(NetEvent.SLOT, selected_slot)
 	hotbar_changed.emit(hotbar, selected_slot)
 
 
@@ -734,7 +912,8 @@ func _equip(data: WeaponData) -> void:
 	current_weapon.data = data
 	weapon_holder.add_child(current_weapon)
 	current_weapon.setup(self)
-	weapon_drawn = false
+	if is_local():
+		weapon_drawn = false
 	_refresh_hands()
 	_update_grip()
 
@@ -742,8 +921,14 @@ func _equip(data: WeaponData) -> void:
 func cycle_appearance() -> void:
 	if appearances.is_empty():
 		return
-	_appearance_index = wrapi(_appearance_index + 1, 0, appearances.size())
-	character_visual.appearance = appearances[_appearance_index]
+	appearance_index = wrapi(appearance_index + 1, 0, appearances.size())
+	_send(NetEvent.APPEARANCE, appearance_index)
+
+
+func _apply_appearance_index() -> void:
+	if appearances.is_empty():
+		return
+	character_visual.appearance = appearances[clampi(appearance_index, 0, appearances.size() - 1)]
 	if current_weapon:
 		current_weapon.apply_appearance(character_visual.appearance)
 	if _tool:

@@ -42,7 +42,8 @@ func _begin() -> void:
 func tool_hit() -> void:
 	if target:
 		target.on_tool_hit(player)
-	Events.camera_shake_requested.emit(hit_shake, 0.08)
+	if player.is_local():
+		Events.camera_shake_requested.emit(hit_shake, 0.08)
 
 
 func _process(_delta: float) -> void:

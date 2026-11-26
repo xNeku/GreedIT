@@ -25,10 +25,10 @@ assets/                 arte, luces, audio (solo datos, sin lógica)
   sprites/weapons|props|fx|ui|world/
   lights/               texturas de luz compartidas
 src/
-  autoload/             Events (bus de señales), GameFeel (hitstop, pantalla completa)
+  autoload/             Events (bus de señales), GameFeel (hitstop, pantalla completa), Net (solo / host / unirse)
   combat/               HitData, Hitbox, Hurtbox, DamageNumber, shader de flash
   items/                ItemData, WeaponData (recursos de datos)
-  characters/           CharacterVisual (cuerpo por capas), CharacterAppearance (.tres), HandUtils
+  characters/           CharacterVisual (cuerpo por capas), CharacterAppearance + CharacterLayers (.tres), HandUtils
   player/               Player, PlayerCamera
   weapons/              weapon.gd (base), projectile.gd, weapon_trail.gd, una carpeta por arma (.tscn + .tres)
   gathering/            Gatherable (recurso infinito), GatherTool / FishingRod, tools/, resources/
@@ -36,9 +36,9 @@ src/
   items/materials/      materiales (.tres de ItemData)
   enemies/              Enemy (IA base), EnemyProjectile, MobSpawner, una carpeta por mob (goblin/, skeleton/, zombie/)
                         y training_dummy/
-  world/                escenas de mundo/niveles y props
-  ui/                   HUD, hotbar, panel de materiales, cartel "E", textos flotantes
-tests/                  test de humo ejecutable en headless
+  world/                Game (arranca la red y crea jugadores), escenas de mundo/niveles y props
+  ui/                   menú principal, HUD, hotbar, panel de materiales, cartel "E", textos flotantes
+tests/                  test de humo (un jugador) y test de red (host + cliente), en headless
 docs/                   GDD y backlog
 ```
 
@@ -51,6 +51,33 @@ Cada cosa vive en una carpeta por funcionalidad, con su escena, su script y sus 
 - Valores ajustables con `@export` (agrupados con `@export_group`) y un comentario `##` que explique qué hacen.
 - Comunicación entre sistemas con **señales**. Lo global va por el autoload `Events`.
 - Nada de rutas absolutas de nodos tipo `/root/...`. Usa `@export var x: Node` o `%UniqueName`.
+
+## Red: el juego SIEMPRE es coop
+
+El juego está escrito como multijugador desde la base, aunque juegues solo (en solo se usa un
+`OfflineMultiplayerPeer`: eres el peer 1 y mandas sobre todo). **Todo lo nuevo tiene que respetar estas reglas:**
+
+1. **Quién manda (multiplayer authority)**: cada jugador manda sobre su `Player` (authority = su peer id).
+   El **host (peer 1)** manda sobre todo lo demás: mobs, muñecos, spawners, mundo.
+2. **Solo simula quien manda**: IA, física, vida, cooldowns... dentro de `if is_multiplayer_authority():`
+   (en el jugador, `Player.is_local()`). Las copias de los demás solo dibujan.
+3. **Daño**: lo calcula quien golpea y lo **aplica quien manda sobre la víctima**. `Hurtbox.receive_hit()` ya
+   reenvía el golpe por RPC si hace falta: tú solo llama a `receive_hit()` desde la copia que manda sobre el atacante
+   (`Weapon.deal_hit` y `SpellExplosion` ya comprueban que el jugador sea local; los ataques de mobs, que seas el host).
+4. **Efectos para todos**: quien aplica el golpe avisa con una RPC `@rpc("authority", "call_local")`
+   (p. ej. `Enemy._show_hit`, `TrainingDummy._show_hit`) que pinta números, destellos y partículas en todos.
+5. **Estado continuo** (posición, vida, animación...) → nodo `Sync` (`MultiplayerSynchronizer`) de la escena.
+   **Momentos puntuales** (saltar, atacar, cambiar de arma...) → RPC. En el jugador: `Player._net_event()` con
+   `NetEvent`, y las acciones de arma con `Player.weapon_action()` (la ejecuta aquí y la replica).
+6. **Crear cosas en red**: los nodos que deben existir en todos los peers los crea el host y los replica un
+   `MultiplayerSpawner` (`PlayerSpawner`, `MobNetSpawner` en `sandbox.tscn`). Añade la escena a su lista y usa
+   `add_child(nodo, true)` para que el nombre sea igual en todos. Proyectiles y efectos rápidos no van por spawner:
+   cada peer crea su copia (las de los demás son solo visuales, `visual_only`).
+7. **Botín**: el host decide y se lo manda al dueño: `player.receive_item.rpc_id(player.get_multiplayer_authority(), ruta, n)`.
+8. Lo local de cada jugador (inventario, maná, recolección, prompts, HUD, cámara) vive en su ordenador.
+
+Flujo: `main_menu` → `Net.play(modo)` → carga `sandbox.tscn` → `Game._ready()` llama a `Net.start()` y crea los
+jugadores (`_spawn_player` corre en todos los peers y pone el dueño). Un cliente pide su jugador con `_request_spawn`.
 
 ## Capas de física (2D)
 
@@ -146,11 +173,15 @@ Las capas del personaje comparten un lienzo de **52x70 px** con los pies abajo e
 porque flotan y las mueve el arma. Un `CharacterAppearance` (.tres) dice qué textura usa cada capa.
 Para un pelo, ropa o armadura nueva: pinta sobre el lienzo de 52x70 y asígnala en un `CharacterAppearance`.
 
-Vistas (`CharacterVisual.View`): **FRONT**, **FRONT_SIDE**, **SIDE**, **BACK_SIDE** y **BACK** (con el volteo,
-8 direcciones). El jugador elige la vista según hacia dónde se mueve (o apunta al atacar). De espaldas se usan
-`head_back`, `hair_back` y `torso_back`; en diagonal y de lado se desplazan ojos y pelo para girar la cabeza.
-Andar: `walk` (frente/espalda), `walk_diag` y `walk_side` (zancada), con balanceo de las manos libres. Si añades ropa o pelo nuevo,
-pinta también su versión de espalda (si no, se usa la de frente).
+Vistas (`CharacterVisual.View`, estilo Diablo / Path of Exile): **FRONT**, **FRONT_SIDE**, **SIDE**, **BACK_SIDE**
+y **BACK** (con el volteo, 8 direcciones). Cada vista tiene su juego de capas (`CharacterLayers`) dentro del
+`CharacterAppearance`: frente en `male/*.png`, espalda en `male/*_back.png`, y `male/front_side/`, `male/side/`
+(perfil) y `male/back_side/` con todas las capas. Si añades pelo, ropa o armadura, píntalo en las 5 vistas.
+
+Animaciones del cuerpo: `idle`, `run` (frente/espalda), `run_diag`, `run_side` (zancada), `run_start`, `run_stop`,
+`turn`, `jump_windup`, `rise`, `peak`, `fall`, `land`, `land_heavy`. La velocidad de la carrera se ajusta sola a la del
+personaje. Las manos libres cuelgan de `HandLAnchor`/`HandRAnchor` (su posición por vista está en `hand_rest_l/r`);
+las animaciones mueven `HandL`/`HandR` dentro de su ancla.
 
 ## Pixel art
 
@@ -163,6 +194,13 @@ pinta también su versión de espalda (si no, se usa la de frente).
 ```bash
 godot --headless --path . --import                        # reimporta y muestra errores de scripts/escenas
 godot --headless --path . res://tests/smoke_test.tscn      # debe terminar con "SMOKE OK"
+```
+
+Si tocas algo de red (o cualquier cosa que se vea en coop), pasa también el test de red (dos copias del juego):
+
+```bash
+godot --headless --path . res://tests/net_test.tscn -- --role=host --port=7790 &
+godot --headless --path . res://tests/net_test.tscn -- --role=client --port=7790   # "NET CLIENT OK" (y el host "NET HOST OK")
 ```
 
 Si cambias combate o armas y el test falla, arréglalo o actualiza el test en el mismo commit.

@@ -33,6 +33,9 @@ func _ready() -> void:
 
 
 func _begin() -> void:
+	if not player.is_local():
+		animation_player.play(&"wait") # copia remota: solo la pose
+		return
 	_cast()
 
 
@@ -95,6 +98,8 @@ func finish_reel() -> void:
 
 func _process(delta: float) -> void:
 	super(delta)
+	if player == null or not player.is_local():
+		return
 	match state:
 		State.WAITING:
 			_timer -= delta

@@ -25,6 +25,14 @@ var _rows: Dictionary[ItemData, InventoryRow] = {}
 
 func _ready() -> void:
 	if player:
+		set_player(player)
+	materials.visible = false
+
+
+## Engancha el HUD al jugador de este ordenador (lo llama Game cuando aparece).
+func set_player(new_player: Player) -> void:
+	player = new_player
+	if player:
 		player.hotbar_changed.connect(_on_hotbar_changed)
 		_on_hotbar_changed(player.hotbar, player.selected_slot)
 		player.inventory.changed.connect(_on_inventory_changed)

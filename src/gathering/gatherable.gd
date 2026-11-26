@@ -48,6 +48,8 @@ func on_tool_hit(player: Player) -> void:
 	_shake = 0.12
 	_flash = 1.0
 	chips.restart()
+	if not player.is_local():
+		return # en coop, cada jugador farmea en su ordenador
 	_progress += 1
 	if _progress >= hits_to_gather:
 		_progress = 0

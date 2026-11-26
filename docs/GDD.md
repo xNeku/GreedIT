@@ -86,5 +86,7 @@ Técnicamente, talentos, afijos y brebajes son **modificadores que escuchan even
 ## 8. Técnica
 
 - Godot 4.7, GDScript tipado, renderer Compatibility.
-- Multijugador host-cliente con autoridad del host, **pensado desde el principio** (aunque se implemente después).
+- Multijugador host-cliente (ENet), **hecho desde la base**: cada jugador manda sobre su personaje y el host sobre
+  el mundo y los mobs. Ver la sección "Red" de `AGENTS.md`.
+- Personajes en 8 direcciones (5 vistas + volteo), estilo Diablo / Path of Exile.
 - Todo en escenas y recursos editables. Ver `AGENTS.md`.

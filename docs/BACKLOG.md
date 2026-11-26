@@ -49,6 +49,15 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [x] 5 vistas (8 direcciones con el volteo): frente, diagonal abajo, lado, diagonal arriba, espalda
 - [x] Empuñadura real: mano debajo del mango y dedos encima (de espaldas, al revés)
 
+## Hito 0.6: Coop y base de movimiento (hecho)
+
+- [x] Coop de 2 a 4 jugadores: menú (solo / crear partida / unirse por IP), red ENet
+- [x] Todo el juego preparado para red: jugadores, armas, hechizos, mobs, muñecos, botín, recolección
+- [x] Test de red automático (host + cliente en dos procesos)
+- [x] Sprites en 8 direcciones estilo Diablo/PoE: 3/4 de frente, perfil y 3/4 de espaldas dibujados
+- [x] Movimiento más rápido y con respuesta inmediata; carrera con zancada, inclinación y brazos;
+      arrancar, frenar y girar con peso
+
 ## Hito 1: Sensación de combate (siguiente)
 
 - [ ] Ajustar a mano tiempos y poses de cada arma en el editor según feedback de juego
@@ -58,7 +67,8 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [ ] Saltar por encima de obstáculos bajos (capa "low_obstacles" que se ignora en el aire)
 - [ ] Al morir, soltar el saco de materiales con temporizador (ahora solo reapareces)
 - [ ] Mando: apuntado con stick (ya existe `Player.aim_target_override`)
-- [ ] Perfil y diagonales dibujados a mano (ahora son el frente/espalda con ojos y pelo desplazados)
+- [ ] Repasar a mano los sprites de perfil y 3/4 (generados a partir del frente y la espalda)
+- [ ] Vistas 3/4 y perfil para los mobs
 - [ ] Animación de desenfundar/enfundar (ahora es instantáneo)
 
 ## Hito 2: Enemigos y progresión
@@ -76,11 +86,12 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [ ] Vetas de distintos minerales por bioma (ahora solo cobre)
 - [ ] Profesiones con nivel (más rápido / mejor botín al subir)
 
-## Hito 4: Coop
+## Coop (mejoras)
 
-- [ ] Arquitectura host-cliente (MultiplayerSpawner / MultiplayerSynchronizer)
-- [ ] Sincronizar jugador, armas, golpes
-- [ ] Chunks cargados por jugador
+- [ ] Suavizado de la posición de los jugadores/mobs remotos (interpolación) para conexiones con lag
+- [ ] Nombre de jugador y lista de conectados en el HUD
+- [ ] Pesca: que los demás vean la boya y la captura (ahora solo ven la pose)
+- [ ] Chunks del mundo cargados por jugador (cuando exista el mundo generado)
 
 ## Magia (siguiente)
 
