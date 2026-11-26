@@ -11,14 +11,14 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/fx/spark.png" id="14_sparkpng"]
 [ext_resource type="Material" path="res://assets/materials/unshaded.tres" id="15_unshadedtr"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_feet"]
-radius = 9.0
-
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_flash"]
 resource_local_to_scene = true
 shader = ExtResource("4_flashgdsha")
 shader_parameter/flash_color = Color(1, 1, 1, 1)
 shader_parameter/flash_amount = 0.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_feet"]
+radius = 9.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(32, 58)

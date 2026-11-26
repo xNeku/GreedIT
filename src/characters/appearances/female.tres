@@ -47,30 +47,6 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/characters/female/hand_l.png" id="50_handlpng"]
 [ext_resource type="Texture2D" path="res://assets/sprites/characters/female/hand_r.png" id="51_handrpng"]
 
-[sub_resource type="Resource" id="Resource_back"]
-script = ExtResource("2_characterl")
-head = ExtResource("46_headbackpn")
-hair = ExtResource("47_hairbackpn")
-torso = ExtResource("48_torsobackp")
-cloth_top = ExtResource("7_clothtoppn")
-cloth_bottom = ExtResource("8_clothbotto")
-leg_l = ExtResource("9_leglpng")
-leg_r = ExtResource("10_legrpng")
-boot_l = ExtResource("11_bootlpng")
-boot_r = ExtResource("12_bootrpng")
-
-[sub_resource type="Resource" id="Resource_back_side"]
-script = ExtResource("2_characterl")
-head = ExtResource("36_headpng")
-hair = ExtResource("37_hairpng")
-torso = ExtResource("38_torsopng")
-cloth_top = ExtResource("39_clothtoppn")
-cloth_bottom = ExtResource("40_clothbotto")
-leg_l = ExtResource("41_leglpng")
-leg_r = ExtResource("42_legrpng")
-boot_l = ExtResource("43_bootlpng")
-boot_r = ExtResource("44_bootrpng")
-
 [sub_resource type="Resource" id="Resource_front"]
 script = ExtResource("2_characterl")
 head = ExtResource("3_headpng")
@@ -109,6 +85,30 @@ leg_l = ExtResource("31_leglpng")
 leg_r = ExtResource("32_legrpng")
 boot_l = ExtResource("33_bootlpng")
 boot_r = ExtResource("34_bootrpng")
+
+[sub_resource type="Resource" id="Resource_back_side"]
+script = ExtResource("2_characterl")
+head = ExtResource("36_headpng")
+hair = ExtResource("37_hairpng")
+torso = ExtResource("38_torsopng")
+cloth_top = ExtResource("39_clothtoppn")
+cloth_bottom = ExtResource("40_clothbotto")
+leg_l = ExtResource("41_leglpng")
+leg_r = ExtResource("42_legrpng")
+boot_l = ExtResource("43_bootlpng")
+boot_r = ExtResource("44_bootrpng")
+
+[sub_resource type="Resource" id="Resource_back"]
+script = ExtResource("2_characterl")
+head = ExtResource("46_headbackpn")
+hair = ExtResource("47_hairbackpn")
+torso = ExtResource("48_torsobackp")
+cloth_top = ExtResource("7_clothtoppn")
+cloth_bottom = ExtResource("8_clothbotto")
+leg_l = ExtResource("9_leglpng")
+leg_r = ExtResource("10_legrpng")
+boot_l = ExtResource("11_bootlpng")
+boot_r = ExtResource("12_bootrpng")
 
 [resource]
 script = ExtResource("1_charactera")

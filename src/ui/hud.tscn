@@ -274,10 +274,5 @@ modulate = Color(1, 1, 1, 0.85)
 theme_override_colors/font_outline_color = Color(0.09, 0.05, 0.07, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 10
-text = "WASD mover · Ratón apuntar
-Clic izq: pulsa = combo · mantén = carga / ráfaga
-Clic der: ataque especial
-Espacio: salto hacia donde corres (ataca en el aire = caída en picado)
-Clic rueda: bola de fuego · E: minar / recolectar / pescar · Shift: dash
-1-6 / girar rueda: arma · C: personaje · F11: pantalla completa · Esc: salir al menú"
+text = "WASD mover · Ratón apuntar\nClic izq: pulsa = combo · mantén = carga / ráfaga\nClic der: ataque especial\nEspacio: salto hacia donde corres (ataca en el aire = caída en picado)\nClic rueda: bola de fuego · E: minar / recolectar / pescar · Shift: dash\n1-6 / girar rueda: arma · C: personaje · F11: pantalla completa · Esc: salir al menú"
 vertical_alignment = 2

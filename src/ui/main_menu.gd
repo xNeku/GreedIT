@@ -15,6 +15,8 @@ func _ready() -> void:
 	%Solo.pressed.connect(func() -> void: _play(Net.Mode.SOLO))
 	%Host.pressed.connect(func() -> void: _play(Net.Mode.HOST))
 	%Join.pressed.connect(func() -> void: _play(Net.Mode.JOIN))
+	%ProtoA.pressed.connect(func() -> void: get_tree().change_scene_to_file("res://prototypes/proto_a/proto_a.tscn"))
+	%ProtoB.pressed.connect(func() -> void: get_tree().change_scene_to_file("res://prototypes/proto_b/proto_b.tscn"))
 	%Solo.grab_focus()
 
 

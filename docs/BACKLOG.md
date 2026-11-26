@@ -58,6 +58,12 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [x] Movimiento más rápido y con respuesta inmediata; carrera con zancada, inclinación y brazos;
       arrancar, frenar y girar con peso
 
+## Decisión pendiente: personaje 2D o 3D
+
+- [x] Prototipo A: personaje 3D (vóxeles generados desde los sprites) horneado a sprites en 8 direcciones
+- [x] Prototipo B: el mismo personaje en un mundo 3D real (giro libre, luces y sombras 3D)
+- [ ] Elegir camino (2D por capas / A / B) y migrar el personaje, armas y mobs
+
 ## Hito 1: Sensación de combate (siguiente)
 
 - [ ] Ajustar a mano tiempos y poses de cada arma en el editor según feedback de juego

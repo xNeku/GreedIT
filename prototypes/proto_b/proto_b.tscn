@@ -1,0 +1,283 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://prototypes/proto_common.gd" id="1_protocommo"]
+[ext_resource type="Texture2D" path="res://assets/sprites/world/floor_stone.png" id="3_floorstone"]
+[ext_resource type="Script" path="res://prototypes/proto_b/flicker_light_3d.gd" id="11_flickerlig"]
+[ext_resource type="Script" path="res://prototypes/proto_b/proto_b_player.gd" id="15_protobplay"]
+[ext_resource type="PackedScene" path="res://prototypes/model3d/character_3d.tscn" id="16_character3"]
+[ext_resource type="Material" path="res://prototypes/model3d/voxel_material_outline.tres" id="18_voxelmater"]
+[ext_resource type="Script" path="res://prototypes/proto_b/proto_b_dummy.gd" id="19_protobdumm"]
+[ext_resource type="PackedScene" path="res://prototypes/proto_b/damage_label_3d.tscn" id="20_damagelabe"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/dummy_stand.png" id="22_dummystand"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/dummy_body.png" id="23_dummybodyp"]
+[ext_resource type="Script" path="res://prototypes/proto_b/proto_b_camera.gd" id="24_protobcame"]
+
+[sub_resource type="Environment" id="Environment_env"]
+background_mode = 1
+background_color = Color(0.05, 0.045, 0.06, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.42, 0.42, 0.55, 1)
+ambient_light_energy = 0.45
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
+diffuse_mode = 3
+specular_mode = 2
+albedo_texture = ExtResource("3_floorstone")
+uv1_scale = Vector3(18.75, 18.75, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_stone"]
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.62, 0.6, 0.64, 1)
+albedo_texture = ExtResource("3_floorstone")
+uv1_scale = Vector3(2, 1, 1)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_iron"]
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.3, 0.3, 0.35, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ember"]
+shading_mode = 0
+albedo_color = Color(1, 0.6, 0.25, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_floor"]
+size = Vector2(1200, 1200)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_pillar"]
+top_radius = 12.0
+bottom_radius = 13.0
+height = 56.0
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_pillar"]
+radius = 12.0
+height = 56.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_bowl"]
+top_radius = 9.0
+bottom_radius = 5.0
+height = 6.0
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_leg"]
+top_radius = 1.5
+bottom_radius = 1.5
+height = 14.0
+radial_segments = 4
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_coal"]
+radius = 6.0
+height = 5.0
+radial_segments = 8
+rings = 3
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
+radius = 7.0
+height = 30.0
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_dummy"]
+radius = 9.0
+height = 40.0
+
+[node name="ProtoB" type="Node3D"]
+script = ExtResource("1_protocommo")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_env")
+
+[node name="Moon" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-55, 25, 0)
+position = Vector3(0, 200, 0)
+light_color = Color(0.9, 0.88, 0.95, 1)
+light_energy = 0.8
+shadow_enabled = true
+
+[node name="Floor" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_floor")
+material_override = SubResource("StandardMaterial3D_floor")
+
+[node name="Pillar1" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -240, 28, -120)
+
+[node name="Mesh" type="MeshInstance3D" parent="Pillar1"]
+mesh = SubResource("CylinderMesh_pillar")
+material_override = SubResource("StandardMaterial3D_stone")
+
+[node name="Shape" type="CollisionShape3D" parent="Pillar1"]
+shape = SubResource("CylinderShape3D_pillar")
+
+[node name="Pillar2" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 240, 28, -120)
+
+[node name="Mesh" type="MeshInstance3D" parent="Pillar2"]
+mesh = SubResource("CylinderMesh_pillar")
+material_override = SubResource("StandardMaterial3D_stone")
+
+[node name="Shape" type="CollisionShape3D" parent="Pillar2"]
+shape = SubResource("CylinderShape3D_pillar")
+
+[node name="Pillar3" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -240, 28, 200)
+
+[node name="Mesh" type="MeshInstance3D" parent="Pillar3"]
+mesh = SubResource("CylinderMesh_pillar")
+material_override = SubResource("StandardMaterial3D_stone")
+
+[node name="Shape" type="CollisionShape3D" parent="Pillar3"]
+shape = SubResource("CylinderShape3D_pillar")
+
+[node name="Pillar4" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 240, 28, 200)
+
+[node name="Mesh" type="MeshInstance3D" parent="Pillar4"]
+mesh = SubResource("CylinderMesh_pillar")
+material_override = SubResource("StandardMaterial3D_stone")
+
+[node name="Shape" type="CollisionShape3D" parent="Pillar4"]
+shape = SubResource("CylinderShape3D_pillar")
+
+[node name="Brazier1" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -120, 0, -120)
+
+[node name="Leg" type="MeshInstance3D" parent="Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+mesh = SubResource("CylinderMesh_leg")
+material_override = SubResource("StandardMaterial3D_iron")
+
+[node name="Bowl" type="MeshInstance3D" parent="Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, 0)
+mesh = SubResource("CylinderMesh_bowl")
+material_override = SubResource("StandardMaterial3D_iron")
+
+[node name="Coal" type="MeshInstance3D" parent="Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 18, 0)
+mesh = SubResource("SphereMesh_coal")
+material_override = SubResource("StandardMaterial3D_ember")
+
+[node name="Light" type="OmniLight3D" parent="Brazier1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 30, 0)
+light_color = Color(1, 0.6, 0.3, 1)
+light_energy = 7.0
+shadow_enabled = true
+omni_range = 170.0
+omni_attenuation = 0.8
+script = ExtResource("11_flickerlig")
+
+[node name="Brazier2" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 150, 0, 120)
+
+[node name="Leg" type="MeshInstance3D" parent="Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+mesh = SubResource("CylinderMesh_leg")
+material_override = SubResource("StandardMaterial3D_iron")
+
+[node name="Bowl" type="MeshInstance3D" parent="Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, 0)
+mesh = SubResource("CylinderMesh_bowl")
+material_override = SubResource("StandardMaterial3D_iron")
+
+[node name="Coal" type="MeshInstance3D" parent="Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 18, 0)
+mesh = SubResource("SphereMesh_coal")
+material_override = SubResource("StandardMaterial3D_ember")
+
+[node name="Light" type="OmniLight3D" parent="Brazier2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 30, 0)
+light_color = Color(1, 0.6, 0.3, 1)
+light_energy = 7.0
+shadow_enabled = true
+omni_range = 170.0
+omni_attenuation = 0.8
+script = ExtResource("11_flickerlig")
+
+[node name="Player" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 80)
+motion_mode = 1
+script = ExtResource("15_protobplay")
+
+[node name="Shape" type="CollisionShape3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, 0)
+shape = SubResource("CapsuleShape3D_player")
+
+[node name="Character3D" parent="Player" instance=ExtResource("16_character3")]
+material = ExtResource("18_voxelmater")
+
+[node name="Dummy1" type="StaticBody3D" parent="." groups=["proto_dummy"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -30)
+script = ExtResource("19_protobdumm")
+number_scene = ExtResource("20_damagelabe")
+
+[node name="Shape" type="CollisionShape3D" parent="Dummy1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 20, 0)
+shape = SubResource("CylinderShape3D_dummy")
+
+[node name="Stand" type="Sprite3D" parent="Dummy1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+pixel_size = 1.0
+texture_filter = 0
+alpha_cut = 1
+texture = ExtResource("22_dummystand")
+
+[node name="Pivot" type="Node3D" parent="Dummy1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 0)
+
+[node name="Body" type="Sprite3D" parent="Dummy1/Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 33, 0)
+pixel_size = 1.0
+texture_filter = 0
+alpha_cut = 1
+texture = ExtResource("23_dummybodyp")
+
+[node name="Dummy2" type="StaticBody3D" parent="." groups=["proto_dummy"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -150, 0, 40)
+script = ExtResource("19_protobdumm")
+number_scene = ExtResource("20_damagelabe")
+
+[node name="Shape" type="CollisionShape3D" parent="Dummy2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 20, 0)
+shape = SubResource("CylinderShape3D_dummy")
+
+[node name="Stand" type="Sprite3D" parent="Dummy2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+pixel_size = 1.0
+texture_filter = 0
+alpha_cut = 1
+texture = ExtResource("22_dummystand")
+
+[node name="Pivot" type="Node3D" parent="Dummy2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 0)
+
+[node name="Body" type="Sprite3D" parent="Dummy2/Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 33, 0)
+pixel_size = 1.0
+texture_filter = 0
+alpha_cut = 1
+texture = ExtResource("23_dummybodyp")
+
+[node name="Camera" type="Camera3D" parent="." node_paths=PackedStringArray("target")]
+transform = Transform3D(1, 0, 0, 0, 0.866, 0.5, 0, -0.5, 0.866, 0, 300, 600)
+projection = 1
+size = 540.0
+near = 1.0
+far = 3000.0
+current = true
+script = ExtResource("24_protobcame")
+target = NodePath("../Player")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Info" type="Label" parent="HUD"]
+offset_left = 10.0
+offset_top = 8.0
+offset_right = 600.0
+offset_bottom = 60.0
+theme_override_colors/font_outline_color = Color(0.09, 0.05, 0.07, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 12
+text = "PROTOTIPO B · 3D real con filtro pixel art (giro libre, luces y sombras 3D)\nWASD mover · Clic izq: atacar · Esc: menú"

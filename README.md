@@ -11,6 +11,15 @@ Farmear, forjar, hacerte una build bestia y tumbar bosses con tus colegas.
 2. Abre Godot → *Importar* → selecciona `project.godot` de esta carpeta.
 3. Pulsa **F5**. Sale el menú: **Jugar solo**, **Crear partida** o **Unirse**.
 
+## Prototipos de personaje 3D
+
+En el menú, **Prototipos de personaje 3D** abre dos pruebas con el personaje convertido a 3D (calvo):
+
+- **A: 3D → sprites**: el personaje 3D renderizado a hojas de sprites en 8 direcciones, dentro del mundo 2D actual.
+- **B: 3D real**: el mismo personaje en un mundo 3D con cámara ortográfica, luces y sombras 3D y giro libre.
+
+En ambos: WASD para moverse, clic izquierdo para atacar y Esc para volver al menú.
+
 ## Jugar con amigos (coop)
 
 1. Uno pulsa **Crear partida** (puerto 7777 por defecto).

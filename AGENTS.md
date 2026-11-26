@@ -38,7 +38,9 @@ src/
                         y training_dummy/
   world/                Game (arranca la red y crea jugadores), escenas de mundo/niveles y props
   ui/                   menú principal, HUD, hotbar, panel de materiales, cartel "E", textos flotantes
-tests/                  test de humo (un jugador) y test de red (host + cliente), en headless
+tests/                  test de humo (un jugador), test de red (host + cliente) y test de prototipos
+prototypes/             EXPERIMENTOS (personaje 3D): A = 3D horneado a sprites, B = 3D real. No forman parte del juego.
+tools/baker/            herramientas para generar el personaje 3D y hornearlo a sprites (ver su README)
 docs/                   GDD y backlog
 ```
 

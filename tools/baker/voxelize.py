@@ -129,19 +129,39 @@ def write_gltf(path,pos,col,idx,origin=(0,0,0)):
          {"bufferView":3,"componentType":5125,"count":len(idx),"type":"SCALAR"}]}
     with open(path,'w') as f: json.dump(g,f)
 
-def build(g):
+SKIN=[(215,148,110),(211,139,102),(183,112,81)]
+def skull(cx=26.0,cy=15.0,rx=10.5,ry=10.0):
+    """Cráneo calvo: óvalo de piel con luz arriba a la izquierda."""
+    o=np.zeros((H,W,4),np.uint8)
+    for y in range(H):
+        for x in range(W):
+            dx=(x+0.5-cx)/rx; dy=(y+0.5-cy)/ry
+            if dx*dx+dy*dy<=1:
+                t=0 if (dx+dy)<-0.6 else (2 if (dx+dy)>0.7 else 1)
+                o[y,x]=(*SKIN[t],255)
+    return o
+
+def build(g, bald=True):
     os.makedirs(f'{OUTDIR}/{g}',exist_ok=True)
     F=lambda n: load(f'{g}/{n}'); S=lambda n: load(f'{g}/side/{n}'); B=lambda n,alt=None: load(f'{g}/{alt or n}')
     eyes_f=F('eyes'); eyes_s=S('eyes')
+    if bald:
+        head_parts=(over(skull(),F('head'),eyes_f), over(S('head'),eyes_s), over(skull(),B('head','head_back')), (0,44,0))
+    else:
+        head_parts=(over(F('head'),eyes_f), over(S('head'),eyes_s), B('head','head_back'), (0,44,0))
     parts={
       # nombre: (frente, perfil, espalda, pivote)
-      'head':  (over(F('head'),eyes_f), over(S('head'),eyes_s), B('head','head_back'), (0,44,0)),
+      'head':  head_parts,
       'hair':  (F('hair'), S('hair'), B('hair','hair_back'), (0,44,0)),
       'torso': (over(F('torso'),F('cloth_top')), over(S('torso'),S('cloth_top')), over(B('torso','torso_back'),F('cloth_top')), (0,30,0)),
       'cloth': (F('cloth_bottom'), S('cloth_bottom'), F('cloth_bottom'), (0,24,0)),
       'leg_l': (over(F('leg_l'),F('boot_l')), over(S('leg_l'),S('boot_l')), over(F('leg_r'),F('boot_r')), (-5,22,0)),
       'leg_r': (over(F('leg_r'),F('boot_r')), over(S('leg_r'),S('boot_r')), over(F('leg_l'),F('boot_l')), (5,22,0)),
     }
+    if bald:
+        del parts['hair']
+        p=f'{OUTDIR}/{g}/hair.gltf'
+        if os.path.exists(p): os.remove(p)
     info={}
     for name,(fr,sd,bk,pivot) in parts.items():
         keep=(eyes_f[...,3]>0) if name=='head' else None
@@ -173,8 +193,6 @@ def build(g):
         write_gltf(f'{OUTDIR}/{g}/{side_name}.gltf',pos,col,idx,origin=(0,cy,0))
         info[side_name]={'voxels':int(vox.sum())}
     return info
-if __name__=='__main__':
-    print(build('male'))
 
 def extrude(img, depth):
     """Vóxeles de un sprite plano (armas): la imagen en el plano XY con `depth` de grosor."""
@@ -252,3 +270,8 @@ def strip_outline_any(img):
             yy,xx=y+dy,x+dx
             if 0<=yy<h and 0<=xx<w and a[yy,xx] and not dark[yy,xx]: o[y,x]=img[yy,xx]; break
     return o
+
+
+if __name__=='__main__':
+    print(build('male', bald=True))
+    build_extras('male')
