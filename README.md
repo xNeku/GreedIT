@@ -62,5 +62,6 @@ godot --headless --path . res://tests/net_test.tscn -- --role=client --port=7795
 ## Créditos
 
 - Personajes modulares y animaciones: [Quaternius](https://quaternius.com) (CC0).
+- Entorno (árboles, rocas, montañas...): ["LowPoly Environment Pack"](https://k0rveen.itch.io/lowpoly-environment-pack) por k0rveen ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)).
 - Armas y animaciones de armas: [KayKit](https://kaylousberg.com) por Kay Lousberg (CC0).
   Ver `assets/models/*/LICENSE.txt`.

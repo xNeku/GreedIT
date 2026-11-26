@@ -124,7 +124,7 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 
 ## Siguiente
 
-- [ ] Confirmar la licencia del pack de entorno (assets/models/lowpoly_environment)
+- [ ] Pantalla de créditos en el juego (el pack de entorno es CC BY 4.0: hay que citar a k0rveen)
 - [ ] Reloj o indicador de la hora (si el dueño lo quiere)
 - [ ] Ajustar a mano el agarre de cada arma (GripR) y animaciones propias
 - [ ] Números de daño en el HUD (nítidos) en vez de Label3D pixelado
