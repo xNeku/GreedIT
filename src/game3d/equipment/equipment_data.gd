@@ -9,7 +9,8 @@ extends ItemData
 ##    Sus mallas se "visten" sobre el esqueleto del personaje y se deforman con él: encaja en cualquier animación.
 
 ## OUTFIT = conjunto de ropa entero (cuerpo, brazos, piernas, botas) de los personajes modulares.
-enum Slot { MAIN_HAND, OFF_HAND, HEAD, BACK, CHEST, OUTFIT }
+## BODY / FACE / HAIR / BEARD = el cuerpo base, ojos y cejas, pelo y barba (también son "equipo": se cambian igual).
+enum Slot { MAIN_HAND, OFF_HAND, HEAD, BACK, CHEST, OUTFIT, BODY, FACE, HAIR, BEARD }
 
 @export var slot: Slot = Slot.MAIN_HAND
 @export var builtin_node := ""
@@ -20,5 +21,7 @@ enum Slot { MAIN_HAND, OFF_HAND, HEAD, BACK, CHEST, OUTFIT }
 ## Partes del cuerpo que esta pieza tapa y se ocultan: "head", "body", "arm_l", "arm_r", "leg_l", "leg_r"
 ## (ver `Avatar3D.body_parts`). P. ej. un peto tapa "body".
 @export var hides_body_parts: PackedStringArray = []
+## Material que se pone a todas sus mallas (p. ej. el cuerpo base algo encogido para que no asome por la ropa).
+@export var material_override: Material
 @export var position_offset := Vector3.ZERO
 @export var rotation_offset_degrees := Vector3.ZERO

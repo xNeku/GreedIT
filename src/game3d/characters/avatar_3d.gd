@@ -196,6 +196,8 @@ func _dress_skinned(item: EquipmentData) -> Array:
 		mesh.transform = Transform3D.IDENTITY
 		mesh.skeleton = mesh.get_path_to(skeleton)
 		mesh.visible = true
+		if item.material_override:
+			mesh.material_override = item.material_override
 		dressed.append(mesh)
 	source.free()
 	return dressed

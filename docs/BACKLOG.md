@@ -106,7 +106,8 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 
 ## Hito 3D.1: Pasar el juego al 3D (siguiente)
 
-- [ ] Cabezas de verdad: Quaternius "Universal Base Characters" (CC0) en vez del maniquí calvo
+- [x] Cabezas de verdad: Universal Base Characters (CC0): cuerpo (solo cabeza visible), ojos, cejas, pelo y barba
+- [ ] Elegir pelo, barba y color de piel/pelo en el menú (los .tres ya existen: hair_parted, hair_buzzed, hair_long, beard)
 - [ ] Ajustar a mano el agarre de cada arma en el explorador (GripR) y animaciones propias de espada/arco
 - [ ] Versión femenina (necesita su propio esqueleto/maniquí)
 

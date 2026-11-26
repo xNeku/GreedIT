@@ -223,8 +223,10 @@ Mismas reglas que todo lo demás (escenas reales, datos en `.tres`, red coop). L
     `get_global_transform_interpolated()` y tiene la interpolación apagada (se mueve en `_process`).
 - **Personajes principales** (explorador, campesino): esqueleto de Quaternius (estilo Unreal) **retargeteado** al
   humanoide de Godot (`assets/models/retarget/`). La escena es la Universal Animation Library (`UAL1_Standard.glb`:
-  maniquí + esqueleto + 43 animaciones) con la ropa como equipo de serie (`default_items`: `OUTFIT` y la capucha en
-  `HEAD`). Las animaciones de armas vienen de KayKit (`KayKit_Animations.glb`, retargeteado igual) vía
+  esqueleto + 43 animaciones; su maniquí va oculto) con todo lo demás como equipo de serie (`default_items`):
+  `BODY` (cuerpo de Universal Base Characters; su shader `body_head_only` solo dibuja cuello y cabeza, lo demás lo
+  tapa la ropa), `FACE` (ojos y cejas), `HAIR`, `BEARD`, `OUTFIT` (ropa) y `HEAD` (capucha, que oculta el pelo).
+  Para cambiar pelo, barba o ropa basta con cambiar ese `.tres` en el inspector del personaje. Las animaciones de armas vienen de KayKit (`KayKit_Animations.glb`, retargeteado igual) vía
   `extra_animation_sources`, y `clip_aliases` cambia la carrera/esquiva/golpe por las de Quaternius.
   Las armas se pegan a `HandR/GripR` y `HandL/GripL` (BoneAttachment3D + Node3D): se colocan a mano en el editor.
 - **Proporciones**: `BoneScaleModifier` (hijo del `Skeleton3D`) escala huesos encima de las animaciones; en los
@@ -264,6 +266,7 @@ Huesos que usa el código (`Avatar3D.slot_bones`, nombres de KayKit / del humano
 | HEAD | `head` / `Head` | casco, sombrero, capucha |
 | BACK / CHEST | `chest` / `UpperChest` | capa / piezas rígidas del pecho |
 | OUTFIT | (con esqueleto) | conjunto de ropa entero de los personajes modulares |
+| BODY / FACE / HAIR / BEARD | (con esqueleto) | cuerpo base, ojos y cejas, pelo y barba |
 
 Tres tipos de pieza (`EquipmentData`):
 
