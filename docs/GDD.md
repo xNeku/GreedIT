@@ -40,13 +40,23 @@ Pilares:
 - Aparte de eso no hay habilidades activas: todo sale de las armas y lo que las modifica.
 
 ### Armas (diseño del dueño)
-Familias: **daga, maza, espada, vara (bō), arco, armas de fuego, puños y escudo**. Cada una tendrá evoluciones y
+Familias: **daga, maza, espada (y mandoble), hacha, vara (bō), arco, armas de fuego, puños y escudo**. Cada una tendrá evoluciones y
 variantes, y algunas se podrán combinar.
 - **Se usan por manos y por clic**:
   - Dos armas distintas (p. ej. daga + escudo): cada clic usa el arma de su mano.
   - Un arma sola o dos del mismo tipo: el clic izquierdo **alterna** los ataques (izquierda/derecha) y el
     **clic derecho es un especial propio** de ese arma.
 - **No hacen falta atributos para llevar un arma**: cualquiera lleva lo que le dé la gana.
+- **Todo empieza a una mano.** Al avanzar se desbloquea llevarla a **dos manos** o llevar **una en cada mano**
+  (cada opción cambia el moveset). Algunas armas no lo permiten todo:
+  - **Arco**: de una mano al principio; luego dos estilos: **arco gigante** (dos manos) o **arco + daga/hacha**.
+  - **Vara**: empieza a una mano y luego se transforma en dos manos (con la vara no llevas nada más).
+  - **Maza**: una en cada mano o a dos manos.
+  - **Espada**: su evolución es el **mandoble** (espada a dos manos).
+  - **Hacha** (familia propia): a dos manos, una en cada mano, o con arco o escudo en la otra.
+  - **Escudo**: de una mano (clic = empujar; mantener = posición de defensa) y de dos manos.
+- **Maestría por familia**: toda daga suma a "daga". Algunas armas concretas piden una habilidad para cogerlas,
+  pero siguen siendo de su familia y dan su maestría.
 - **Maestría por arma**: al usarla ganas maestría, que desbloquea cosas dentro de esa arma y te deja escoger en
   **su propia rama**. Ejemplos:
   - Daga: lanzarla, dashear con los golpes, velocidad de ataque, desangrar.
