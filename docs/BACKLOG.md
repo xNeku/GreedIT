@@ -158,8 +158,16 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [ ] XP y subida de nivel
 - [ ] Primer boss
 
-## Hito 3: Mundo
+## Hito 3: Mundo (diseño en GDD §2)
 
+- [~] (Claude) **World Lab** (https://claude.ai/artifact/N2H9aTAHKYeqoNqyyE3R6k): prototipo 2D de la forma de los tres
+  mundos (biomas con pesos, cordilleras con pasos, sitios, caminos, zonas de dificultad). Esperando la receta del dueño.
+- [ ] Pasar el generador del World Lab a Godot (mismo resultado con la misma semilla) y cargar el mundo por trozos
+- [ ] Suelos por bioma (hierba, arena, caminos...): buscar recursos para Godot y que el dueño elija
+- [ ] Estructuras hechas a mano (escenas) que coloca el generador
+- [ ] Dungeons por pisos con salas hechas a mano, pantalla de carga al entrar, se regeneran al cambiar de dificultad
+- [ ] Guardado del mundo (persistente) y de lo que cambia (cofres, vetas, bosses muertos)
+- [ ] Piedra del primer boss: canalizarla te devuelve a la base
 - [ ] Generación por semilla con `FastNoiseLite` por chunks
 - [ ] Bioma bosque + cueva
 - [ ] Punto de spawn (cofre infinito, hamaca) y área de estaciones
