@@ -15,17 +15,53 @@ Pilares:
 3. **Progresión larga por bosses**: cada boss desbloquea materiales, equipo y eventos.
 4. **Profesiones que se fusionan**: minería, pesca, alquimia y cocina alimentan la forja y los brebajes.
 
-## 2. Mundo
+## 2. Mundo (diseño del dueño)
 
-- Mapa **continuo** tipo Terraria pero top-down, generado por **semilla**, cargado por chunks.
-- No hay base libre: hay **puntos de spawn** (cofre infinito + hamaca entre dos árboles). Las estaciones
-  (mesa de trabajo, yunque...) solo se colocan en el área pequeña de esos puntos.
-- Tres capas, cada una un mapa continuo propio:
-  1. **Overworld**: biomas de nieve, desierto, bosque y montaña, con cuevas y dungeons. Los bosses van
-     cambiando qué minerales aparecen y qué eventos ocurren. Tras el último boss se abre un **pozo-portal** al infierno.
-  2. **Infierno**: vacío, lleno de bestias, dungeons y bosses. Pura guerra, pocas zonas tranquilas, recursos propios.
-  3. **Cielo**: tras el infierno, un evento trae una legión de ángeles; al matarlos aparece un **haz de luz** que te sube.
-     Zona limpia y bonita, catedrales como dungeons, ángeles y clérigos como enemigos.
+### Tres mundos persistentes
+- **Mundo normal, infierno y cielo**: tres mapas grandes, cada uno continuo, generados por **semilla** y
+  **persistentes** (creas tu mundo, se guarda y vuelves a él, como Terraria / Valheim).
+- Tamaño: cruzar el mundo normal de punta a punta **andando lleva unos 20 minutos** (unos 8 km). Se carga por trozos
+  alrededor de cada jugador.
+- **Se va a pata.** No hay viaje rápido: más adelante el equipo dará velocidad. La única ayuda: una **piedra que
+  suelta el primer boss** que, canalizándola, te devuelve a la base.
+- Casi todo el mapa es zona de pelea constante, rollo Diablo 2 / 4. Las **zonas neutrales son muy pocas** y humildes
+  (una tienda de campaña y un paisano sentado con el que hablar; ni siquiera un poblado).
+
+### Generación (estilo Diablo 2: estructurada, no "cosas al azar")
+1. **Biomas** del mundo normal: bosque y desierto (los más grandes, la base del mapa), jungla, montaña y nieve. Se
+   reparten "a lo loco" pero con reglas de tamaño, y los bordes se deforman con ruido.
+2. **Montañas** que dividen zonas y obligan a rodear; en ellas hay **puertas a dungeons** y demás.
+3. **Sitios** colocados con reglas de distancia: entradas de dungeon, minas, cuevas, portales, campamentos
+   neutrales, eventos, élites, guaridas de boss. La dificultad sube al alejarse del inicio.
+4. **Detalle**: relieve suave (sin montañitas por todas partes), vegetación por bioma y **estructuras hechas a mano**
+   (escenas que diseña el dueño) que el generador coloca. Suelo sencillo pero bonito: buscar recursos de hierba,
+   arena, caminos... para Godot.
+5. El mismo generador vale para el infierno y el cielo, con sus propios biomas y reglas.
+- Técnica: cada jugador genera el mismo mundo a partir de la semilla; por red solo va lo que cambia (bichos, botín,
+  cofres, vetas picadas). Prototipo de la forma del mapa en el **World Lab** (artefacto).
+
+### Dungeons, minas y cuevas
+- Repartidas por el mapa; hay que **explorar** para encontrarlas. Al entrar hay **pantalla de carga**.
+- Plantas autogeneradas con **bastantes pisos y estancias** (salas hechas a mano que el generador encadena).
+- Dentro: minar, matar y lootear. Al fondo puede haber un **iniciador de boss**, una **cadena hacia un boss**, un
+  **boss**, un **élite** o un **evento de oleadas**.
+- **Minería**: vetas que se agotan.
+- En la trama principal, las dungeons **se regeneran en cada cambio de dificultad**.
+
+### Trama principal: tres etapas
+1. **Pacífica** (comienzo): matas 3-4 bosses principales del mundo normal. Mientras, puedes encontrar la **bajada al
+   infierno**: un **pozo de lava escondido** en alguna zona. Para abrirlo hay que superar un reto: matar muchísimos
+   bichos que van apareciendo en esa zona. Nada más bajar está casi el primer boss del infierno; **matarlo empieza la
+   segunda etapa**.
+2. **Infierno**: muchos bosses, exploras los dos mundos. Cada cambio de dificultad saca un par de bosses más en el
+   mundo normal, sube la dificultad y cambian los eventos (como en Terraria).
+3. **Cielo**: al matar al **boss final del infierno** cambia la dificultad y sale un boss más en el mundo normal, el
+   **guardián del cielo**. Al matarlo baja un **haz de luz** del cielo: si te metes, subes. Además, todos los bosses
+   del mundo normal que ya existían **vuelven mejorados**.
+
+### Endgame (después del lanzamiento, si el juego triunfa)
+- Una **torre por plantas** que se renueva cada semana, la misma para todos los jugadores del mundo, con raids y demás.
+- Prioridad ahora: pulir la trama principal.
 
 ## 3. Combate
 
