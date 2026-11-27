@@ -40,6 +40,7 @@ assets/                 arte (solo datos, sin lógica)
     retarget/           mapas de huesos para compartir animaciones entre esqueletos (ver su README)
     pixel_look_import.gd  script de importación de todos los modelos (estilo del juego)
   materials/            world_lit.gdshader: el material de todo el juego
+  vfx/binbun/           efectos de BinbunVFX (CC0, de prueba): fuego, rayo y estados (ver assets/vfx/README.md)
   ui/icons/             iconos de objetos (barra de 8 huecos)
 src/
   autoload/             Events (bus de señales), GameFeel (hitstop, pantalla completa), Net (solo / host / unirse)
