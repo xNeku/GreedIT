@@ -26,6 +26,16 @@ body_parts = {
 }
 looping_clips = PackedStringArray("Idle", "Jog_Fwd", "Walk", "Sprint", "Sword_Idle", "Spell_Simple_Idle", "Crouch_Idle", "Running_A", "Jump_Idle", "2H_Melee_Idle", "Unarmed_Idle", "2H_Ranged_Aiming")
 extra_animation_sources = Array[PackedScene]([ExtResource("6_kaykitanim")])
+animation_bone_remap = {
+"hand.l": "LeftHand",
+"hand.r": "RightHand",
+"handslot.l": "WeaponL",
+"handslot.r": "WeaponR"
+}
+extra_bones = {
+"WeaponL": ["LeftHand", Transform3D(0, -1, 0, -1, 0, 0, 0, 0, -1, 0, 0.085, 0.03)],
+"WeaponR": ["RightHand", Transform3D(0, 1, 0, 1, 0, 0, 0, 0, -1, 0, 0.085, 0.03)]
+}
 clip_aliases = {
 "Running_A": "Jog_Fwd",
 "Dodge_Forward": "Roll",
@@ -35,16 +45,16 @@ clip_aliases = {
 [node name="Model" parent="." instance=ExtResource("7_ual1standa")]
 
 [node name="HandR" type="BoneAttachment3D" parent="Model/Armature/GeneralSkeleton"]
-bone_name = "RightHand"
+bone_name = "WeaponR"
 
 [node name="GripR" type="Node3D" parent="Model/Armature/GeneralSkeleton/HandR"]
-transform = Transform3D(0, 0.75, 0, 0.75, 0, 0, 0, 0, -0.75, 0, 0.085, 0.03)
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 0, 0, 0)
 
 [node name="HandL" type="BoneAttachment3D" parent="Model/Armature/GeneralSkeleton"]
-bone_name = "LeftHand"
+bone_name = "WeaponL"
 
 [node name="GripL" type="Node3D" parent="Model/Armature/GeneralSkeleton/HandL"]
-transform = Transform3D(0, -0.75, 0, -0.75, 0, 0, 0, 0, -0.75, 0, 0.085, 0.03)
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 0, 0, 0)
 
 [node name="Mannequin" parent="Model/Armature/GeneralSkeleton"]
 visible = false

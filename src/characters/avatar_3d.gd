@@ -33,6 +33,12 @@ extends Node3D
 @export var extra_animation_sources: Array[PackedScene] = []
 ## Nombre que pide el juego -> animación de este modelo.
 @export var clip_aliases := {}
+## Huesos de las animaciones de `extra_animation_sources` que en nuestro esqueleto se llaman distinto
+## (p. ej. KayKit gira la muñeca con "hand.r", que en el nuestro es "RightHand").
+@export var animation_bone_remap := {}
+## Huesos que añadimos al esqueleto: nombre -> [hueso padre, reposo (Transform3D)]. Sirven para el arma: KayKit
+## gira el arma dentro de la mano al atacar (su hueso "handslot"), y eso llega a nuestro "WeaponR"/"WeaponL".
+@export var extra_bones := {}
 
 var skeleton: Skeleton3D
 var animation_player: AnimationPlayer
@@ -45,12 +51,30 @@ var _slots := {}
 func _ready() -> void:
 	skeleton = model.find_children("*", "Skeleton3D", true, false)[0] as Skeleton3D
 	animation_player = model.find_children("*", "AnimationPlayer", true, false)[0] as AnimationPlayer
+	_add_extra_bones()
 	_merge_animations()
 	for clip in looping_clips:
 		if animation_player.has_animation(clip):
 			animation_player.get_animation(clip).loop_mode = Animation.LOOP_LINEAR
 	for slot: EquipmentData.Slot in default_items:
 		equip(default_items[slot])
+
+
+func _add_extra_bones() -> void:
+	for bone_name: String in extra_bones:
+		if skeleton.find_bone(bone_name) >= 0:
+			continue
+		var info: Array = extra_bones[bone_name]
+		var bone := skeleton.get_bone_count()
+		skeleton.add_bone(bone_name)
+		skeleton.set_bone_parent(bone, skeleton.find_bone(info[0]))
+		skeleton.set_bone_rest(bone, info[1])
+		skeleton.reset_bone_pose(bone)
+	# los BoneAttachment3D que apuntan a estos huesos se crearon antes de que existieran: que los busquen otra vez
+	for attachment in skeleton.find_children("*", "BoneAttachment3D", false, false):
+		var bone_attachment := attachment as BoneAttachment3D
+		if extra_bones.has(bone_attachment.bone_name):
+			bone_attachment.bone_name = bone_attachment.bone_name
 
 
 ## Copia a nuestro AnimationPlayer las animaciones de `extra_animation_sources` que no tengamos.
@@ -61,12 +85,81 @@ func _merge_animations() -> void:
 	var library := animation_player.get_animation_library(&"")
 	for source_scene in extra_animation_sources:
 		var source := source_scene.instantiate()
+		var source_skeletons := source.find_children("*", "Skeleton3D", true, false)
+		var source_skeleton: Skeleton3D = source_skeletons[0] if not source_skeletons.is_empty() else null
 		for player in source.find_children("*", "AnimationPlayer", true, false):
 			var source_player := player as AnimationPlayer
 			for clip in source_player.get_animation_list():
 				if not library.has_animation(clip):
-					library.add_animation(clip, source_player.get_animation(clip))
+					library.add_animation(clip, _adapt_rotations(source_player.get_animation(clip), source_skeleton))
 		source.free()
+	# las animaciones que no mueven los huesos añadidos los dejan en reposo (si no, se quedarían como en la anterior)
+	for clip_name in library.get_animation_list():
+		_add_rest_tracks(library.get_animation(clip_name))
+
+
+func _add_rest_tracks(clip: Animation) -> void:
+	var prefix := ""
+	for track in clip.get_track_count():
+		if clip.track_get_type(track) == Animation.TYPE_ROTATION_3D:
+			prefix = str(clip.track_get_path(track)).get_slice(":", 0)
+			break
+	if prefix == "":
+		return
+	for bone_name: String in extra_bones:
+		var path := NodePath(prefix + ":" + bone_name)
+		if clip.find_track(path, Animation.TYPE_ROTATION_3D) >= 0:
+			continue
+		var track := clip.add_track(Animation.TYPE_ROTATION_3D)
+		clip.track_set_path(track, path)
+		clip.rotation_track_insert_key(track, 0.0, (extra_bones[bone_name][1] as Transform3D).basis.get_rotation_quaternion())
+
+
+## Pasa los giros de un esqueleto a otro. Los dos están en la misma pose de reposo vistos desde fuera, pero un
+## hueso puede tener otro giro "local" (KayKit no tiene clavícula: su hombro va sin girar y el brazo lleva todo el
+## giro), así que copiar los giros tal cual levanta los brazos. Se copia el giro de cada hueso visto desde fuera:
+##   nuevo = (reposo global del padre nuestro)⁻¹ · (reposo global del padre suyo) · giro · (reposo global suyo)⁻¹ · (reposo global nuestro)
+func _adapt_rotations(source_clip: Animation, source_skeleton: Skeleton3D) -> Animation:
+	if source_skeleton == null:
+		return source_clip
+	var clip := source_clip.duplicate(true) as Animation
+	var path_prefix := ""
+	for track in clip.get_track_count():
+		if clip.track_get_type(track) == Animation.TYPE_ROTATION_3D:
+			path_prefix = str(clip.track_get_path(track)).get_slice(":", 0)
+			break
+	for track in range(clip.get_track_count() - 1, -1, -1):
+		if clip.track_get_type(track) != Animation.TYPE_ROTATION_3D \
+				and animation_bone_remap.has(clip.track_get_path(track).get_concatenated_subnames()):
+			clip.remove_track(track) # solo se pasa el giro (las posiciones son de otro tamaño de muñeco)
+	for track in clip.get_track_count():
+		if clip.track_get_type(track) != Animation.TYPE_ROTATION_3D:
+			continue
+		var source_name := clip.track_get_path(track).get_concatenated_subnames()
+		var our_name: String = animation_bone_remap.get(source_name, source_name)
+		var ours := skeleton.find_bone(our_name)
+		var theirs := source_skeleton.find_bone(source_name)
+		if ours < 0 or theirs < 0:
+			continue
+		if our_name != source_name:
+			if clip.find_track(NodePath(path_prefix + ":" + our_name), Animation.TYPE_ROTATION_3D) >= 0:
+				continue
+			clip.track_set_path(track, NodePath(path_prefix + ":" + our_name))
+		var before := _global_rest(skeleton, skeleton.get_bone_parent(ours)).inverse() \
+				* _global_rest(source_skeleton, source_skeleton.get_bone_parent(theirs))
+		var after := _global_rest(source_skeleton, theirs).inverse() * _global_rest(skeleton, ours)
+		if before.is_equal_approx(Quaternion.IDENTITY) and after.is_equal_approx(Quaternion.IDENTITY):
+			continue
+		for key in clip.track_get_key_count(track):
+			var value: Quaternion = clip.track_get_key_value(track, key)
+			clip.track_set_key_value(track, key, (before * value * after).normalized())
+	return clip
+
+
+func _global_rest(target: Skeleton3D, bone: int) -> Quaternion:
+	if bone < 0:
+		return Quaternion.IDENTITY
+	return target.get_bone_global_rest(bone).basis.get_rotation_quaternion()
 
 
 # --- Animación ------------------------------------------------------------
