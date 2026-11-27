@@ -32,7 +32,9 @@ Si cambias una convención, actualiza este archivo en el mismo commit.
 assets/                 arte (solo datos, sin lógica)
   _inbox/               buzón: zips de packs para probar (van a la rama `inbox`, no a main; ver su README)
   models/               modelos 3D (.glb/.gltf), de muestra y CC0:
-    quaternius/         personaje base (Universal Base Characters), ropa modular y Universal Animation Library
+    quaternius/         personaje base (Universal Base Characters) y Universal Animation Library: SOLO los archivos
+                        que usa el juego (los packs enteros pesan cientos de MB; si hace falta algo más, se copia
+                        ese archivo suelto). La ropa modular se quitó hasta que haya diseños propios.
     kaykit_adventurers/ armas (weapons/) y animaciones de armas (animations/KayKit_Animations.glb)
     lowpoly_environment/ pack de entorno del dueño (árboles, rocas, arbustos, plantas, troncos, montañas)
     retarget/           mapas de huesos para compartir animaciones entre esqueletos (ver su README)

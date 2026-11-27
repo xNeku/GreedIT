@@ -102,6 +102,8 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 - [x] Packs CC0 de Quaternius: ropa modular (explorador y campesino) + Universal Animation Library
 - [x] Retarget al humanoide de Godot: las animaciones de armas de KayKit valen para el esqueleto de Quaternius
 - [x] Ropa y capucha como equipo de serie (OUTFIT / HEAD), armas en un agarre colocable a mano (GripR / GripL)
+- [x] Repo adelgazado (425 MB -> 36 MB): de los packs de Quaternius solo queda lo que usa el juego; fuera la ropa
+  modular y sus `.tres` (ranger_outfit, ranger_hood, peasant_outfit). Siguen en el historial de git.
 - [x] Sin normal maps ni brillos al importar (luz por bandas limpia) y contorno más fino
 
 ## Hito 3D.1: Limpieza (hecho)
