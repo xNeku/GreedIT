@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://clu5eubrxgbj5"]
 
-[ext_resource type="Script" uid="uid://bibs4yxcfq6b4" path="res://assets/vfx/binbun/StatusFX/script/VFXStatusBB.gd" id="1_5e04j"]
-[ext_resource type="Shader" uid="uid://uss6sdw6l1l1" path="res://assets/vfx/binbun/StatusFX/shader/streaks.gdshader" id="2_rykdo"]
-[ext_resource type="Shader" uid="uid://mfsasawk6uxn" path="res://assets/vfx/binbun/StatusFX/shader/aura_particle.gdshader" id="3_xrh64"]
+[ext_resource type="Script" path="res://assets/vfx/binbun/StatusFX/script/VFXStatusBB.gd" id="1_5e04j"]
+[ext_resource type="Shader" path="res://assets/vfx/binbun/StatusFX/shader/streaks.gdshader" id="2_rykdo"]
+[ext_resource type="Shader" path="res://assets/vfx/binbun/StatusFX/shader/aura_particle.gdshader" id="3_xrh64"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_5e04j"]
 noise_type = 2

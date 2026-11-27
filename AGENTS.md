@@ -51,7 +51,9 @@ src/
   player/               Player3D
   enemies/              muñeco de entrenamiento (y los enemigos cuando lleguen)
   world/                Game3D (red + jugadores), game_3d.tscn (el mundo), DayNightCycle, FollowCamera3D, PixelView + filtro
-  ui/                   menú principal, HUD (orbe de vida + barra de 8 huecos)
+    gen/                generador de mundo: WorldGenerator (mapa grande), WorldStreamer (trozos), WorldSettings,
+                        BiomeData, DecorationData; normal/ = reglas y biomas del mundo normal (.tres)
+  ui/                   menú principal, HUD (orbe de vida + barra de 8 huecos), mapa de prueba (M)
 tests/                  test de humo y test de red (host + cliente)
 docs/                   GDD y backlog
 ```
@@ -121,6 +123,21 @@ jugadores (`_spawn_player` corre en todos los peers y pone el dueño). Un client
   - **Interpolación de física** activada en el proyecto: lo que se mueve en
     `_physics_process` se dibuja suave aunque la pantalla vaya a 120 Hz. La cámara lee
     `get_global_transform_interpolated()` y tiene la interpolación apagada (se mueve en `_process`).
+- **Mundo generado** (diseño en `docs/GDD.md` §2; forma probada en el World Lab,
+  https://claude.ai/artifact/N2H9aTAHKYeqoNqyyE3R6k):
+  - `WorldGenerator` saca de la **semilla** el mapa grande (`WorldMap`: celdas de ~35 m con bioma, montaña, camino,
+    zona de dificultad y sitios), con las reglas de `WorldSettings` (`src/world/gen/normal/normal_world.tres`). Tarda
+    menos de 1 s y se guarda en `user://worlds` (si cambias el algoritmo, sube `WorldGenerator.VERSION`).
+  - `WorldStreamer` (nodo `Land` de `game_3d.tscn`) monta el mundo por **trozos de 32 m** alrededor de los jugadores:
+    terreno facetado con el color de cada bioma (colores por vértice, `use_vertex_color` en world_lit), montañas con
+    laderas que no se pueden subir, colisión `HeightMapShape3D` y la decoración de cada bioma en MultiMesh.
+  - Todo lo que se ve se edita en los recursos: `BiomeData` (peso, clima, colores del suelo, decoración) y
+    `DecorationData` (modelo, densidad, manchas, escala, si bloquea el paso). La decoración de ahora es de prueba (el
+    pack del bosque) hasta que el dueño elija assets para desierto, nieve, jungla y montaña.
+  - En red no se manda el mapa: todos los peers lo generan con la misma semilla (`Land.world_seed`).
+  - El inicio (la base) está en el origen y llano (`base_radius`). Lo que tapa al jugador (montañas) se recorta
+    alrededor de él (`occlusion_cutout` en world_lit; la cámara pone `occlusion_point`).
+  - Tecla **M**: mapa de prueba con biomas, montañas, caminos, sitios y jugadores (`src/ui/world_map_view.gd`).
 - **Personaje** = `Avatar3D` (`src/characters/hero/hero.tscn`): la Universal Animation Library de Quaternius
   (`UAL1_Standard.glb`: esqueleto + animaciones; su maniquí va oculto) **retargeteada** al humanoide de Godot
   (`assets/models/retarget/`). Lo que lleva puesto es equipo de serie (`default_items`): `BODY` (cuerpo en ropa

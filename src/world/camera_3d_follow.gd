@@ -9,8 +9,9 @@ extends Camera3D
 ## Isométrica estilo Diablo: girada 45° y a 30° del suelo (las líneas del suelo salen 2:1, como el pixel art).
 @export var yaw_degrees := 45.0
 @export_range(20.0, 90.0) var pitch_degrees := 30.0
-## Distancia de la cámara (en ortográfica no cambia el tamaño, solo lo que entra delante).
-@export var distance := 30.0
+## Distancia de la cámara (en ortográfica no cambia el tamaño, solo lo que entra delante: tiene que ser más que lo
+## que miden las montañas para que no se corten).
+@export var distance := 80.0
 
 @export_group("Zoom")
 ## Alto visible en metros (más = más lejos). Las teclas + y - lo cambian entre min y max.
@@ -72,6 +73,8 @@ func _update(weight: float, delta: float) -> void:
 		var m := get_viewport().get_mouse_position() / viewport_size - Vector2(0.5, 0.5)
 		lead = (Vector3(m.x, 0, m.y).limit_length(0.5) * 2.0 * mouse_lead).rotated(Vector3.UP, yaw)
 	_focus = _focus.lerp(_target_position() + lead, weight)
+	# lo que tape al jugador (montañas) se recorta alrededor de él (world_lit.gdshader)
+	RenderingServer.global_shader_parameter_set(&"occlusion_point", _target_position())
 	var offset := Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch)) * distance
 	var eye := _focus + offset
 	look_at_from_position(eye, _focus + Vector3(0, 0.8, 0), Vector3.UP)

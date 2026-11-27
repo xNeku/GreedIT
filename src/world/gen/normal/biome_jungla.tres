@@ -1,0 +1,158 @@
+[gd_resource type="Resource" script_class="BiomeData" format=3]
+
+[ext_resource type="Script" path="res://src/world/gen/biome_data.gd" id="1_biome"]
+[ext_resource type="Script" path="res://src/world/gen/decoration_data.gd" id="2_deco"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Tree_2.fbx" id="3_tree_2"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Tree_3.fbx" id="4_tree_3"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Bush_1.fbx" id="5_bush_1"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Bush_2.fbx" id="6_bush_2"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Bush_3.fbx" id="7_bush_3"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Plant_2.fbx" id="8_plant_2"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Plant_5.fbx" id="9_plant_5"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Plant_6.fbx" id="10_plant_6"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Plant_7.fbx" id="11_plant_7"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Grass_1.fbx" id="12_grass_1"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Log_3.fbx" id="13_log_3"]
+
+[sub_resource type="Resource" id="Deco_0"]
+script = ExtResource("2_deco")
+scene = ExtResource("3_tree_2")
+per_100m2 = 0.3
+clumping = 0.3
+scale_min = 0.45
+scale_max = 0.7
+tilt_degrees = 0.0
+block_radius = 0.8
+cast_shadow = true
+on_mountains = false
+
+[sub_resource type="Resource" id="Deco_1"]
+script = ExtResource("2_deco")
+scene = ExtResource("4_tree_3")
+per_100m2 = 0.3
+clumping = 0.3
+scale_min = 0.45
+scale_max = 0.7
+tilt_degrees = 0.0
+block_radius = 0.8
+cast_shadow = true
+on_mountains = false
+
+[sub_resource type="Resource" id="Deco_2"]
+script = ExtResource("2_deco")
+scene = ExtResource("5_bush_1")
+per_100m2 = 0.2
+clumping = 0.3
+scale_min = 0.6
+scale_max = 1.0
+tilt_degrees = 0.0
+block_radius = 0.0
+cast_shadow = true
+on_mountains = false
+
+[sub_resource type="Resource" id="Deco_3"]
+script = ExtResource("2_deco")
+scene = ExtResource("6_bush_2")
+per_100m2 = 0.2
+clumping = 0.3
+scale_min = 0.6
+scale_max = 1.0
+tilt_degrees = 0.0
+block_radius = 0.0
+cast_shadow = true
+on_mountains = false
+
+[sub_resource type="Resource" id="Deco_4"]
+script = ExtResource("2_deco")
+scene = ExtResource("7_bush_3")
+per_100m2 = 0.2
+clumping = 0.3
+scale_min = 0.6
+scale_max = 1.0
+tilt_degrees = 0.0
+block_radius = 0.0
+cast_shadow = true
+on_mountains = false
+
+[sub_resource type="Resource" id="Deco_5"]
+script = ExtResource("2_deco")
+scene = ExtResource("8_plant_2")
+per_100m2 = 0.2
+clumping = 0.2
+scale_min = 1.0
+scale_max = 1.5
+tilt_degrees = 0.0
+block_radius = 0.0
+cast_shadow = false
+on_mountains = false
+
+[sub_resource type="Resource" id="Deco_6"]
+script = ExtResource("2_deco")
+scene = ExtResource("9_plant_5")
+per_100m2 = 0.2
+clumping = 0.2
+scale_min = 1.0
+scale_max = 1.5
+tilt_degrees = 0.0
+block_radius = 0.0
+cast_shadow = false
+on_mountains = false
+
+[sub_resource type="Resource" id="Deco_7"]
+script = ExtResource("2_deco")
+scene = ExtResource("10_plant_6")
+per_100m2 = 0.2
+clumping = 0.2
+scale_min = 1.0
+scale_max = 1.5
+tilt_degrees = 0.0
+block_radius = 0.0
+cast_shadow = false
+on_mountains = false
+
+[sub_resource type="Resource" id="Deco_8"]
+script = ExtResource("2_deco")
+scene = ExtResource("11_plant_7")
+per_100m2 = 0.15
+clumping = 0.2
+scale_min = 0.9
+scale_max = 1.3
+tilt_degrees = 0.0
+block_radius = 0.0
+cast_shadow = false
+on_mountains = false
+
+[sub_resource type="Resource" id="Deco_9"]
+script = ExtResource("2_deco")
+scene = ExtResource("12_grass_1")
+per_100m2 = 1.4
+clumping = 0.2
+scale_min = 1.8
+scale_max = 2.8
+tilt_degrees = 0.0
+block_radius = 0.0
+cast_shadow = false
+on_mountains = false
+
+[sub_resource type="Resource" id="Deco_10"]
+script = ExtResource("2_deco")
+scene = ExtResource("13_log_3")
+per_100m2 = 0.03
+clumping = 0.2
+scale_min = 0.7
+scale_max = 1.0
+tilt_degrees = 0.0
+block_radius = 0.8
+cast_shadow = true
+on_mountains = false
+
+[resource]
+script = ExtResource("1_biome")
+id = &"jungla"
+display_name = "Jungla"
+weight = 1.2
+climate = 3
+rocky = false
+ground_color = Color(0.27, 0.47, 0.22, 1)
+ground_color_2 = Color(0.31, 0.53, 0.24, 1)
+decorations = Array[ExtResource("2_deco")]([SubResource("Deco_0"), SubResource("Deco_1"), SubResource("Deco_2"), SubResource("Deco_3"), SubResource("Deco_4"), SubResource("Deco_5"), SubResource("Deco_6"), SubResource("Deco_7"), SubResource("Deco_8"), SubResource("Deco_9"), SubResource("Deco_10")])

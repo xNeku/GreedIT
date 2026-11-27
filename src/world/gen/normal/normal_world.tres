@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="WorldSettings" format=3]
+
+[ext_resource type="Script" path="res://src/world/gen/world_settings.gd" id="1_settings"]
+[ext_resource type="Script" path="res://src/world/gen/biome_data.gd" id="2_biome"]
+[ext_resource type="Script" path="res://src/world/gen/decoration_data.gd" id="3_deco"]
+[ext_resource type="Resource" path="res://src/world/gen/normal/biome_bosque.tres" id="b0"]
+[ext_resource type="Resource" path="res://src/world/gen/normal/biome_desierto.tres" id="b1"]
+[ext_resource type="Resource" path="res://src/world/gen/normal/biome_jungla.tres" id="b2"]
+[ext_resource type="Resource" path="res://src/world/gen/normal/biome_montana.tres" id="b3"]
+[ext_resource type="Resource" path="res://src/world/gen/normal/biome_nieve.tres" id="b4"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Rock_2.fbx" id="m_rock_2"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Rock_3.fbx" id="m_rock_3"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Rock_6.fbx" id="m_rock_6"]
+
+[sub_resource type="Resource" id="Mount_0"]
+script = ExtResource("3_deco")
+scene = ExtResource("m_rock_2")
+per_100m2 = 0.05
+clumping = 0.2
+scale_min = 0.8
+scale_max = 1.6
+block_radius = 1.6
+on_mountains = true
+
+[sub_resource type="Resource" id="Mount_1"]
+script = ExtResource("3_deco")
+scene = ExtResource("m_rock_3")
+per_100m2 = 0.05
+clumping = 0.2
+scale_min = 0.8
+scale_max = 1.6
+block_radius = 1.6
+on_mountains = true
+
+[sub_resource type="Resource" id="Mount_2"]
+script = ExtResource("3_deco")
+scene = ExtResource("m_rock_6")
+per_100m2 = 0.04
+clumping = 0.2
+scale_min = 0.8
+scale_max = 1.4
+block_radius = 1.5
+on_mountains = true
+
+[resource]
+script = ExtResource("1_settings")
+display_name = "Mundo normal"
+biomes = Array[ExtResource("2_biome")]([ExtResource("b0"), ExtResource("b1"), ExtResource("b2"), ExtResource("b3"), ExtResource("b4")])
+start_biome = &"bosque"
+mountain_decorations = Array[ExtResource("3_deco")]([SubResource("Mount_0"), SubResource("Mount_1"), SubResource("Mount_2")])

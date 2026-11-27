@@ -4,6 +4,8 @@ extends CanvasLayer
 ## elegido (rueda del ratón para cambiarlo).
 
 @onready var health_orb: ColorRect = %HealthOrb
+## Mapa de prueba del mundo (tecla M).
+@onready var world_map: WorldMapView = %WorldMap
 @onready var slots: Array[HotbarSlot3D] = []
 
 var player: Player3D

@@ -162,7 +162,12 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 
 - [~] (Claude) **World Lab** (https://claude.ai/artifact/N2H9aTAHKYeqoNqyyE3R6k): prototipo 2D de la forma de los tres
   mundos (biomas con pesos, cordilleras con pasos, sitios, caminos, zonas de dificultad). Esperando la receta del dueño.
-- [ ] Pasar el generador del World Lab a Godot (mismo resultado con la misma semilla) y cargar el mundo por trozos
+- [x] Generador del World Lab en Godot (`src/world/gen`): mapa grande por semilla (<1 s, guardado en disco), mundo
+  por trozos de 32 m, montañas que no se suben, decoración por bioma (de prueba), recorte de lo que tapa al jugador,
+  mapa de prueba con la M
+- [ ] Sitios en el mundo (entradas de dungeon, campamentos, bosses...): ahora solo salen en el mapa de la M
+- [ ] Caminos dibujados en el suelo (ahora solo en el mapa)
+- [ ] Semilla elegida por el host al crear el mundo y mandada a los clientes (ahora va fija en la escena)
 - [ ] Suelos por bioma (hierba, arena, caminos...): buscar recursos para Godot y que el dueño elija
 - [ ] Estructuras hechas a mano (escenas) que coloca el generador
 - [ ] Dungeons por pisos con salas hechas a mano, pantalla de carga al entrar, se regeneran al cambiar de dificultad

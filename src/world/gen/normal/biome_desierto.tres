@@ -1,0 +1,93 @@
+[gd_resource type="Resource" script_class="BiomeData" format=3]
+
+[ext_resource type="Script" path="res://src/world/gen/biome_data.gd" id="1_biome"]
+[ext_resource type="Script" path="res://src/world/gen/decoration_data.gd" id="2_deco"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Rock_1.fbx" id="3_rock_1"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Rock_2.fbx" id="4_rock_2"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Rock_5.fbx" id="5_rock_5"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Stone_1.fbx" id="6_stone_1"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Plant_4.fbx" id="7_plant_4"]
+[ext_resource type="PackedScene" path="res://assets/models/lowpoly_environment/Log_2.fbx" id="8_log_2"]
+
+[sub_resource type="Resource" id="Deco_0"]
+script = ExtResource("2_deco")
+scene = ExtResource("3_rock_1")
+per_100m2 = 0.03
+clumping = 0.3
+scale_min = 0.5
+scale_max = 1.0
+tilt_degrees = 0.0
+block_radius = 0.0
+cast_shadow = false
+on_mountains = false
+
+[sub_resource type="Resource" id="Deco_1"]
+script = ExtResource("2_deco")
+scene = ExtResource("4_rock_2")
+per_100m2 = 0.012
+clumping = 0.3
+scale_min = 0.4
+scale_max = 0.8
+tilt_degrees = 0.0
+block_radius = 1.6
+cast_shadow = true
+on_mountains = false
+
+[sub_resource type="Resource" id="Deco_2"]
+script = ExtResource("2_deco")
+scene = ExtResource("5_rock_5")
+per_100m2 = 0.02
+clumping = 0.3
+scale_min = 0.4
+scale_max = 0.9
+tilt_degrees = 0.0
+block_radius = 1.2
+cast_shadow = true
+on_mountains = false
+
+[sub_resource type="Resource" id="Deco_3"]
+script = ExtResource("2_deco")
+scene = ExtResource("6_stone_1")
+per_100m2 = 0.15
+clumping = 0.0
+scale_min = 1.0
+scale_max = 2.2
+tilt_degrees = 0.0
+block_radius = 0.0
+cast_shadow = false
+on_mountains = false
+
+[sub_resource type="Resource" id="Deco_4"]
+script = ExtResource("2_deco")
+scene = ExtResource("7_plant_4")
+per_100m2 = 0.04
+clumping = 0.5
+scale_min = 0.6
+scale_max = 1.0
+tilt_degrees = 0.0
+block_radius = 0.0
+cast_shadow = false
+on_mountains = false
+
+[sub_resource type="Resource" id="Deco_5"]
+script = ExtResource("2_deco")
+scene = ExtResource("8_log_2")
+per_100m2 = 0.01
+clumping = 0.0
+scale_min = 0.8
+scale_max = 1.2
+tilt_degrees = 5
+block_radius = 0.0
+cast_shadow = true
+on_mountains = false
+
+[resource]
+script = ExtResource("1_biome")
+id = &"desierto"
+display_name = "Desierto"
+weight = 2.6
+climate = 3
+rocky = false
+ground_color = Color(0.736, 0.661, 0.33, 1)
+ground_color_2 = Color(0.7, 0.6, 0.3, 1)
+decorations = Array[ExtResource("2_deco")]([SubResource("Deco_0"), SubResource("Deco_1"), SubResource("Deco_2"), SubResource("Deco_3"), SubResource("Deco_4"), SubResource("Deco_5")])

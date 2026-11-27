@@ -9,9 +9,11 @@ extends Node
 ##   - Muñecos y props son parte de la escena (existen igual en todos); el host manda sobre ellos.
 ##
 ## El mundo 3D vive dentro de PixelView/World (SubViewport, estilo pixel art); el HUD va fuera.
+## El terreno lo genera `Land` (WorldStreamer) a partir de su semilla: todos los peers generan el mismo mundo.
 
 @export var player_scene: PackedScene
 
+@onready var land: WorldStreamer = %Land
 @onready var players: Node3D = %Players
 @onready var dummies: Node3D = %Dummies
 @onready var player_spawner: MultiplayerSpawner = %PlayerSpawner
@@ -22,6 +24,8 @@ extends Node
 func _ready() -> void:
 	player_spawner.spawn_function = _spawn_player
 	Events.local_player_ready.connect(hud.set_player)
+	land.prepare() # el suelo de la base tiene que existir antes de que aparezca nadie
+	hud.world_map.land = land
 	if Net.start() != OK:
 		return
 	if multiplayer.is_server():

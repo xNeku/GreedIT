@@ -1,6 +1,6 @@
 [gd_resource type="ShaderMaterial" format=3 uid="uid://gnpaaon1rqti"]
 
-[ext_resource type="Shader" uid="uid://dtvdi31o1l24p" path="res://assets/vfx/binbun/StatusFX/shader/status_overlay.gdshader" id="1_m1or3"]
+[ext_resource type="Shader" path="res://assets/vfx/binbun/StatusFX/shader/status_overlay.gdshader" id="1_m1or3"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_5e04j"]
 noise_type = 2
