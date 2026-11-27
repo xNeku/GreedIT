@@ -12,6 +12,11 @@
 [ext_resource type="Resource" path="res://src/equipment/items/fists.tres" id="11_fiststres"]
 [ext_resource type="Resource" path="res://src/equipment/items/shield_round.tres" id="12_shieldroun"]
 [ext_resource type="Resource" path="res://src/equipment/items/fireball.tres" id="13_fireballtr"]
+[ext_resource type="Resource" path="res://src/equipment/items/fire_bolt.tres" id="13_firebolt"]
+[ext_resource type="Resource" path="res://src/equipment/items/lightning_ball.tres" id="13_lightball"]
+[ext_resource type="Resource" path="res://src/equipment/items/lightning_bolt.tres" id="13_lightbolt"]
+[ext_resource type="Script" path="res://src/equipment/spell_3d_data.gd" id="13_spelldata"]
+[ext_resource type="PackedScene" path="res://src/combat/fx/dash_aura.tscn" id="13_dashaura"]
 [ext_resource type="Script" path="res://src/combat/hitbox_3d.gd" id="15_hitbox3dgd"]
 [ext_resource type="Script" path="res://src/combat/hurtbox_3d.gd" id="22_hurtbox3dg"]
 
@@ -79,7 +84,8 @@ avatar_scene = ExtResource("9_herotscn")
 hotbar = Array[ExtResource("10_weapon3dda")]([ExtResource("2_swordtres"), ExtResource("3_greatsword"), ExtResource("4_axetres"), ExtResource("5_daggerstre"), ExtResource("6_crossbowtr"), ExtResource("7_botres"), null, null])
 unarmed = ExtResource("11_fiststres")
 shield_item = ExtResource("12_shieldroun")
-spell = ExtResource("13_fireballtr")
+spells = Array[ExtResource("13_spelldata")]([ExtResource("13_fireballtr"), ExtResource("13_firebolt"), ExtResource("13_lightball"), ExtResource("13_lightbolt")])
+dash_fx = ExtResource("13_dashaura")
 
 [node name="Collision" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)

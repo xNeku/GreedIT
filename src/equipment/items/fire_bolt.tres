@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="Spell3DData" format=3]
+
+[ext_resource type="Script" path="res://src/equipment/attack_3d.gd" id="1_attack3dgd"]
+[ext_resource type="PackedScene" path="res://src/combat/projectiles/fire_bolt.tscn" id="2_projectile"]
+[ext_resource type="Script" path="res://src/equipment/spell_3d_data.gd" id="4_spell3ddat"]
+
+[sub_resource type="Resource" id="Resource_cast"]
+script = ExtResource("1_attack3dgd")
+clip = "Spellcast_Shoot"
+speed = 2.3
+hit_time = 0.35
+projectiles = 1
+move_multiplier = 0.5
+projectile_scene = ExtResource("2_projectile")
+
+[resource]
+script = ExtResource("4_spell3ddat")
+id = &"fire_bolt"
+display_name = "Llamarada"
+mana_cost = 25.0
+cooldown = 0.6
+base_damage = 26.0
+crit_chance = 0.1
+crit_multiplier = 1.8
+max_range = 14.0
+cast = SubResource("Resource_cast")
+projectile_speed = 15.0

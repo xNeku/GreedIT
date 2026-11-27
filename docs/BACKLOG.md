@@ -140,6 +140,9 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
   (https://claude.ai/artifact/FH12LDbC4rbF4S6QiZcRhB): el dueño manda la receta y se pasa a los `.tres`
   (falta: escala y offsets de la otra mano en el equipo, cerrar dedos en el juego, animación de correr por arma)
 - [x] La voltereta de la esquiva ya no se corta a medias (cabe en la esquiva + `dodge_recovery`)
+- [x] (de prueba, con BinbunVFX) Rueda del ratón = cambiar de magia (bola de fuego, llamarada, bola de rayo, rayo);
+  aura roja tras la esquiva; área de fuego bajo los pies en el golpe cargado del mandoble. Pendiente: que el dueño
+  elija qué efectos se quedan y para qué.
 - [ ] Números de daño en el HUD (nítidos) en vez de Label3D pixelado
 - [ ] Personaje propio hecho en Blender (mismo esqueleto, ver AGENTS.md)
 - [ ] Enemigos 3D (la IA del 2D está en el historial: enemy.gd)

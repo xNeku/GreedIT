@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://src/equipment/weapon_3d_data.gd" id="2_weapon3dda"]
 [ext_resource type="PackedScene" path="res://assets/models/kaykit_adventurers/weapons/sword_2handed.gltf" id="3_sword2hand"]
 [ext_resource type="PackedScene" path="res://src/combat/fx/whirl.tscn" id="6_whirltscn"]
+[ext_resource type="PackedScene" path="res://src/combat/fx/fire_ground.tscn" id="7_fireground"]
 [ext_resource type="PackedScene" path="res://src/combat/fx/slam.tscn" id="9_slamtscn"]
 [ext_resource type="Texture2D" path="res://assets/ui/icons/greatsword.png" id="13_greatsword"]
 
@@ -33,7 +34,7 @@ area = true
 area_radius = 3.0
 damage_multiplier = 0.8
 move_multiplier = 0.5
-fx_scene = ExtResource("6_whirltscn")
+fx_scene = ExtResource("7_fireground")
 fx_attached = true
 
 [sub_resource type="Resource" id="Resource_8"]

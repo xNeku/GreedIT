@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/combat/projectile_3d.gd" id="1_projectile"]
+[ext_resource type="PackedScene" path="res://src/combat/fx/lightning_strike.tscn" id="2_explosion"]
+[ext_resource type="PackedScene" path="res://assets/vfx/binbun/ElectricFX/effects/ball/vfx_ball_lightning_01.tscn" id="3_visual"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_s"]
+radius = 0.5
+
+[node name="LightningBall" type="Area3D"]
+collision_layer = 8
+collision_mask = 17
+monitorable = false
+script = ExtResource("1_projectile")
+lifetime = 2.5
+knockback = 9.0
+explosion_scene = ExtResource("2_explosion")
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_s")
+
+[node name="Visual" parent="." instance=ExtResource("3_visual")]
+
+[node name="VFXOmniLightBB" parent="Visual"]
+vfx_light_energy = 2.5
+
+[editable path="Visual"]

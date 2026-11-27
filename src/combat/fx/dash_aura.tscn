@@ -1,0 +1,14 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/combat/aura_fx.gd" id="1_aura"]
+[ext_resource type="Material" path="res://src/combat/fx/dash_aura_overlay.tres" id="2_overlay"]
+[ext_resource type="PackedScene" path="res://assets/vfx/binbun/StatusFX/effects/status/vfx_status_shatter.tscn" id="3_shatter"]
+
+[node name="DashAura" type="Node3D"]
+script = ExtResource("1_aura")
+body_overlay = ExtResource("2_overlay")
+
+[node name="Visual" parent="." instance=ExtResource("3_shatter")]
+primary_color = Color(1, 0.3, 0.15, 1)
+secondary_color = Color(0.9, 0.08, 0.04, 1)
+tertiary_color = Color(0.45, 0.02, 0.02, 1)

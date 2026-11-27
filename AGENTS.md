@@ -130,7 +130,7 @@ jugadores (`_spawn_player` corre en todos los peers y pone el dueño). Un client
   en el editor). Cuando lleve ropa encima, el cuerpo debe usar `body_male_covered_material.tres` (solo dibuja cuello
   y cabeza) para que no asome por la ropa.
 - **Jugador** = `Player3D`: el dueño simula; por `Sync` viajan posición, `yaw`, `net_anim` ("clip#contador#velocidad"),
-  `charging`, el hueco elegido (`slot_index`) y la vida. Barra de 8 huecos (`hotbar`, 1-8 / rueda); hueco vacío =
+  `charging`, el hueco elegido (`slot_index`) y la vida. Barra de 8 huecos (`hotbar`, teclas 1-8); hueco vacío =
   `unarmed` (puños). Al morir reaparece en su punto de salida; tras un golpe es invulnerable un momento.
 - **Movimiento**: WASD relativo a la cámara. Salto estilo Conquer (se agacha y sale hacia donde corres; en lo alto
   esquivas golpes, `dodge_height`), aterrizaje con polvo. Shift = esquiva. Los ataques en el aire se hacen en el
@@ -143,9 +143,14 @@ jugadores (`_spawn_player` corre en todos los peers y pone el dueño). Un client
   (`plunge`), proyectiles (cuántos, abanico, escena, tamaño) y efecto (`fx_scene`).
   Para añadir un arma: duplica un `.tres` de `src/equipment/items/`, ponle icono (`assets/ui/icons/`) y métela en un
   hueco de `hotbar` en `player_3d.tscn`. El bō es una escena propia (`src/equipment/weapons/bo_staff.tscn`).
-- **Hechizo** (clic de la rueda) = `Spell3DData` (`fireball.tres`): maná, enfriamiento, daño y su `cast` (un Attack3D
-  con el proyectil). Los proyectiles con `explosion_scene` explotan (`Explosion3D`: daño en área, solo en el dueño).
-- En red, los ataques se identifican por clave (`combo0`, `heavy`, `alt`, `alt_hold`, `air`, `spell`, `.../land`):
+- **Hechizos**: `Player3D.spells` (lista de `Spell3DData`); **girar la rueda** cambia de hechizo (`spell_index`, el HUD
+  lo enseña encima de la barra) y el **clic de la rueda** lo lanza. Cada `.tres` (`fireball`, `fire_bolt`, `lightning_ball`,
+  `lightning_bolt`) dice maná, enfriamiento, daño y su `cast` (un Attack3D con el proyectil). Los proyectiles con
+  `explosion_scene` explotan (`Explosion3D`: daño en área, solo en el dueño). Los de prueba usan los efectos de
+  BinbunVFX (`assets/vfx/binbun`) metidos dentro de nuestras escenas (`src/combat/projectiles`, `src/combat/fx`).
+- **Aura de la esquiva**: `Player3D.dash_fx` (`src/combat/fx/dash_aura.tscn`, un `AuraFX`: efecto encima + tinte del
+  cuerpo un rato). Sale en todos los peers por la RPC `_spawn_dash_fx`.
+- En red, los ataques se identifican por clave (`combo0`, `heavy`, `alt`, `alt_hold`, `air`, `spell0`..`spellN`, `.../land`):
   `Player3D._fire` (proyectiles) y `_spawn_fx` (efectos) son RPC; `charging` va por `Sync`.
 
 ### Equipo y modelos propios (Blender)

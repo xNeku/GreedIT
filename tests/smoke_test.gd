@@ -82,6 +82,8 @@ func _test_movement() -> void:
 	await _wait(0.35)
 	if _player.global_position.distance_to(before) < 2.0:
 		_fail("la esquiva no desplaza al jugador")
+	if _player.dash_fx and _player.get_node_or_null(^"DashFX") == null:
+		_fail("tras la esquiva debería salir el aura")
 	print("movimiento (relativo a la cámara), salto y esquiva OK")
 
 
@@ -193,16 +195,28 @@ func _test_weapon(index: int) -> void:
 
 func _test_fireball() -> void:
 	_player.slot_index = 0
-	await _place(7.0)
-	_player.mana = _player.max_mana
-	var hits := _dummy.total_hits
-	_player.cast_spell()
-	if _player.mana > _player.max_mana - _player.spell.mana_cost + 1.0:
-		_fail("la bola de fuego no gasta maná")
-	await _wait(0.5)
-	await _shot("85_fireball")
-	await _wait(0.8)
-	await _check("bola de fuego", hits)
+	if _player.spells.size() < 2:
+		_fail("debería llevar varios hechizos para cambiar con la rueda")
+	# cada hechizo de la rueda hace daño
+	for i in _player.spells.size():
+		_player.spell_index = 0
+		_player.next_spell(i)
+		if _player.spell != _player.spells[i]:
+			_fail("la rueda no elige el hechizo %d" % i)
+		await _place(7.0)
+		_player.mana = _player.max_mana
+		_player._spell_cooldown = 0.0
+		var hits := _dummy.total_hits
+		_player.cast_spell()
+		if _player.mana > _player.max_mana - _player.spell.mana_cost + 1.0:
+			_fail("%s no gasta maná" % _player.spell.display_name)
+		await _wait(0.5)
+		await _shot("85_spell_%d" % i)
+		await _wait(1.0)
+		await _check(_player.spell.display_name, hits)
+	_player.spell_index = 0
+	if _scene.hud.find_child("Spell", true, false).text.find(_player.spell.display_name) < 0:
+		_fail("el HUD no dice qué hechizo llevas")
 	_player.mana = 1.0
 	var before := _player.mana
 	_player.cast_spell()

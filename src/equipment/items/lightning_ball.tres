@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="Spell3DData" format=3]
+
+[ext_resource type="Script" path="res://src/equipment/attack_3d.gd" id="1_attack3dgd"]
+[ext_resource type="PackedScene" path="res://src/combat/projectiles/lightning_ball.tscn" id="2_projectile"]
+[ext_resource type="Script" path="res://src/equipment/spell_3d_data.gd" id="4_spell3ddat"]
+
+[sub_resource type="Resource" id="Resource_cast"]
+script = ExtResource("1_attack3dgd")
+clip = "Spell_Simple_Shoot"
+speed = 2.0
+hit_time = 0.35
+projectiles = 1
+move_multiplier = 0.5
+projectile_scene = ExtResource("2_projectile")
+
+[resource]
+script = ExtResource("4_spell3ddat")
+id = &"lightning_ball"
+display_name = "Bola de rayo"
+mana_cost = 30.0
+cooldown = 0.8
+base_damage = 30.0
+crit_chance = 0.1
+crit_multiplier = 1.8
+max_range = 12.0
+cast = SubResource("Resource_cast")
+projectile_speed = 9.0

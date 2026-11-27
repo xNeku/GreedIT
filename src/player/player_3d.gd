@@ -15,6 +15,7 @@ extends CharacterBody3D
 signal weapon_changed(weapon: Weapon3DData)
 signal health_changed(health: float, max_health: float)
 signal mana_changed(mana: float, max_mana: float)
+signal spell_changed(spell: Spell3DData)
 
 @export_group("Movimiento")
 @export var move_speed := 7.5
@@ -63,7 +64,10 @@ signal mana_changed(mana: float, max_mana: float)
 @export var hurt_invulnerability := 0.5
 ## Segundos tumbado antes de reaparecer al morir.
 @export var respawn_time := 2.5
-@export var spell: Spell3DData
+## Hechizos que lleva (la rueda del ratón cambia entre ellos; el clic de la rueda lanza el elegido).
+@export var spells: Array[Spell3DData] = []
+## Efecto que sale encima del personaje al esquivar (un AuraFX).
+@export var dash_fx: PackedScene
 @export var max_mana := 100.0
 @export var mana_regen := 12.0
 
@@ -134,6 +138,15 @@ var _charge_full := false
 # otros
 var _alt_cooldown := 0.0
 var _spell_cooldown := 0.0
+## Hechizo elegido (índice en `spells`). Solo lo usa el dueño: en red el hechizo viaja en la clave ("spell2").
+var spell_index := 0:
+	set(value):
+		spell_index = value
+		spell_changed.emit(spell)
+## El hechizo elegido.
+var spell: Spell3DData:
+	get:
+		return spells[spell_index] if spell_index < spells.size() else null
 var _dodge_timer := 0.0
 var _dodge_cooldown_timer := 0.0
 var _dodge_recovery_timer := 0.0
@@ -213,10 +226,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		jump()
 	elif event.is_action_pressed("dash"):
 		dodge()
-	elif event.is_action_pressed("hotbar_next"):
-		slot_index = wrapi(slot_index + 1, 0, hotbar.size())
-	elif event.is_action_pressed("hotbar_prev"):
-		slot_index = wrapi(slot_index - 1, 0, hotbar.size())
+	elif event.is_action_pressed("spell_next"):
+		next_spell(1)
+	elif event.is_action_pressed("spell_prev"):
+		next_spell(-1)
 	else:
 		for i in hotbar.size():
 			if event.is_action_pressed("hotbar_%d" % (i + 1)):
@@ -268,6 +281,12 @@ func secondary_up() -> void:
 		_alt_attack()
 
 
+## Rueda del ratón: cambia de hechizo.
+func next_spell(step: int) -> void:
+	if not spells.is_empty():
+		spell_index = wrapi(spell_index + step, 0, spells.size())
+
+
 ## Clic de la rueda: lanza el hechizo si hay maná.
 func cast_spell() -> void:
 	if spell == null or spell.cast == null or mana < spell.mana_cost or _spell_cooldown > 0.0 or _dodge_timer > 0.0:
@@ -277,7 +296,7 @@ func cast_spell() -> void:
 	mana -= spell.mana_cost
 	mana_changed.emit(mana, max_mana)
 	_spell_cooldown = spell.cooldown
-	_start_attack(spell.cast, "spell")
+	_start_attack(spell.cast, "spell%d" % spell_index)
 
 
 # --- Simulación (solo el dueño) -------------------------------------------
@@ -440,6 +459,8 @@ func dodge() -> void:
 	_dodge_timer = dodge_time
 	_dodge_cooldown_timer = dodge_cooldown
 	# la voltereta entera cabe en la esquiva + lo que tarda en levantarse (si no, se corta a medias)
+	if dash_fx:
+		_spawn_dash_fx.rpc()
 	_play("Dodge_Forward", snappedf(avatar.clip_length("Dodge_Forward") / (dodge_time + dodge_recovery), 0.1), true)
 
 
@@ -609,7 +630,7 @@ func _cancel_attack() -> void:
 	area_hitbox.active = false
 
 
-## Busca el ataque por su clave ("combo0", "heavy", "alt", "alt_hold", "air", "spell", ".../land").
+## Busca el ataque por su clave ("combo0", "heavy", "alt", "alt_hold", "air", "spell0" (hechizo 0), ".../land").
 func attack_by_key(key: String) -> Attack3D:
 	var parts := key.split("/")
 	var attack: Attack3D = null
@@ -619,7 +640,9 @@ func attack_by_key(key: String) -> Attack3D:
 		"alt": attack = w.alt
 		"alt_hold": attack = w.alt_hold
 		"air": attack = w.air
-		"spell": attack = spell.cast if spell else null
+		_ when parts[0].begins_with("spell"):
+			var s := _spell_by_key(parts[0])
+			attack = s.cast if s else null
 		_:
 			if parts[0].begins_with("combo") and w:
 				var i := parts[0].trim_prefix("combo").to_int()
@@ -629,17 +652,23 @@ func attack_by_key(key: String) -> Attack3D:
 	return attack
 
 
+func _spell_by_key(key: String) -> Spell3DData:
+	var i := key.trim_prefix("spell").to_int()
+	return spells[i] if i >= 0 and i < spells.size() else null
+
+
 ## Crea los proyectiles en todos los peers; solo la copia del dueño hace daño.
 @rpc("authority", "call_local", "reliable")
 func _fire(key: String, origin: Vector3, fire_yaw: float, bonus: float, target: Vector3) -> void:
 	var attack := attack_by_key(key)
 	if attack == null:
 		return
-	var is_spell := key == "spell"
+	var is_spell := key.begins_with("spell")
+	var spell_data := _spell_by_key(key) if is_spell else null
 	var scene := attack.projectile_scene if attack.projectile_scene else current_weapon.projectile_scene
 	if scene == null:
 		return
-	var base := spell.base_damage if is_spell else current_weapon.base_damage
+	var base := spell_data.base_damage if is_spell else current_weapon.base_damage
 	var count := attack.projectiles
 	# Disparando desde el aire, los proyectiles bajan hacia el objetivo (a la altura del pecho).
 	var flat_distance := Vector2(target.x - origin.x, target.z - origin.z).length()
@@ -650,18 +679,30 @@ func _fire(key: String, origin: Vector3, fire_yaw: float, bonus: float, target: 
 		var projectile := scene.instantiate() as Projectile3D
 		var a := fire_yaw + spread
 		projectile.direction = Vector3(sin(a) * cos(pitch), -sin(pitch), cos(a) * cos(pitch))
-		projectile.speed = spell.projectile_speed if is_spell else current_weapon.projectile_speed
+		projectile.speed = spell_data.projectile_speed if is_spell else current_weapon.projectile_speed
 		projectile.damage = base * attack.damage_multiplier * bonus
-		projectile.crit_chance = spell.crit_chance if is_spell else current_weapon.crit_chance
-		projectile.crit_multiplier = spell.crit_multiplier if is_spell else current_weapon.crit_multiplier
+		projectile.crit_chance = spell_data.crit_chance if is_spell else current_weapon.crit_chance
+		projectile.crit_multiplier = spell_data.crit_multiplier if is_spell else current_weapon.crit_multiplier
 		projectile.shooter = self
 		projectile.visual_only = not is_local()
 		if is_spell:
 			var flat := Vector2(target.x - origin.x, target.z - origin.z).length()
-			projectile.max_distance = clampf(flat, 1.5, spell.max_range)
+			projectile.max_distance = clampf(flat, 1.5, spell_data.max_range)
 		projectile.scale = Vector3.ONE * attack.projectile_scale
 		get_parent().add_child(projectile)
 		projectile.global_position = origin
+
+
+## Aura de la esquiva en todos los peers (solo visual). Si ya había una, se cambia por la nueva.
+@rpc("authority", "call_local", "reliable")
+func _spawn_dash_fx() -> void:
+	var old := get_node_or_null(^"DashFX")
+	if old:
+		old.name = &"DashFXOld"
+		old.queue_free()
+	var fx := dash_fx.instantiate()
+	fx.name = &"DashFX"
+	add_child(fx)
 
 
 ## Efecto del ataque en todos los peers (solo visual).

@@ -29,12 +29,19 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -160.0
-offset_top = -52.0
+offset_top = -78.0
 offset_right = 160.0
 offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 4
+
+[node name="Spell" type="Label" parent="Bottom"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
 
 [node name="Hotbar" type="HBoxContainer" parent="Bottom"]
 unique_name_in_owner = true

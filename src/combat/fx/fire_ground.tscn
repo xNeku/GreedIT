@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/combat/one_shot_fx.gd" id="1_oneshot"]
+[ext_resource type="PackedScene" path="res://assets/vfx/binbun/ElementalMagicFX/effects/area/vfx_fire_area_01.tscn" id="2_firearea"]
+
+[sub_resource type="Animation" id="Animation_play"]
+resource_name = "play"
+length = 1.5
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Visual")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(1.0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"close"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_lib"]
+_data = {
+&"play": SubResource("Animation_play")
+}
+
+[node name="FireGround" type="Node3D"]
+script = ExtResource("1_oneshot")
+
+[node name="Visual" parent="." instance=ExtResource("2_firearea")]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_lib")
+}

@@ -1,0 +1,43 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/combat/explosion_3d.gd" id="1_explosion"]
+[ext_resource type="PackedScene" path="res://assets/vfx/binbun/ElectricFX/effects/zap/vfx_zap_lightning_01.tscn" id="2_zap"]
+
+[sub_resource type="Animation" id="Animation_play"]
+resource_name = "play"
+length = 1.4
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Visual")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"play"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_lib"]
+_data = {
+&"play": SubResource("Animation_play")
+}
+
+[node name="LightningStrike" type="Node3D"]
+script = ExtResource("1_explosion")
+radius = 2.4
+
+[node name="Visual" parent="." instance=ExtResource("2_zap")]
+
+[node name="VFXOmniLightBB" parent="Visual"]
+vfx_light_energy = 2.5
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_lib")
+}
+
+[editable path="Visual"]

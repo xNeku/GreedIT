@@ -1,5 +1,11 @@
 [gd_scene format=3]
 
+[ext_resource type="PackedScene" path="res://src/combat/projectiles/fire_bolt.tscn" id="70_firebolt"]
+[ext_resource type="PackedScene" path="res://src/combat/projectiles/lightning_ball.tscn" id="71_lightball"]
+[ext_resource type="PackedScene" path="res://src/combat/fx/fire_area_explosion.tscn" id="72_fireareaex"]
+[ext_resource type="PackedScene" path="res://src/combat/fx/lightning_strike.tscn" id="73_lightstrike"]
+[ext_resource type="PackedScene" path="res://src/combat/fx/fire_ground.tscn" id="74_fireground"]
+[ext_resource type="PackedScene" path="res://src/combat/fx/dash_aura.tscn" id="75_dashaura"]
 [ext_resource type="Script" path="res://src/world/game_3d.gd" id="1_game3dgd"]
 [ext_resource type="PackedScene" path="res://src/player/player_3d.tscn" id="2_player3dts"]
 [ext_resource type="Material" path="res://src/world/pixel_post_material.tres" id="3_pixelpostm"]
@@ -1536,7 +1542,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3001, 7)
 
 [node name="ShaderWarmup" type="Node3D" parent="PixelView/World"]
 script = ExtResource("60_shaderwarm")
-scenes = Array[PackedScene]([ExtResource("61_fireballts"), ExtResource("62_fireballex"), ExtResource("63_slamtscn"), ExtResource("64_whirltscn"), ExtResource("65_bolttscn"), ExtResource("66_throwndagg"), ExtResource("67_damagelabe")])
+scenes = Array[PackedScene]([ExtResource("61_fireballts"), ExtResource("62_fireballex"), ExtResource("63_slamtscn"), ExtResource("64_whirltscn"), ExtResource("65_bolttscn"), ExtResource("66_throwndagg"), ExtResource("67_damagelabe"), ExtResource("70_firebolt"), ExtResource("71_lightball"), ExtResource("72_fireareaex"), ExtResource("73_lightstrike"), ExtResource("74_fireground"), ExtResource("75_dashaura")])
 
 [node name="Players" type="Node3D" parent="PixelView/World"]
 unique_name_in_owner = true

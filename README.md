@@ -23,10 +23,11 @@ Farmear, forjar, hacerte una build bestia y tumbar bosses con tus colegas.
 | Ataque especial | Clic derecho |
 | Especial cargado (mandoble y bō: salto aplastante) | Mantener clic derecho |
 | Ataque en el aire | Atacar mientras saltas |
-| Bola de fuego (gasta maná) | Clic de la rueda |
+| Lanzar la magia elegida (gasta maná) | Clic de la rueda |
+| Cambiar de magia (bola de fuego, llamarada, bola de rayo, rayo) | Girar la rueda |
 | Saltar (hacia donde corres) | Espacio |
 | Esquivar (invulnerable) | Shift |
-| Elegir hueco de la barra | 1-8 / girar la rueda (hueco vacío = puños) |
+| Elegir hueco de la barra | 1-8 (hueco vacío = puños) |
 | Zoom | + / - |
 | Pantalla completa | F11 |
 | Salir al menú | Esc |
