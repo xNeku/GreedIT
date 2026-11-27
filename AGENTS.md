@@ -30,6 +30,7 @@ Si cambias una convención, actualiza este archivo en el mismo commit.
 
 ```
 assets/                 arte (solo datos, sin lógica)
+  _inbox/               buzón: zips de packs para probar (van a la rama `inbox`, no a main; ver su README)
   models/               modelos 3D (.glb/.gltf), de muestra y CC0:
     quaternius/         personaje base (Universal Base Characters), ropa modular y Universal Animation Library
     kaykit_adventurers/ armas (weapons/) y animaciones de armas (animations/KayKit_Animations.glb)

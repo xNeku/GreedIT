@@ -5,3 +5,6 @@
 export_presets.cfg
 .DS_Store
 Thumbs.db
+
+# Buzón de assets: los zips van a la rama "inbox", no a main (ver assets/_inbox/README.md)
+assets/_inbox/*.zip
