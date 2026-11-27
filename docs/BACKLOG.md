@@ -134,7 +134,10 @@ Leyenda: `[ ]` pendiente · `[~]` en curso (pon tu nombre) · `[x]` hecho
 
 - [ ] Pantalla de créditos en el juego (el pack de entorno es CC BY 4.0: hay que citar a k0rveen)
 - [ ] Reloj o indicador de la hora (si el dueño lo quiere)
-- [ ] Ajustar a mano el agarre de cada arma (GripR) y animaciones propias
+- [~] (Claude) Ajustar el agarre de cada arma, la mano cerrada y el moveset desde el Weapon Lab
+  (https://claude.ai/artifact/FH12LDbC4rbF4S6QiZcRhB): el dueño manda la receta y se pasa a los `.tres`
+  (falta: escala y offsets de la otra mano en el equipo, cerrar dedos en el juego, animación de correr por arma)
+- [x] La voltereta de la esquiva ya no se corta a medias (cabe en la esquiva + `dodge_recovery`)
 - [ ] Números de daño en el HUD (nítidos) en vez de Label3D pixelado
 - [ ] Personaje propio hecho en Blender (mismo esqueleto, ver AGENTS.md)
 - [ ] Enemigos 3D (la IA del 2D está en el historial: enemy.gd)

@@ -41,8 +41,10 @@ signal mana_changed(mana: float, max_mana: float)
 @export var plunge_speed := 30.0
 
 @export_group("Esquiva")
-@export var dodge_speed := 19.0
-@export var dodge_time := 0.24
+@export var dodge_speed := 16.0
+@export var dodge_time := 0.3
+## Segundos tras la esquiva en los que la voltereta termina (te levantas): vas más lento y no se corta la animación.
+@export var dodge_recovery := 0.15
 @export var dodge_cooldown := 0.4
 
 @export_group("Equipo")
@@ -134,6 +136,7 @@ var _alt_cooldown := 0.0
 var _spell_cooldown := 0.0
 var _dodge_timer := 0.0
 var _dodge_cooldown_timer := 0.0
+var _dodge_recovery_timer := 0.0
 var _dodge_direction := Vector3.ZERO
 var _air_time := 0.0
 var _land_timer := 0.0
@@ -300,6 +303,8 @@ func _physics_process(delta: float) -> void:
 	elif _dodge_timer > 0.0:
 		_dodge_timer -= delta
 		flat = _dodge_direction * dodge_speed
+		if _dodge_timer <= 0.0:
+			_dodge_recovery_timer = dodge_recovery
 	elif _leaping:
 		pass # el salto de ataque lleva su propia trayectoria
 	elif not on_floor:
@@ -310,7 +315,7 @@ func _physics_process(delta: float) -> void:
 			speed *= _attack.move_multiplier
 		elif is_charging():
 			speed *= 0.35
-		if _land_timer > 0.0:
+		if _land_timer > 0.0 or _dodge_recovery_timer > 0.0:
 			speed *= 0.4
 		var rate := acceleration if wish != Vector3.ZERO else friction
 		flat = flat.move_toward(wish * speed, rate * delta)
@@ -356,6 +361,7 @@ func _tick_timers(delta: float) -> void:
 	_alt_cooldown = maxf(0.0, _alt_cooldown - delta)
 	_spell_cooldown = maxf(0.0, _spell_cooldown - delta)
 	_land_timer = maxf(0.0, _land_timer - delta)
+	_dodge_recovery_timer = maxf(0.0, _dodge_recovery_timer - delta)
 	if mana < max_mana:
 		mana = minf(max_mana, mana + mana_regen * delta)
 		mana_changed.emit(mana, max_mana)
@@ -433,7 +439,8 @@ func dodge() -> void:
 	_dodge_direction = dir
 	_dodge_timer = dodge_time
 	_dodge_cooldown_timer = dodge_cooldown
-	_play("Dodge_Forward", 1.7, true)
+	# la voltereta entera cabe en la esquiva + lo que tarda en levantarse (si no, se corta a medias)
+	_play("Dodge_Forward", snappedf(avatar.clip_length("Dodge_Forward") / (dodge_time + dodge_recovery), 0.1), true)
 
 
 func _check_landing(was_on_floor: bool, delta: float) -> void:
@@ -736,7 +743,7 @@ func _update_animation(flat: Vector3, _delta: float) -> void:
 	if is_attacking():
 		_update_attack(get_physics_process_delta_time())
 		return
-	if is_charging() or _dodge_timer > 0.0 or _jump_windup > 0.0:
+	if is_charging() or _dodge_timer > 0.0 or _dodge_recovery_timer > 0.0 or _jump_windup > 0.0:
 		return
 	var current := net_anim.get_slice("#", 0)
 	if not is_on_floor():
